@@ -218,55 +218,106 @@ def fig_padding_modes(ctx: BuildContext) -> Figure:
 
 def fig_stride_grid(ctx: BuildContext) -> Figure:
     k = 2
-    fig, axes = plt.subplots(1, 3, figsize=(12, 4.2))
-    for ax, s in zip(axes, (1, 2, 3)):
-        n = IMG_STRIDE.shape[0]
-        o = output_size(n, k, 0, s)
-        sync_matrix(ax, IMG_STRIDE, title=f"stride s = {s} → output {o}×{o}", fontsize=8)
-        # One dot per kernel position, at the position's top-left cell. Drawing
-        # every kernel outline instead would overlap into an unreadable mess at
-        # stride 1, which is exactly the case the figure needs to stay legible.
+    n = IMG_STRIDE.shape[0]
+    strides = (1, 2, 3)
+    # Real convolutions, so the output values on the page are the ones a student
+    # gets by working the same example by hand.
+    outs = {}
+    for s in strides:
+        _, kflip, out, _ = conv2d_steps(IMG_STRIDE, KER_STRIDE, pad=0, stride=s)
+        assert out.shape == (output_size(n, k, 0, s),) * 2
+        outs[s] = out
+
+    # Both rows share one cell size and one axis extent, so the output really
+    # does look smaller rather than being rescaled to fill its panel.
+    lim = (-0.6, n - 0.4)
+    fig, axes = plt.subplots(2, 3, figsize=(12, 7.8))
+    for col, s in enumerate(strides):
+        o = outs[s].shape[0]
+        ax = axes[0, col]
+        sync_matrix(ax, IMG_STRIDE, title=f"input 6×6, stride s = {s}", fontsize=9)
+        # One ring per kernel position, on the position's top-left cell. Drawing
+        # every kernel outline instead overlaps into an unreadable mess at
+        # stride 1, which is exactly the case this figure has to keep legible.
         ax.scatter([oj * s for oi in range(o) for oj in range(o)],
                    [oi * s for oi in range(o) for oj in range(o)],
                    s=150, marker="o", facecolors="none", edgecolors=C["red"],
                    linewidths=1.8, zorder=4)
         ax.add_patch(plt.Rectangle((-0.5, -0.5), k, k, fill=False,
                                    ec=C["red"], lw=2.4, zorder=5))
-        ax.set_xlabel(f"o = ⌊(6 − 2)/{s}⌋ + 1 = {o}   ({o * o} positions)", fontsize=9.5)
+        ax.set_xlim(*lim); ax.set_ylim(lim[1], lim[0])
+        ax.set_xlabel(f"{o * o} kernel positions", fontsize=9.5)
+
+        ax = axes[1, col]
+        # Formula in the title, not an xlabel: the axes span the full 6-cell
+        # extent, so an xlabel would float well below the smaller output block.
+        sync_matrix(ax, outs[s], cmap="Greens", fontsize=9,
+                    title=f"output {o}×{o}     o = ⌊(6 − 2)/{s}⌋ + 1 = {o}")
+        ax.set_xlim(*lim); ax.set_ylim(lim[1], lim[0])
     png = save_mpl(fig, ctx, "stride_grid")
 
-    fig2 = go.Figure()
-    frames = []
-    for s in (1, 2, 3):
-        n = IMG_STRIDE.shape[0]
-        o = output_size(n, k, 0, s)
-        shapes = [dict(type="rect", xref="x", yref="y",
-                       x0=oj * s - 0.5, x1=oj * s + k - 0.5,
-                       y0=oi * s - 0.5, y1=oi * s + k - 0.5,
-                       line=dict(color=C["red"], width=2))
-                  for oi in range(o) for oj in range(o)]
-        frames.append(go.Frame(name=str(s), data=[
+    # Interactive: one slider over stride, input fixed and output shrinking.
+    fig2 = make_subplots(rows=1, cols=2, horizontal_spacing=0.10,
+                         subplot_titles=("input 6 × 6 — rings mark kernel positions",
+                                         "output"))
+
+    def _traces(s):
+        o = outs[s].shape[0]
+        return [
             go.Heatmap(z=IMG_STRIDE, text=IMG_STRIDE, texttemplate="%{text}",
-                       colorscale="Blues", showscale=False)],
-            traces=[0], layout=go.Layout(
-                shapes=shapes,
-                title=f"stride {s}: {o}×{o} = {o * o} kernel positions")))
-    fig2.add_trace(frames[0].data[0])
+                       colorscale="Blues", showscale=False, xgap=1, ygap=1,
+                       hoverinfo="skip", xaxis="x", yaxis="y"),
+            go.Scatter(x=[oj * s for oi in range(o) for oj in range(o)],
+                       y=[oi * s for oi in range(o) for oj in range(o)],
+                       mode="markers", hoverinfo="skip", showlegend=False,
+                       marker=dict(size=15, color="rgba(0,0,0,0)",
+                                   line=dict(color=C["red"], width=2)),
+                       xaxis="x", yaxis="y"),
+            go.Heatmap(z=outs[s], text=outs[s], texttemplate="%{text}",
+                       colorscale="Greens", showscale=False, xgap=1, ygap=1,
+                       hoverinfo="skip", xaxis="x2", yaxis="y2"),
+        ]
+
+    frames = []
+    for s in strides:
+        o = outs[s].shape[0]
+        frames.append(go.Frame(name=str(s), data=_traces(s), traces=[0, 1, 2],
+                               layout=go.Layout(shapes=[dict(
+                                   type="rect", xref="x", yref="y",
+                                   x0=-0.5, x1=k - 0.5, y0=-0.5, y1=k - 0.5,
+                                   line=dict(color=C["red"], width=3))],
+                                   title=f"stride s = {s}:  "
+                                         f"o = ⌊(6 − 2)/{s}⌋ + 1 = {o}  →  "
+                                         f"output {o} × {o} "
+                                         f"({o * o} values from {o * o} positions)")))
+    for tr, (r_, c_) in zip(_traces(strides[0]), [(1, 1), (1, 1), (1, 2)]):
+        fig2.add_trace(tr, row=r_, col=c_)
     fig2.frames = frames
-    fig2.update_layout(**slider_frames_layout([1, 2, 3], "stride s = "),
-                       shapes=frames[0].layout.shapes, title=frames[0].layout.title.text)
-    fig2.update_yaxes(autorange="reversed", showticklabels=False)
-    fig2.update_xaxes(showticklabels=False)
+    fig2.update_layout(**slider_frames_layout(strides, "stride s = "),
+                       shapes=frames[0].layout.shapes, showlegend=False,
+                       title=frames[0].layout.title.text)
+    # Identical range and square cells on both panels: that is what makes the
+    # output visibly shrink instead of being stretched to fill its own panel.
+    for c_, anchor in ((1, "x"), (2, "x2")):
+        fig2.update_xaxes(range=[-0.5, n - 0.5], showticklabels=False,
+                          showgrid=False, zeroline=False, row=1, col=c_)
+        fig2.update_yaxes(range=[n - 0.5, -0.5], showticklabels=False,
+                          showgrid=False, zeroline=False,
+                          scaleanchor=anchor, scaleratio=1, row=1, col=c_)
     return Figure("stride_grid",
-                  "Stride is how far the kernel moves between positions. A 6 × 6 input "
-                  "with a 2 × 2 kernel and no padding gives a 5 × 5 output at stride 1, "
-                  "a 3 × 3 output at stride 2 and a 2 × 2 output at stride 3. Each "
-                  "circle marks the top-left cell of one kernel position, and the bold "
-                  "square shows the kernel itself at the first position; the positions "
-                  "thin out from 25 to 9 to 4. A larger stride therefore means both a "
-                  "smaller output and less computation, which is how convolutional "
-                  "networks downsample without a separate pooling layer.",
-                  png=png, html=plotly_html(fig2, height=460), kind="plotly")
+                  "Stride is how far the kernel moves between positions. The same "
+                  "6 × 6 input is convolved with the 2 × 2 kernel "
+                  f"{KER_STRIDE.tolist()} at three strides, with no padding. Top row: "
+                  "each ring marks the top-left cell of one kernel position and the "
+                  "bold square is the kernel at the first position, so the positions "
+                  "thin out from 25 to 9 to 4. Bottom row: the resulting output, drawn "
+                  "at the same cell size so the shrinkage from 5 × 5 to 3 × 3 to "
+                  "2 × 2 is the real thing rather than a change of scale. A larger "
+                  "stride therefore gives both a smaller output and less computation, "
+                  "which is how convolutional networks downsample without a separate "
+                  "pooling layer. Drag the slider in the interactive version to watch "
+                  "the output shrink.",
+                  png=png, html=plotly_html(fig2, height=470), kind="plotly")
 
 
 def fig_pooling_ops(ctx: BuildContext) -> Figure:
