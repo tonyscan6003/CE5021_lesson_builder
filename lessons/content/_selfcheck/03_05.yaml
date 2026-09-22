@@ -1,0 +1,32 @@
+- q: "An image is blurred with σ = 3 and then with σ = 4. The result equals a single blur with σ ="
+  options:
+    - "7"
+    - "5"
+    - "12"
+    - "3.5"
+  answer: 1
+  explain: "Successive Gaussians compose as √(σ₁² + σ₂²) = √(9 + 16) = 5."
+- q: "Why can a heavily blurred image be subsampled without losing important information?"
+  options:
+    - "Because blurring makes the image binary"
+    - "Because the blur has removed the fine detail, so the remaining content is represented by fewer samples"
+    - "Because subsampling sharpens it again"
+    - "It cannot be subsampled"
+  answer: 1
+  explain: "Blurring band-limits the image, which is exactly the condition for safe subsampling from the sampling theorem."
+- q: "In a scale space built with a pyramid, an octave is"
+  options:
+    - "a single blurred image"
+    - "the set of scales that share one subsampling level"
+    - "eight keypoints"
+    - "the original image"
+  answer: 1
+  explain: "Within an octave scales are produced by successive blurs; a subsampling by two starts the next octave."
+- q: "What extra step is needed when keypoints are found in a subsampled octave?"
+  options:
+    - "Re-running the detector at full resolution"
+    - "Interpolating their positions back to the coordinates of the original image"
+    - "Discarding them"
+    - "Rotating them"
+  answer: 1
+  explain: "Positions in a subsampled image must be scaled and interpolated to locate the keypoint in the full-size image."

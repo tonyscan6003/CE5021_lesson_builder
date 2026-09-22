@@ -1,0 +1,48 @@
+- q: "The Prewitt X-direction kernel responds most strongly to"
+  options:
+    - "horizontal edges"
+    - "vertical edges"
+    - "diagonal edges only"
+    - "flat regions"
+  answer: 1
+  explain: "The X kernel differentiates along rows, so it detects intensity changes across vertical edges."
+- q: "Why is a Gaussian smoothing step applied before a derivative edge detector?"
+  options:
+    - "To make the edges thicker"
+    - "To suppress noise, which would otherwise produce many false edges"
+    - "To convert the image to binary"
+    - "To increase the image resolution"
+  answer: 1
+  explain: "Derivative filters amplify rapid changes, including noise; smoothing first removes the false responses."
+- q: "What distinguishes the Sobel kernel from the Prewitt kernel?"
+  options:
+    - "Sobel detects horizontal edges and Prewitt vertical ones"
+    - "Sobel includes an averaging component [1 2 1] along the edge, reducing noise sensitivity"
+    - "Sobel is a second-order operator"
+    - "Sobel needs no smoothing at all"
+  answer: 1
+  explain: "Sobel X = [1 2 1]ᵀ ⊗ [1 0 −1]: the same central difference combined with averaging."
+- q: "Gx = 3 and Gy = 4 at a pixel. The gradient magnitude is"
+  options:
+    - "7"
+    - "5"
+    - "1"
+    - "12"
+  answer: 1
+  explain: "|G| = √(3² + 4²) = 5."
+- q: "A Gaussian derivative filter with a large σ"
+  options:
+    - "responds to fine, small-scale edges"
+    - "responds only to coarse, large-scale edges"
+    - "is identical to the Laplacian"
+    - "produces no output"
+  answer: 1
+  explain: "Large σ smooths away fine structure before differentiating, leaving only the coarse edges."
+- q: "Where does the Laplacian of an edge cross zero?"
+  options:
+    - "At the true position of the edge"
+    - "One pixel to the left of the edge"
+    - "It never crosses zero"
+    - "At the image border"
+  answer: 0
+  explain: "The second derivative has a positive-negative pair around an edge with its zero crossing at the edge itself."

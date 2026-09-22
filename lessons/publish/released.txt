@@ -1,0 +1,53 @@
+# Release manifest for the student-facing lesson site.
+#
+# One lesson id per line. Only the lessons listed here are built into the
+# published site: no page or figure is written for any other lesson, the
+# previous/next navigation skips them, and they appear greyed out as
+# "coming soon" on the index and in the section sidebar.
+#
+# To release more lessons, uncomment their lines and run:
+#   lessons/publish/publish_site.sh --update
+#
+# Removing a line un-publishes that lesson on the next --update.
+
+# Section 1 — Digital images and filtering
+01_01
+01_02
+01_03
+01_04
+01_05
+01_06
+01_07
+
+# Section 2 — Edges, corners and segmentation
+# 02_01
+# 02_02
+# 02_03
+# 02_04
+# 02_05
+
+# Section 3 — Features and descriptors
+# 03_01
+# 03_02
+# 03_03
+# 03_04
+# 03_05
+
+# Section 4 — Object detection
+# 04_01
+# 04_02
+# 04_03
+# 04_04
+# 04_05
+# 04_06
+
+# Section 5 — Facial recognition
+# 05_01
+# 05_02
+# 05_03
+# 05_04
+# 05_05
+
+# Section 6 — Bag of features
+# 06_01
+# 06_02

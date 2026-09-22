@@ -1,0 +1,103 @@
+:root {
+  --ink: #1f2933;
+  --muted: #5f6b7a;
+  --line: #e1e5ea;
+  --accent: #0072b2;
+  --accent-soft: #e8f1f8;
+  --bg: #ffffff;
+  --bg-alt: #f6f8fa;
+  --ok: #009e73;
+  --bad: #d55e00;
+  --max: 860px;
+}
+* { box-sizing: border-box; }
+html { color-scheme: light; }
+body { margin: 0; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; background: var(--bg-alt); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { overflow-x: auto; background: var(--bg-alt); padding: 0.8rem 1rem; border-radius: 6px; }
+
+.topbar { position: sticky; top: 0; z-index: 10; display: flex; gap: 1rem; align-items: baseline; padding: 0.6rem 1.25rem; background: var(--bg); border-bottom: 1px solid var(--line); }
+.brand { font-weight: 700; color: var(--ink); }
+.crumb { color: var(--muted); font-size: 0.9rem; }
+
+.layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+.sidebar { position: sticky; top: 3.5rem; align-self: start; font-size: 0.88rem; max-height: calc(100vh - 4rem); overflow-y: auto; }
+.sidebar ul { list-style: none; margin: 0 0 1.5rem; padding: 0; }
+.sidebar li { margin: 0.25rem 0; }
+.sidebar li.current span { font-weight: 600; }
+.toc-title { margin: 0 0 0.4rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+.lesson { max-width: var(--max); min-width: 0; }
+.lesson.index { margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+.kicker { margin: 0; color: var(--muted); font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; }
+h1 { font-size: 2rem; line-height: 1.2; margin: 0.2rem 0 0.6rem; }
+h2 { font-size: 1.4rem; margin: 2.2rem 0 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+h3 { font-size: 1.12rem; margin: 1.6rem 0 0.4rem; }
+h4 { font-size: 1rem; margin: 0 0 0.6rem; }
+.summary { color: var(--muted); font-size: 1.05rem; margin-top: 0; }
+p { margin: 0.7rem 0; }
+table { border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem; }
+th, td { border: 1px solid var(--line); padding: 0.4rem 0.7rem; text-align: left; }
+th { background: var(--bg-alt); }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.2rem 0; }
+
+figure.lesson-fig { margin: 1.5rem 0; padding: 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+figure.lesson-fig img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+figure.lesson-fig figcaption { margin-top: 0.6rem; font-size: 0.9rem; color: var(--muted); }
+figure.lesson-fig figcaption b { color: var(--ink); }
+.credit { font-size: 0.8rem; color: var(--muted); }
+.credits { font-size: 0.85rem; color: var(--muted); }
+.credits ul { padding-left: 1.2rem; }
+.fig-toggle { margin-left: 0.5rem; font: inherit; font-size: 0.8rem; color: var(--accent); background: var(--accent-soft); border: 1px solid transparent; border-radius: 999px; padding: 0.1rem 0.7rem; cursor: pointer; }
+.fig-toggle:hover { border-color: var(--accent); }
+.fig-interactive { margin-top: 0.5rem; }
+figure.lesson-fig.show-interactive img { display: none; }
+
+.widget { margin-top: 0.8rem; padding: 0.75rem 1rem; background: var(--bg-alt); border-radius: 6px; font-size: 0.95rem; }
+.widget-row { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin: 0.5rem 0; }
+.widget label { display: inline-flex; align-items: center; gap: 0.4rem; }
+.widget input[type=number] { width: 4.5rem; font: inherit; padding: 0.15rem 0.3rem; }
+.widget-out { font-family: ui-monospace, monospace; font-size: 0.95rem; }
+.muted { color: var(--muted); }
+
+.worked-example { margin: 1.5rem 0; padding: 0.9rem 1.1rem; border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; }
+.worked-example h4 { color: var(--accent); }
+.worked-example details summary { cursor: pointer; font-weight: 600; margin-top: 0.5rem; }
+.worked-example details[open] summary { margin-bottom: 0.5rem; }
+.worked-example table { font-size: 0.9rem; background: var(--bg); }
+.worked-example img { max-width: 420px; height: auto; display: block; margin: 0.5rem 0; }
+
+.selfcheck { margin-top: 2rem; }
+.sc-q { margin: 1rem 0; padding: 0.7rem 0.9rem; border: 1px solid var(--line); border-radius: 8px; }
+.sc-text { margin: 0 0 0.4rem; font-weight: 600; }
+.sc-options { list-style: none; margin: 0; padding: 0; }
+.sc-options li { margin: 0.2rem 0; }
+.sc-options label { cursor: pointer; }
+.sc-feedback { margin: 0.4rem 0 0; font-weight: 600; }
+.sc-explain { margin: 0.2rem 0 0; color: var(--muted); font-size: 0.92rem; }
+.sc-q.correct { border-color: var(--ok); }
+.sc-q.correct .sc-feedback { color: var(--ok); }
+.sc-q.wrong { border-color: var(--bad); }
+.sc-q.wrong .sc-feedback { color: var(--bad); }
+.sc-check { font: inherit; padding: 0.4rem 1rem; color: #fff; background: var(--accent); border: 0; border-radius: 6px; cursor: pointer; }
+
+.practice { margin-top: 2rem; }
+.practice code { margin-right: 0.15rem; }
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin: 3rem 0 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.foot { color: var(--muted); font-size: 0.8rem; margin-top: 2rem; }
+
+.index-section h2 { border-top: 0; margin-top: 1.6rem; }
+.lesson-list { padding-left: 1.4rem; }
+.lesson-list li { margin: 0.35rem 0; }
+.lesson-list .lesson-summary { display: block; color: var(--muted); font-size: 0.9rem; }
+.lesson-list li.pending { color: var(--muted); }
+.section-nav li.pending span { color: var(--muted); }
+.tag { font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; background: var(--bg-alt); border-radius: 999px; padding: 0.05rem 0.5rem; margin-left: 0.3rem; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; max-height: none; }
+  .toc { display: none; }
+}

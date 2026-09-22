@@ -1,0 +1,21 @@
+# CE6021 lesson builder — figure engines, site builder and interactive examples.
+# Installed into the devcontainer image by .devcontainer/Dockerfile.
+
+# Figure engines and interactive examples
+numpy
+scipy
+opencv-python-headless<5   # 4.x keeps HOGDescriptor and the Haar cascade files used in Section 4
+scikit-image
+scikit-learn
+matplotlib
+plotly
+streamlit
+
+# Site builder
+markdown-it-py
+jinja2
+pyyaml
+
+# Slide/script PDF -> markdown conversion (lessons/build/convert_pdfs.py)
+pymupdf
+pymupdf4llm

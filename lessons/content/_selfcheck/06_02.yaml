@@ -1,0 +1,72 @@
+- q: "Which classifier is typically trained on bag of features vectors, and with which kernel?"
+  options:
+    - "k nearest neighbours with a Euclidean metric"
+    - "A support vector machine, usually with a radial basis function kernel"
+    - "A decision tree"
+    - "Naive Bayes"
+  answer: 1
+  explain: "The RBF kernel allows a more complex decision boundary to be learnt in the histogram space."
+- q: "What overhead does the bag of features add before any classifier can be trained?"
+  options:
+    - "The images must all be the same size"
+    - "The visual vocabulary has to be built first, by describing and clustering features across a large dataset"
+    - "Every image must be labelled twice"
+    - "The classifier must be cross-validated"
+  answer: 1
+  explain: "The vocabulary step is unsupervised, but it still has to happen before training."
+- q: "What does the spatial pyramid add to the representation?"
+  options:
+    - "More visual words in the vocabulary"
+    - "Spatial information, by forming a histogram per grid cell at several levels and concatenating them with weights"
+    - "Colour information"
+    - "A second classifier"
+  answer: 1
+  explain: "Finer levels are weighted more heavily, and the SVM then uses the pyramid match kernel."
+- q: "With a 200-word vocabulary and three pyramid levels of 1, 4 and 16 cells, how long is the term vector?"
+  options:
+    - "200"
+    - "600"
+    - "4200"
+    - "3200"
+  answer: 2
+  explain: "It is 200 x (1 + 4 + 16) = 4200, so the vector grows by a factor of four with every level added."
+- q: "How does bag-of-features retrieval differ from content-based image retrieval?"
+  options:
+    - "It is supervised, while content-based retrieval is unsupervised"
+    - "It ranks by similarity of term vectors and needs no labels, while content-based retrieval classifies the images first and matches labels"
+    - "It only works on video frames"
+    - "There is no difference"
+  answer: 1
+  explain: "Content-based retrieval needs labelled training data in advance; the bag of features does not."
+- q: "What does an inverted file index store?"
+  options:
+    - "For each image, the list of visual words it contains"
+    - "For each visual word, the list of database images that contain it"
+    - "The cluster centres of the vocabulary"
+    - "The tf-idf weights of every word"
+  answer: 1
+  explain: "It is the same information the other way round, and it lets a query touch only the images that share a word with it."
+- q: "What extra step does Video Google add after gathering candidate frames?"
+  options:
+    - "It retrains the vocabulary"
+    - "A spatial consistency check that the matching visual words lie close together"
+    - "It converts the frames to greyscale"
+    - "It applies a Gaussian blur"
+  answer: 1
+  explain: "Words clustered together in the frame are evidence of an object rather than a coincidental match."
+- q: "In a vocabulary tree with branching factor k and depth L, assigning one descriptor to a word costs about"
+  options:
+    - "k to the power L comparisons, one per visual word"
+    - "k times L comparisons, k at each level"
+    - "one comparison"
+    - "L comparisons"
+  answer: 1
+  explain: "That is what makes the cost logarithmic in the vocabulary size and supports sub-second retrieval over a million images."
+- q: "Which is a genuine disadvantage of the bag of features?"
+  options:
+    - "It cannot be computed from greyscale images"
+    - "The vocabulary has no semantic meaning and spatial layout is discarded, so it is unsuited to detection and localisation"
+    - "It requires a labelled vocabulary"
+    - "It cannot tolerate any viewpoint change"
+  answer: 1
+  explain: "The spatial pyramid recovers some of the spatial information for classification, but not enough for localisation."

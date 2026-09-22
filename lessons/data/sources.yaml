@@ -1,0 +1,271 @@
+# Source images for the lesson figures. Run build/fetch_images.py to download
+# scaled copies and write credits.yaml from the Commons API.
+#
+# `note` records where the image came from in the old slides (lesson and
+# footnote number) so the attribution history is traceable.
+
+# --- carried forward from the old slides -----------------------------------
+sphinx:
+  commons: "Great_Sphinx_of_Giza_-_20080716a.jpg"
+  width: 1280
+  author: "Barcex"
+  note: "old slides 1.4 (x); also lab data"
+sacre_coeur:
+  commons: "Le sacre Coeur.jpg"
+  width: 1024
+  author: "Tonchino"
+  trim_border: true
+  note: "lab data image (cropped copy); Commons author field is empty"
+cat:
+  commons: "Six weeks old cat (aka).jpg"
+  width: 1024
+  author: "André Karwath"
+  note: "old slides 1.1 (iv)"
+lion:
+  commons: "Lion d'Afrique.jpg"
+  width: 1024
+  note: "old slides 1.1 (viii)"
+macaw:
+  commons: "Ara ararauna (Linnaeus 1758).jpg"
+  width: 1024
+  note: "old slides 1.3 (v)"
+lcd_monitor:
+  commons: "LG L194WT-SF LCD monitor.jpg"
+  width: 1024
+  author: "florisla"
+  note: "old slides 1.1 (x)"
+lcd_subpixels:
+  commons: "LCD subpixels.jpg"
+  width: 800
+  note: "macro of RGB sub-pixels; pairs with the monitor photo from old slides 1.1 (x)"
+helicopter:
+  commons: "Bell alfa vysocina.jpg"
+  width: 1024
+  note: "old slides 1.1, rolling-shutter example"
+sensor_noise:
+  commons: "ImageNoise Dynax7D iso100vs3200.jpg"
+  width: 640
+  author: "Florian Lindner"
+  note: "old slides 1.1 (xi)"
+sail:
+  commons: "Creux d une voile.jpg"
+  width: 1024
+  note: "old slides 1.3 (ii)"
+moire_bricks:
+  commons: "Moire pattern of bricks.jpg"
+  width: 622
+  author: "Maksim"
+  note: "old slides 1.3 (vi) - full resolution, no moire visible"
+moire_bricks_small:
+  commons: "Moire pattern of bricks small.jpg"
+  width: 400
+  author: "Maksim"
+  note: "the downsampled companion, where the moire pattern appears"
+owl:
+  commons: "Eastern screech owl (44327).jpg"
+  width: 1024
+  note: "old slides 3.2 (i)"
+butterfly:
+  commons: "Butterfly 56 (4529057073).jpg"
+  width: 1024
+  note: "old slides 3.x (ix)"
+alpaca:
+  commons: "Lama LLama Alpaca 06.jpg"
+  width: 1024
+  note: "old slides 1.4 (iv)"
+pyramids:
+  commons: "All Gizah Pyramids.jpg"
+  width: 1024
+  note: "old slides 1.4 (ii)"
+agathe_cat:
+  commons: "Agathe the cat.jpg"
+  width: 1024
+  note: "old slides 4.x (i)"
+baby_toys:
+  commons: "Baby toys.jpg"
+  width: 1024
+  note: "old slides 3.1 (i)"
+notre_dame_a:
+  commons: "Notre-Dame de Paris 2792x2911.jpg"
+  width: 1024
+  author: "Jérôme Blum"
+  note: "old slides 3.x (i)"
+notre_dame_b:
+  commons: "Notre Dame Cathedral - Paris.jpg"
+  width: 1024
+  author: "Christopher Kramer"
+  note: "old slides 3.x (ii)"
+galvani:
+  commons: "Bologna Statue of Galvani.jpg"
+  width: 1024
+  note: "old slides 3.1 (ii)"
+plate_dutch:
+  commons: "Chinese - Plate with Dutch Couple - Walters 492419.jpg"
+  width: 1024
+  author: "Walters Art Museum"
+  note: "old slides 3.1 (i)"
+fruit:
+  commons: "Nuts, Apples & Oranges.jpg"
+  width: 1024
+  note: "old slides 2.x (ix)"
+monarch:
+  commons: "Monarch butterfly in BBG (84685).jpg"
+  width: 1024
+  note: "old slides 3.x (v)"
+trevi_detail:
+  commons: "Detail Neptune Trevi fountain Rome Italy.jpg"
+  width: 1024
+  note: "old slides 3.4 (xiii)"
+trevi:
+  commons: "Trevi fountain in Rome.jpg"
+  width: 1024
+  note: "old slides 3.4 (xii)"
+cow_field:
+  commons: "Cow in a field.jpg"
+  width: 1024
+  note: "old slides 2.x (xiv)"
+dairy_cows:
+  commons: "Dairy cows on pasture in Ireland.jpg"
+  width: 1024
+  note: "old slides 2.x (xv)"
+workbench:
+  commons: "Garage Workbench Clutter.jpg"
+  width: 640
+  note: "old slides 4.1 (xvii)"
+horses:
+  commons: "Wildlife (Horses in France).jpg"
+  width: 1024
+  note: "old slides 4.1 (xviii)"
+chairs:
+  commons: "Chairs in The Danish Museum of Art & Design.jpg"
+  width: 1024
+  note: "old slides 4.1 (xix)"
+crowd:
+  commons: "Crowd (613445810).jpg"
+  width: 1024
+  author: "James Cridland"
+  note: "old slides 4.6 (i)"
+sheep:
+  commons: "7 sau på voll.JPG"
+  width: 1024
+  note: "old slides 4.x (i)"
+labrador:
+  commons: "YellowLabradorLooking new.jpg"
+  width: 700
+  author: "Djmirko"
+  note: "old slides 4.x (ii)"
+tanker:
+  commons: "Atlas Maritime's Mitera Marigo Aframax Oil Tanker.jpg"
+  width: 567
+  note: "old slides 4.1 (vi)"
+minivan:
+  commons: "Wiki cars 257.jpg"
+  width: 1024
+  note: "old slides 4.1 (vii)"
+apollo_statue:
+  commons: "MANNapoli 6281 Sitting Apollo Farnese.jpg"
+  width: 1024
+  note: "old slides 4.4 (iii)"
+faces_man:
+  commons: "Different faces of a man.jpg"
+  width: 724
+  note: "old slides 5.1 (ii)"
+faces_crumb:
+  commons: "My Favourite Faces (Imagicity 640).jpg"
+  width: 1024
+  note: "old slides 5.1 (x)"
+friends:
+  commons: "Friends become family.jpg"
+  width: 1024
+  note: "old slides 4.6 (i)"
+jimmy:
+  commons: "Jimmy answering questions.jpg"
+  width: 1024
+  author: "Beatrice Murch"
+  note: "old slides 5.x (iv)"
+arlit_street:
+  commons: "Niger, Arlit (18), street scene.jpg"
+  width: 1024
+  note: "old slides 4.1 (viii)"
+balloons:
+  commons: "Balloony sky.jpg"
+  width: 1024
+  note: "old slides 2.3 (viii)"
+rubiks_cube:
+  commons: "Rubics Cube.JPG"
+  width: 445
+  note: "old slides 1.4 (xii)"
+cycle_track:
+  commons: "Fietspad naar campus Diepenbeek.JPG"
+  width: 1024
+  note: "old slides 2.x (iv)"
+liege_panorama:
+  commons: "Panorama Liege North.jpg"
+  width: 1600
+  note: "old slides 3.1 (iii)"
+
+# --- new Commons images replacing unattributed slide images ------------------
+brickwork:
+  commons: "Flemish bond at the Georgian House, Kilkenny.jpg"
+  width: 1024
+  note: "replaces 'Brickwork in Flemish Bond' (Dickson) which could not be located"
+zebra:
+  commons: "Common zebra 1.jpg"
+  width: 1024
+  author: "Gusjer"
+  note: "old slides 1.3 (iii)"
+kitten_hiding:
+  commons: "KittenHiding.JPG"
+  width: 1024
+  note: "old slides 4.1 (xvi)"
+handwriting:
+  commons: "Handwritten letter of Guru Gobind Singh 01.png"
+  width: 1024
+  note: "high-frequency text example (replaces scikit-image 'text' of undocumented origin)"
+office_facade:
+  commons: "Gray office building facade (Unsplash).jpg"
+  width: 1024
+  note: "repeating-window pattern for corners/Hough"
+starfish:
+  commons: "Starfish - Cannon Beach (213457447).jpg"
+  width: 1024
+  note: "foreground/background segmentation example"
+
+# --- scikit-image samples with documented provenance --------------------------
+skimage_astronaut:
+  skimage: astronaut
+  title: "Astronaut Eileen Collins"
+  author: "NASA"
+  licence: "Public domain"
+  licence_url: "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+  source_url: "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.astronaut"
+skimage_hubble_deep_field:
+  skimage: hubble_deep_field
+  title: "Hubble eXtreme Deep Field"
+  author: "NASA, ESA"
+  licence: "Public domain"
+  licence_url: "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+  source_url: "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.hubble_deep_field"
+skimage_brick:
+  skimage: brick
+  title: "Bricks 25"
+  author: "CC0Textures"
+  licence: "CC0 1.0"
+  licence_url: "https://creativecommons.org/publicdomain/zero/1.0/"
+  source_url: "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.brick"
+
+# --- external datasets fetched by the engines ---------------------------------
+olivetti:
+  dataset: olivetti_faces
+  title: "The Database of Faces (Olivetti / AT&T)"
+  author: "AT&T Laboratories Cambridge"
+  licence: "free for research use"
+  licence_url: "https://cam-orl.co.uk/facedatabase.html"
+  source_url: "https://scikit-learn.org/stable/datasets/real_world.html#the-olivetti-faces-dataset"
+sklearn_digits:
+  dataset: sklearn_digits
+  title: "Optical Recognition of Handwritten Digits (UCI ML Repository)"
+  author: "E. Alpaydin and C. Kaynak"
+  licence: "CC BY 4.0"
+  licence_url: "https://creativecommons.org/licenses/by/4.0/"
+  source_url: "https://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits"

@@ -1,0 +1,48 @@
+- q: "The value of a Haar-like feature is"
+  options:
+    - "the average pixel value in the window"
+    - "the sum of pixels under its white rectangles minus the sum under its black rectangles"
+    - "the number of edges in the window"
+    - "the gradient magnitude at the centre"
+  answer: 1
+  explain: "Each feature measures a contrast difference between adjacent rectangles."
+- q: "Approximately how many candidate features exist in a 24 × 24 detector window?"
+  options:
+    - "24"
+    - "576"
+    - "6,000"
+    - "over 180,000"
+  answer: 3
+  explain: "All scalings and positions of the basic types give more than 180,000; AdaBoost selects about 6,000."
+- q: "Using the integral image, the sum of any rectangle needs how many lookups?"
+  options:
+    - "One per pixel of the rectangle"
+    - "Four"
+    - "Two"
+    - "It depends on the rectangle's size"
+  answer: 1
+  explain: "sum = A − B − C + D from the four corner entries, independent of size."
+- q: "Each entry of the integral image holds"
+  options:
+    - "the pixel value at that position"
+    - "the sum of all pixels above and to the left, inclusive"
+    - "the gradient at that position"
+    - "the row sum only"
+  answer: 1
+  explain: "It is built by accumulating down the columns and then along the rows."
+- q: "AdaBoost is used in Viola-Jones to"
+  options:
+    - "compute the integral image"
+    - "select the most discriminative features and combine them into a strong classifier"
+    - "resize the detector window"
+    - "detect eyes"
+  answer: 1
+  explain: "Each rectangle feature is a weak classifier; boosting selects and weights the best ones."
+- q: "Why are classifiers with the lowest false-negative rate placed early in the cascade?"
+  options:
+    - "Because they are the most accurate overall"
+    - "So that real faces are almost never rejected early while most background windows are discarded quickly"
+    - "Because they are the slowest"
+    - "To reduce the number of stages"
+  answer: 1
+  explain: "Early stages must not miss faces; they may pass some background, which later stages reject."

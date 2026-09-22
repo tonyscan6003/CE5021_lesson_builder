@@ -1,0 +1,48 @@
+- q: "A signal is sampled at 1000 Hz. A component at 800 Hz will appear in the samples at which frequency?"
+  options:
+    - "800 Hz"
+    - "500 Hz"
+    - "200 Hz"
+    - "It disappears"
+  answer: 2
+  explain: "Frequencies above fs/2 = 500 Hz are mirrored about fs/2, so 800 Hz aliases to 1000 − 800 = 200 Hz."
+- q: "What is the purpose of the optical low-pass filter fitted over many camera sensors?"
+  options:
+    - "To increase sharpness"
+    - "To remove fine patterns that the pixel grid cannot sample, preventing moiré"
+    - "To correct lens distortion"
+    - "To reduce sensor noise"
+  answer: 1
+  explain: "It slightly blurs the finest detail before sampling, the same role as a low-pass filter before an analogue-to-digital converter."
+- q: "Which interpolation kernel can, in theory, reconstruct a band-limited signal from its samples exactly?"
+  options:
+    - "Box (replication)"
+    - "Triangle (linear)"
+    - "Sinc"
+    - "Gaussian"
+  answer: 2
+  explain: "The sinc is a perfect band-limiting filter with a cut-off exactly at fs/2, removing all image frequencies (Whittaker–Shannon)."
+- q: "Why do 'image frequencies' matter when resampling?"
+  options:
+    - "They make the digital signal louder"
+    - "If the interpolation filter does not remove them, they alias when the signal is sampled again"
+    - "They only matter for colour images"
+    - "They are removed automatically by resampling"
+  answer: 1
+  explain: "Residual image frequencies left by a poor interpolation filter (such as replication) are sampled by the new grid and produce distortion."
+- q: "In area-weighted bilinear interpolation, the weight of each of the four surrounding pixels is"
+  options:
+    - "the area of the rectangle between the new pixel and that corner"
+    - "the area of the rectangle diagonally opposite that corner"
+    - "the distance from the new pixel to that corner"
+    - "always one quarter"
+  answer: 1
+  explain: "The nearer a corner is to the new pixel, the larger the rectangle diagonally opposite it, so nearer pixels get more weight."
+- q: "Faint ripples next to a sharp edge after sinc (Lanczos) interpolation are caused by"
+  options:
+    - "quantisation noise"
+    - "the Gibbs phenomenon from truncating the sinc kernel"
+    - "the Bayer filter"
+    - "using too many neighbours"
+  answer: 1
+  explain: "A truncated sinc no longer has a perfect frequency response and rings on step edges."

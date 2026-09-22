@@ -1,0 +1,48 @@
+- q: "When a small window is shifted along an edge, the change in intensity E is"
+  options:
+    - "large"
+    - "close to zero"
+    - "negative"
+    - "undefined"
+  answer: 1
+  explain: "Along the edge the intensities do not change; only shifts across the edge give a large E. At a corner every shift gives a large E."
+- q: "After the Taylor expansion of E, which terms remain?"
+  options:
+    - "Only the zero-order term"
+    - "Only the first-order (gradient) term"
+    - "Only the second-order (Hessian) term"
+    - "All three"
+  answer: 2
+  explain: "E and its first derivatives vanish at zero shift, leaving the quadratic term built from products of image gradients."
+- q: "The second-moment matrix M = [[A, C], [C, B]] has eigenvalues λ₁ = 9, λ₂ = 0.1. The point is most likely"
+  options:
+    - "a corner"
+    - "an edge"
+    - "a flat region"
+    - "noise"
+  answer: 1
+  explain: "One large and one small eigenvalue means curvature in one direction only: an edge."
+- q: "The Harris response is R = det M − k (trace M)². With A = 4, B = 4, C = 0 and k = 0.05, R equals"
+  options:
+    - "16"
+    - "12.8"
+    - "0"
+    - "−3.2"
+  answer: 1
+  explain: "det M = 16, trace M = 8, so R = 16 − 0.05 × 64 = 12.8, a corner."
+- q: "Why does the Harris algorithm use det and trace instead of the eigenvalues themselves?"
+  options:
+    - "Eigenvalues cannot be computed for 2 × 2 matrices"
+    - "det and trace are cheap to compute directly from A, B and C and encode the same information"
+    - "Eigenvalues are always negative"
+    - "det and trace are rotation dependent"
+  answer: 1
+  explain: "det M = λ₁λ₂ and trace M = λ₁ + λ₂, so R can be evaluated at every pixel without a decomposition."
+- q: "The Harris detector is invariant to rotation and translation but not to"
+  options:
+    - "brightness"
+    - "scale"
+    - "the choice of k"
+    - "the image format"
+  answer: 1
+  explain: "The fixed window size means only corners of one size are detected; large smooth corners are seen as edges."

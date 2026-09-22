@@ -1,0 +1,48 @@
+- q: "Why does using all the raw pixels of a face as its representation fail?"
+  options:
+    - "Pixels cannot be compared"
+    - "Very high dimensionality with many classes and few samples each brings the curse of dimensionality, and the long vectors are slow to match"
+    - "Faces are not rectangular"
+    - "The mean face cannot be computed"
+  answer: 1
+  explain: "It is also the slowest possible option, since every comparison uses vectors thousands of elements long."
+- q: "Eigenfaces are"
+  options:
+    - "the average of all the faces in the database"
+    - "the eigenvectors of the sample covariance matrix of the face database, which can be reshaped and displayed as images"
+    - "the class labels"
+    - "the weight vectors of each face"
+  answer: 1
+  explain: "They have the same length as a face vector, hence the name."
+- q: "The weight vector w of a face is obtained by"
+  options:
+    - "sorting its pixels"
+    - "multiplying the mean-centred face by the matrix of K eigenfaces"
+    - "averaging its rows"
+    - "thresholding the face"
+  answer: 1
+  explain: "The weights are the face's coordinates in the K-dimensional eigenface space, and they are what the database stores."
+- q: "A database of N faces yields at most how many eigenfaces?"
+  options:
+    - "N"
+    - "N - 1"
+    - "4096"
+    - "K"
+  answer: 1
+  explain: "Only K of them are retained for the representation."
+- q: "Recognising a query face with Eigenfaces amounts to"
+  options:
+    - "training a neural network"
+    - "projecting the query onto the stored eigenfaces and finding the nearest stored weight vector"
+    - "running the Canny edge detector"
+    - "recomputing the eigenfaces"
+  answer: 1
+  explain: "Unknown faces can be rejected when the nearest distance is too large, or when the nearest and second-nearest are too similar."
+- q: "The main limitation of the Eigenface method is that PCA is"
+  options:
+    - "too slow to compute"
+    - "optimal for reconstruction but not for discriminating between faces, because it ignores the class labels"
+    - "unable to reduce dimensionality"
+    - "only defined for colour images"
+  answer: 1
+  explain: "This is exactly what linear discriminant analysis and the Fisherface method address."

@@ -1,0 +1,48 @@
+- q: "In the term h[n − k] of the convolution sum, what does the minus sign in front of k do?"
+  options:
+    - "Shifts the kernel to the left"
+    - "Reverses the kernel"
+    - "Negates the kernel values"
+    - "Nothing; it is a convention"
+  answer: 1
+  explain: "Writing h[n − k] = h[−(k − n)] shows that the kernel is reversed (by the minus sign) and shifted by n."
+- q: "For which kernels do convolution and cross-correlation give the same result?"
+  options:
+    - "All kernels"
+    - "Kernels with all positive values"
+    - "Symmetric kernels, where reversal leaves the kernel unchanged"
+    - "Kernels of odd size"
+  answer: 2
+  explain: "Convolution reverses the kernel and cross-correlation does not; if reversal changes nothing (a symmetric kernel) the two coincide."
+- q: "A 7 × 7 image is convolved with a 3 × 3 kernel using valid padding and unit stride. What is the output size?"
+  options:
+    - "9 × 9"
+    - "7 × 7"
+    - "5 × 5"
+    - "4 × 4"
+  answer: 2
+  explain: "With no padding, o = (i − k) + 1 = (7 − 3) + 1 = 5."
+- q: "How many rings of zero padding does 'full' convolution require for a 5 × 5 kernel?"
+  options:
+    - "1"
+    - "2"
+    - "4"
+    - "5"
+  answer: 2
+  explain: "Full padding uses p = k − 1 = 4 rings so that the kernel just overlaps the image at the extremes."
+- q: "What padding keeps the output of a 3 × 3 convolution the same size as the input (unit stride)?"
+  options:
+    - "p = 0"
+    - "p = 1"
+    - "p = 2"
+    - "p = 3"
+  answer: 1
+  explain: "For odd kernels and unit stride, same padding is p = ⌊k/2⌋ = 1."
+- q: "The first step in 2D convolution by hand is to"
+  options:
+    - "transpose the image"
+    - "flip the kernel horizontally and vertically"
+    - "normalise the kernel to sum to one"
+    - "convert the image to floating point"
+  answer: 1
+  explain: "The kernel must be reversed along both axes before it is slid over the (padded) image."

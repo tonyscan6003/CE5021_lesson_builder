@@ -1,0 +1,48 @@
+- q: "Otsu's method selects the threshold that"
+  options:
+    - "is at the midpoint of the intensity range"
+    - "maximises the between-class variance w₀w₁(μ₀ − μ₁)²"
+    - "gives exactly half the pixels in each class"
+    - "minimises the number of edges"
+  answer: 1
+  explain: "Maximising the between-class variance is equivalent to minimising the intensity spread within each class."
+- q: "Otsu's method tends to fail when"
+  options:
+    - "the image is greyscale"
+    - "the foreground object is very small compared with the background"
+    - "the histogram has two clear modes"
+    - "the image is square"
+  answer: 1
+  explain: "The method assumes comparable class sizes; with a tiny foreground it splits the background instead."
+- q: "In the watershed algorithm, where are the segment boundaries placed?"
+  options:
+    - "At the local minima"
+    - "Where water rising from two different minima would meet"
+    - "At the image centre"
+    - "Along rows of constant intensity"
+  answer: 1
+  explain: "Dams are built where two catchment basins would merge; these generally coincide with edges."
+- q: "The basic watershed over-segments an image because"
+  options:
+    - "it uses too few markers"
+    - "every local minimum, including tiny unimportant ones, becomes a flooding source"
+    - "the image is too bright"
+    - "it ignores edges"
+  answer: 1
+  explain: "Markers restrict the flooding to chosen sources such as object centres, reducing the number of regions."
+- q: "In graph-based split and merge, edges between pixels are processed"
+  options:
+    - "in random order"
+    - "in order of increasing weight, so similar pixels are merged first"
+    - "in order of decreasing weight"
+    - "only at the image border"
+  answer: 1
+  explain: "Sorting by weight ensures the most similar neighbours are considered for merging before dissimilar ones."
+- q: "Two regions are NOT merged in the Felzenszwalb algorithm when"
+  options:
+    - "their difference is small compared with their internal differences"
+    - "their difference is large compared with at least one internal difference"
+    - "they have the same number of pixels"
+    - "they are both large"
+  answer: 1
+  explain: "A large minimum edge weight between regions relative to their internal variation marks them as dissimilar."

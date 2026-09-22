@@ -1,0 +1,48 @@
+- q: "Each iteration of k-means consists of"
+  options:
+    - "assigning points to the nearest centroid, then moving each centroid to the mean of its points"
+    - "splitting every cluster in two"
+    - "removing the outliers"
+    - "choosing a new value of k"
+  answer: 0
+  explain: "Assignment and update steps alternate until the centroids stop moving."
+- q: "Why does k-means give poor image segmentations?"
+  options:
+    - "It is too slow"
+    - "It clusters in colour space and ignores pixel position, so separate objects of similar colour merge"
+    - "It cannot handle RGB data"
+    - "It always finds only two clusters"
+  answer: 1
+  explain: "Spatial location is not a feature, and k must also be chosen in advance."
+- q: "A Parzen window estimates a probability density by"
+  options:
+    - "counting samples in fixed histogram bins"
+    - "summing a kernel of bandwidth h placed on every sample"
+    - "fitting a single Gaussian"
+    - "sorting the samples"
+  answer: 1
+  explain: "This sum of kernels is equivalent to convolving the samples with the kernel."
+- q: "The mean-shift vector points"
+  options:
+    - "towards the origin of feature space"
+    - "in the direction of steepest increase of the density estimate"
+    - "away from the nearest sample"
+    - "in a random direction"
+  answer: 1
+  explain: "It is proportional to the gradient of the Parzen estimate, so following it climbs to a density maximum."
+- q: "Which is an advantage of mean shift over k-means?"
+  options:
+    - "It is faster"
+    - "The number of clusters does not need to be chosen in advance and it is robust to outliers"
+    - "It needs no parameters at all"
+    - "It only works in one dimension"
+  answer: 1
+  explain: "Its disadvantages are speed and the need to choose the bandwidth h."
+- q: "To make mean-shift segmentation produce spatially compact regions, we"
+  options:
+    - "reduce the bandwidth to zero"
+    - "add the pixel coordinates to the colour features and use a product of colour and spatial kernels"
+    - "convert the image to binary first"
+    - "run k-means afterwards"
+  answer: 1
+  explain: "Position becomes part of the feature vector, so nearby pixels are more likely to join the same cluster."

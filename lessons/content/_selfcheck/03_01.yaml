@@ -1,0 +1,40 @@
+- q: "Which of these is NOT a desirable property of a feature detector?"
+  options:
+    - "It finds features in small local regions"
+    - "It is invariant to scale and rotation"
+    - "It finds only one feature per image"
+    - "It locates keypoints accurately"
+  answer: 2
+  explain: "Detectors should find many features, even on small objects, so that matching survives occlusion and clutter."
+- q: "Why is the Harris detector not scale invariant?"
+  options:
+    - "It uses eigenvalues"
+    - "It inspects the image through a fixed-size window and so responds to corners of one size only"
+    - "It is sensitive to noise"
+    - "It cannot be applied to greyscale images"
+  answer: 1
+  explain: "A large smooth corner looks like an edge to a small window; changing the image scale changes which corners are found."
+- q: "A LoG kernel of scale σ responds most strongly to a bright disc of radius approximately"
+  options:
+    - "σ / 2"
+    - "√2 σ"
+    - "4 σ"
+    - "σ²"
+  answer: 1
+  explain: "The zero crossing of the LoG lies at radius √2 σ, so a disc of that radius matches the kernel's dark centre and bright ring."
+- q: "How does the LoG blob detector find blobs of different sizes?"
+  options:
+    - "By resizing the kernel to the image size"
+    - "By convolving with a series of LoG kernels of different σ and finding the maxima of each normalised square response"
+    - "By thresholding the image first"
+    - "By applying the Harris detector at each scale"
+  answer: 1
+  explain: "Each blob responds most strongly at the σ matching its size, and the maximum gives both its location and its scale."
+- q: "Why is the response squared and normalised before looking for maxima?"
+  options:
+    - "To make the image binary"
+    - "To make both dark and bright blobs give positive responses on a comparable scale"
+    - "To remove the Gaussian smoothing"
+    - "To halve the computation"
+  answer: 1
+  explain: "The LoG response is negative for bright blobs and positive for dark ones; squaring removes the sign and normalising makes responses comparable."

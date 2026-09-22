@@ -1,0 +1,48 @@
+- q: "Why can PCA make classification worse?"
+  options:
+    - "It adds noise to the data"
+    - "It maximises variance without using the class labels, so the projection can merge the classes"
+    - "It always increases the dimensionality"
+    - "It requires equal class sizes"
+  answer: 1
+  explain: "LDA includes the labels and finds a direction that preserves the separation instead."
+- q: "The scalar projection of a feature vector x onto a line v is"
+  options:
+    - "v + x"
+    - "v^T x"
+    - "x / |v|"
+    - "the outer product of v and x"
+  answer: 1
+  explain: "Because v^T can be taken outside the sum, the mean of the projected values of a class is v^T times that class's mean."
+- q: "Why is maximising the separation of the transformed means alone insufficient?"
+  options:
+    - "The means cannot be computed"
+    - "A class with large variance in that direction can still overlap the other class after projection"
+    - "It is too slow"
+    - "It needs three classes"
+  answer: 1
+  explain: "The scatter of each class must appear in the criterion, which is what J(v) does."
+- q: "Scatter differs from variance in that it"
+  options:
+    - "uses the median instead of the mean"
+    - "omits the 1/(n-1) normalisation factor"
+    - "is always negative"
+    - "is computed per feature only"
+  answer: 1
+  explain: "Otherwise the two are the same quantity."
+- q: "The LDA objective function J(v) is"
+  options:
+    - "the sum of the transformed scatters divided by the mean separation"
+    - "the squared separation of the transformed means divided by the sum of the transformed scatters"
+    - "the product of the class means"
+    - "the trace of the covariance matrix"
+  answer: 1
+  explain: "Maximising it pulls the means apart while keeping each class tight."
+- q: "With S_W the within-class scatter, the solution for the best line is"
+  options:
+    - "v* = S_W (mu1 - mu2)"
+    - "v* = S_W^-1 (mu1 - mu2)"
+    - "v* = mu1 + mu2"
+    - "v* = S_B^-1 S_W"
+  answer: 1
+  explain: "It follows from setting the derivative of J(v) to zero, and requires S_W to be invertible."

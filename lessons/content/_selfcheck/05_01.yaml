@@ -1,0 +1,48 @@
+- q: "In facial identification, the image of the unknown person is called the"
+  options:
+    - "gallery"
+    - "probe"
+    - "impostor"
+    - "landmark"
+  answer: 1
+  explain: "The probe is compared against the gallery, which holds the known identities."
+- q: "What distinguishes open-set from closed-set identification?"
+  options:
+    - "Open set uses colour images"
+    - "In open set the probe identity may not be in the gallery, so the system must be able to answer 'unknown'"
+    - "Closed set has more identities"
+    - "Open set is a 1:1 comparison"
+  answer: 1
+  explain: "Rejecting unknown identities at an acceptable error rate is what makes the open-set task harder."
+- q: "Facial verification is"
+  options:
+    - "a 1:N search of a gallery"
+    - "a 1:1 check of a claimed identity, and a special case of open-set identification"
+    - "only possible on closed sets"
+    - "the same as face detection"
+  answer: 1
+  explain: "Verification must be tested with impostors, so it only makes sense as an open-set task."
+- q: "Which is an EXTRINSIC intra-personal factor?"
+  options:
+    - "Ageing"
+    - "Facial expression"
+    - "Camera angle and illumination"
+    - "Facial hair"
+  answer: 2
+  explain: "Extrinsic factors come from the imaging conditions; intrinsic factors belong to the person."
+- q: "Why is facial recognition harder than typical object detection?"
+  options:
+    - "Faces are larger than objects"
+    - "There are many classes with few examples each, and inter-personal differences are small while intra-personal differences are large"
+    - "Faces cannot be detected"
+    - "Faces have no edges"
+  answer: 1
+  explain: "Car versus football is an easy distinction; two faces are separated only by small differences."
+- q: "In the recognition pipeline, what does the alignment stage do?"
+  options:
+    - "Finds the faces in the image"
+    - "Warps the detected face to a centred canonical view, usually using facial landmarks"
+    - "Compresses the face with PCA"
+    - "Assigns the identity label"
+  answer: 1
+  explain: "Alignment is what turns a ragged detector crop into something resembling a constrained dataset image."

@@ -1,0 +1,48 @@
+- q: "What is the purpose of non-maximum suppression in the Canny algorithm?"
+  options:
+    - "To remove noise before differentiation"
+    - "To thin edges to one pixel by keeping only local maxima along the gradient direction"
+    - "To join broken edges"
+    - "To convert the direction image to degrees"
+  answer: 1
+  explain: "Each pixel is compared with its neighbours along its gradient direction and kept only if it is the maximum."
+- q: "In hysteresis thresholding, a pixel with magnitude between T_min and T_max is kept if"
+  options:
+    - "it is on the image border"
+    - "it is connected to a pixel above T_max"
+    - "its magnitude is even"
+    - "always"
+  answer: 1
+  explain: "Weak pixels survive only when they continue a strong edge; isolated weak pixels are removed."
+- q: "A pixel has magnitude 15 with T_min = 25 and T_max = 80, and it is adjacent to a strong pixel. It is"
+  options:
+    - "kept, because it is connected"
+    - "rejected, because it is below T_min regardless of connectivity"
+    - "kept only if the strong pixel is diagonal"
+    - "assigned half weight"
+  answer: 1
+  explain: "T_min is a hard lower bound; connectivity only matters for pixels between the two thresholds."
+- q: "In the (m, b) Hough parameter space, a single point in the image becomes"
+  options:
+    - "a point"
+    - "a line"
+    - "a circle"
+    - "a sinusoid"
+  answer: 1
+  explain: "All lines through (x, y) satisfy b = y − mx, a straight line in (m, b) space. In the polar version it becomes a sinusoid."
+- q: "Why is the polar (ρ, θ) parameterisation preferred over slope and intercept?"
+  options:
+    - "It uses fewer votes"
+    - "Its parameters are bounded, whereas the slope of a vertical line is infinite"
+    - "It only works for horizontal lines"
+    - "It avoids the need for edge detection"
+  answer: 1
+  explain: "ρ is limited by the image size and θ lies in [0, π), so the accumulator has finite size."
+- q: "The line through a set of collinear edge points corresponds in the accumulator to"
+  options:
+    - "the cell with the fewest votes"
+    - "the cell where their sinusoids intersect, which has the most votes"
+    - "the origin"
+    - "a random cell"
+  answer: 1
+  explain: "Every collinear point votes for the same (ρ, θ), so that cell accumulates the peak."

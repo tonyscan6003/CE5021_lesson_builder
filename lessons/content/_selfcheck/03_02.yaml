@@ -1,0 +1,48 @@
+- q: "Why is the Gaussian used to build scale spaces?"
+  options:
+    - "It is the cheapest kernel"
+    - "It removes fine structure without introducing artefacts"
+    - "It sharpens edges"
+    - "It is the only separable kernel"
+  answer: 1
+  explain: "Gaussian blurring progressively removes information but creates no new structure, unlike box or sinc kernels."
+- q: "What is the characteristic scale of an image feature?"
+  options:
+    - "The scale at which the image is smallest"
+    - "The scale at which a normalised derivative function, such as the normalised Laplacian, reaches its maximum at that point"
+    - "The scale with the most keypoints"
+    - "Always σ = 1"
+  answer: 1
+  explain: "Lindeberg's principle: the scale of the maximum over scales reflects the size of the structure."
+- q: "What is the role of the σ² factor in the normalised Laplacian σ²∇²L?"
+  options:
+    - "It converts pixels to millimetres"
+    - "It compensates for the amplitude loss caused by Gaussian smoothing so the correct scale maximum is found"
+    - "It makes the kernel symmetric"
+    - "It has no effect"
+  answer: 1
+  explain: "Without normalisation the response decreases with σ and the maximum would always be at the smallest scale."
+- q: "A feature has characteristic scale σ* = 4 in an image. In a copy enlarged three times it will have characteristic scale about"
+  options:
+    - "4"
+    - "12"
+    - "4/3"
+    - "16"
+  answer: 1
+  explain: "The characteristic scale tracks the feature's size in pixels, so it scales with the image."
+- q: "The 26 neighbours used to test for a scale-space maximum are"
+  options:
+    - "26 pixels in the same scale"
+    - "8 in the same scale, 9 in the scale below and 9 in the scale above"
+    - "13 in the scale below and 13 in the scale above"
+    - "the 26 nearest keypoints"
+  answer: 1
+  explain: "The search is a 3 × 3 × 3 cube in (x, y, scale) minus the centre."
+- q: "The difference of two Gaussians of widths ρσ and σ, divided by (ρ − 1), approximates"
+  options:
+    - "the gradient magnitude"
+    - "σ ∂G/∂σ, which equals the normalised Laplacian of Gaussian"
+    - "a box filter"
+    - "the Harris response"
+  answer: 1
+  explain: "It is a finite-difference derivative with respect to σ, and the approximation improves as ρ → 1."

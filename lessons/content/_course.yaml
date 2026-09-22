@@ -1,0 +1,51 @@
+title: CE6021 Machine Vision
+subtitle: Lessons
+sections:
+  - number: 1
+    title: Digital images and filtering
+    lessons:
+      - {id: "01_01", title: "Digital images"}
+      - {id: "01_02", title: "Image processing with convolution"}
+      - {id: "01_03", title: "Image sampling and interpolation"}
+      - {id: "01_04", title: "Linear filters, image noise and non-linear filters"}
+      - {id: "01_05", title: "Binary images and morphology"}
+      - {id: "01_06", title: "1D Fourier series and the DFT"}
+      - {id: "01_07", title: "The 2D discrete Fourier transform"}
+  - number: 2
+    title: Edges, corners and segmentation
+    lessons:
+      - {id: "02_01", title: "Edge detection"}
+      - {id: "02_02", title: "The Canny algorithm and the Hough transform"}
+      - {id: "02_03", title: "Corner detection"}
+      - {id: "02_04", title: "Region-based segmentation"}
+      - {id: "02_05", title: "Clustering-based segmentation"}
+  - number: 3
+    title: Keypoints, scale space and descriptors
+    lessons:
+      - {id: "03_01", title: "Keypoints and feature detection"}
+      - {id: "03_02", title: "Scale spaces"}
+      - {id: "03_03", title: "Keypoint descriptors and matching"}
+      - {id: "03_04", title: "SIFT"}
+      - {id: "03_05", title: "Scale space and image pyramids (supplementary)"}
+  - number: 4
+    title: Object detection and classification
+    lessons:
+      - {id: "04_01", title: "Introduction to object detection"}
+      - {id: "04_02", title: "Machine learning for image recognition"}
+      - {id: "04_03", title: "Classifiers"}
+      - {id: "04_04", title: "Template matching"}
+      - {id: "04_05", title: "The Viola-Jones algorithm"}
+      - {id: "04_06", title: "Histogram of oriented gradients"}
+  - number: 5
+    title: Facial recognition
+    lessons:
+      - {id: "05_01", title: "Introduction to facial recognition"}
+      - {id: "05_02", title: "Principal component analysis"}
+      - {id: "05_03", title: "Eigenfaces"}
+      - {id: "05_04", title: "Linear discriminant analysis"}
+      - {id: "05_05", title: "Fisherfaces"}
+  - number: 6
+    title: Bag of features
+    lessons:
+      - {id: "06_01", title: "The bag of features representation"}
+      - {id: "06_02", title: "Classification and image retrieval with bag of features"}

@@ -1,0 +1,56 @@
+- q: "For a pedestrian braking system, which situation is most dangerous?"
+  options:
+    - "High precision, low recall"
+    - "Low precision, high recall"
+    - "High precision, high recall"
+    - "They are equally dangerous"
+  answer: 0
+  explain: "Low recall means many pedestrians are missed (false negatives)."
+- q: "A k-NN classifier with k = 1"
+  options:
+    - "underfits"
+    - "overfits, following every training point including noise"
+    - "cannot be trained"
+    - "always gives the majority class"
+  answer: 1
+  explain: "Small k gives a highly complex boundary; large k averages over many points and underfits."
+- q: "The support vectors of an SVM are"
+  options:
+    - "all the training points"
+    - "the training points nearest the decision boundary, which alone determine it"
+    - "the misclassified points"
+    - "the class means"
+  answer: 1
+  explain: "The maximal-margin hyperplane depends only on the nearest points of each class."
+- q: "In a soft-margin SVM, a very large value of C"
+  options:
+    - "gives a wide margin and tolerates misclassifications"
+    - "gives a narrow margin and lets outliers dictate the boundary"
+    - "has no effect"
+    - "switches to the RBF kernel"
+  answer: 1
+  explain: "Large C weights misclassification heavily, so the margin shrinks to accommodate every point."
+- q: "The kernel trick makes non-linearly separable data separable by"
+  options:
+    - "removing outliers"
+    - "mapping the data into a higher-dimensional space where a hyperplane can separate it"
+    - "reducing the number of features"
+    - "averaging the classes"
+  answer: 1
+  explain: "With the radial basis function, concentric 2D classes become separable by a plane in 3D."
+- q: "In the pedestrian / road-sign example, why can p(d) be ignored?"
+  options:
+    - "It is always zero"
+    - "It is the same for every class, so it does not change which class has the largest posterior"
+    - "It is unknown"
+    - "It equals p(c)"
+  answer: 1
+  explain: "Bayes' theorem's denominator is a common scaling factor; argmax over classes is unaffected."
+- q: "The 'naive' assumption in naive Bayes is that"
+  options:
+    - "all classes are equally likely"
+    - "the features are independent of one another given the class"
+    - "the data are linearly separable"
+    - "there are only two classes"
+  answer: 1
+  explain: "Independence lets the class likelihood factorise into a product of per-feature probabilities."

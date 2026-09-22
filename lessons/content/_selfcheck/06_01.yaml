@@ -1,0 +1,64 @@
+- q: "The bag of features is described as an orderless representation. What does that mean?"
+  options:
+    - "The visual words are stored in a random order in the file"
+    - "Large-scale spatial information, relative scale and orientation are discarded; only which features occur and how often is kept"
+    - "The images in the database are not sorted"
+    - "The clustering algorithm is not deterministic"
+  answer: 1
+  explain: "That is why it works for classification and scene recognition but is unsuited to object detection and localisation."
+- q: "In the tf-idf weight, what is the effect of the inverse document frequency term?"
+  options:
+    - "It boosts words that occur in many documents"
+    - "It down-weights words that occur in many documents, to zero for a word present in every one"
+    - "It normalises the document length"
+    - "It counts the words in the document"
+  answer: 1
+  explain: "The term frequency alone still lets the common words dominate; the idf is what suppresses them."
+- q: "What are the visual words, or codewords, in a bag of features?"
+  options:
+    - "The raw pixels of the training images"
+    - "The cluster centres found by clustering the descriptors of all the images in the dataset"
+    - "The labels assigned to the training images"
+    - "The keypoints returned by the detector"
+  answer: 1
+  explain: "Each descriptor from a new image is then assigned to its nearest cluster centre."
+- q: "Why can dense or random sampling be preferable to a keypoint detector when building a vocabulary?"
+  options:
+    - "It is faster to compute"
+    - "It yields more features at positions that do not depend on image content, so an object seen in a new pose or light is more likely to share words"
+    - "Keypoint detectors do not work on colour images"
+    - "Dense sampling produces fewer descriptors to cluster"
+  answer: 1
+  explain: "A detector fires in different places when the viewpoint changes, so the same object can produce a different set of visual words."
+- q: "Building the visual vocabulary is which kind of learning?"
+  options:
+    - "Supervised, because the images must be labelled"
+    - "Unsupervised, because it is done by clustering and needs no labels"
+    - "Reinforcement learning"
+    - "Semi-supervised, because half the images are labelled"
+  answer: 1
+  explain: "That is one of the practical advantages: no annotation is needed to build the vocabulary."
+- q: "Which descriptor is usually the best input to the clustering stage?"
+  options:
+    - "Raw pixel intensities"
+    - "SIFT"
+    - "The image histogram"
+    - "The Fourier transform of the patch"
+  answer: 1
+  explain: "SIFT has been found more robust for clustering than simpler descriptors or raw pixels."
+- q: "What is the frequency problem in a visual vocabulary?"
+  options:
+    - "The clustering runs too slowly"
+    - "Common features such as plain edges dominate while carrying little discriminative information, so the useful words are the ones of intermediate frequency"
+    - "The histogram is too short"
+    - "Visual words cannot be counted"
+  answer: 1
+  explain: "It is the same problem the tf-idf weighting solves for the bag of words."
+- q: "With a large vocabulary, the term histogram for one image is typically"
+  options:
+    - "dense, with every word present"
+    - "sparse, with zero counts for many visual words"
+    - "always binary"
+    - "the same for every image"
+  answer: 1
+  explain: "That sparsity is why a purely binary representation is often used for very long vectors."

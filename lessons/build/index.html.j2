@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ course.title }} · {{ course.subtitle }}</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><a class="brand" href="index.html">{{ course.title }}</a><span class="crumb">{{ course.subtitle }}</span></header>
+<main class="lesson index">
+  <h1>{{ course.title }}</h1>
+  <p class="summary">Lessons for the module, section by section. Each lesson has generated figures, worked examples drawn from the question bank, and a short self-check. Lessons not yet published are greyed out.</p>
+  {% for sec in course.sections %}
+  <section class="index-section">
+    <h2>Section {{ sec.number }}: {{ sec.title }}</h2>
+    <ol class="lesson-list">
+    {% for les in sec.lessons %}
+      {% if les.id in built %}
+      <li><a href="{{ les.id }}.html"><b>{{ les.id | replace('_', '.') }}</b> {{ les.title }}</a>
+        {% if summaries.get(les.id) %}<span class="lesson-summary">{{ summaries[les.id] }}</span>{% endif %}</li>
+      {% else %}
+      <li class="pending"><b>{{ les.id | replace('_', '.') }}</b> {{ les.title }} <span class="tag">coming soon</span></li>
+      {% endif %}
+    {% endfor %}
+    </ol>
+  </section>
+  {% endfor %}
+  <footer class="foot">© Dr Tony Scanlan, University of Limerick.</footer>
+</main>
+</body>
+</html>

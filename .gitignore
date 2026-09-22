@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Generated lesson site — rebuild with lessons/build/build_site.py,
+# publish with lessons/publish/publish_site.sh
+lessons/site/
+lessons/site_preview/
+
+# Datasets fetched at runtime by the figure engines
+lessons/data/_sklearn/
+
+# Temporary working copy of the question-bank repo (github.com/tonyscan6003/autoquiz).
+# Source material only: the generators actually used are vendored into
+# lessons/engines/_vendor/. Clone it back with:
+#     git clone https://github.com/tonyscan6003/autoquiz.git autoquiz
+autoquiz/
+
+# Source lecture PDFs: input only, and 53 MB of them. Convert with
+#     python lessons/build/convert_pdfs.py \
+#         --input-dir lessons/reference/pdf_for_conversion \
+#         --output-dir lessons/reference/legacy_md --force
+# The converted markdown under reference/legacy_md/ IS tracked.
+lessons/reference/pdf_for_conversion/
+
+# Editor / OS
+.DS_Store
+*.swp
+*:Zone.Identifier

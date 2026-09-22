@@ -1,0 +1,48 @@
+- q: "As features are added to a fixed number of training samples, the data becomes"
+  options:
+    - "denser, which reduces overfitting"
+    - "sparser, which promotes overfitting"
+    - "unchanged"
+    - "always linearly separable and well generalised"
+  answer: 1
+  explain: "Sparsity rises with every dimension, and the training data needed to hold generalisation constant grows exponentially."
+- q: "In a 2D sample covariance matrix, the off-diagonal elements give"
+  options:
+    - "the variances along each axis"
+    - "the covariance between the two dimensions"
+    - "the mean of the data"
+    - "the eigenvalues"
+  answer: 1
+  explain: "The diagonal holds the variances; zero off-diagonal entries mean the variables are independent."
+- q: "The principal components of a distribution are"
+  options:
+    - "the rows of the data matrix"
+    - "the eigenvectors of its sample covariance matrix"
+    - "the class means"
+    - "the largest data values"
+  answer: 1
+  explain: "They point along the directions of maximum variance, and each eigenvalue is the variance along its eigenvector."
+- q: "A small eigenvalue tells us that"
+  options:
+    - "the data varies little along that eigenvector, so it can be discarded with little loss"
+    - "that eigenvector is the most important"
+    - "the covariance matrix is singular"
+    - "the mean was not subtracted"
+  answer: 0
+  explain: "Dimension reduction keeps the k eigenvectors with the largest eigenvalues."
+- q: "Which step must come before forming the covariance matrix in PCA?"
+  options:
+    - "Normalising the data to unit length"
+    - "Subtracting the mean of each dimension from every sample"
+    - "Sorting the samples"
+    - "Adding noise"
+  answer: 1
+  explain: "PCA operates on mean-centred data; the mean is added back when reconstructing."
+- q: "In PCA image compression, what is used as the input vectors?"
+  options:
+    - "Whole images"
+    - "Small image patches, each flattened into a vector"
+    - "Single pixels"
+    - "The image histogram"
+  answer: 1
+  explain: "A 16 x 16 patch becomes a 256-element vector, and PCA is fitted to the set of patches."
