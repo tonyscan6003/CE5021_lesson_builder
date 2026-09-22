@@ -1,48 +1,111 @@
-- q: "What is the purpose of non-maximum suppression in the Canny algorithm?"
+# 2.2 Architectures for image classification
+# Source: reference/Grasple_image_cls_deep_cnn (exercise 107573).
+# Complete at 8 questions.
+#
+# Two notes on faithfulness to the source:
+#  - The AlexNet computation question lost its option list in the PDF
+#    conversion; only the "pooling layers" feedback survived. The options are
+#    reconstructed from the parallel VGG memory question in the same exercise,
+#    and the surviving feedback confirms convolution is the intended answer.
+#  - Three source questions ("stacked 3x3", "network in network", "global
+#    average pooling") marked two options as 100% correct, which the
+#    single-answer self-check widget cannot express. Each is rewritten so the
+#    two correct statements are combined into one option.
+- q: In a deep CNN such as AlexNet, which layer type dominates the computational requirements?
+...
   options:
-    - "To remove noise before differentiation"
-    - "To thin edges to one pixel by keeping only local maxima along the gradient direction"
-    - "To join broken edges"
-    - "To convert the direction image to degrees"
-  answer: 1
-  explain: "Each pixel is compared with its neighbours along its gradient direction and kept only if it is the maximum."
-- q: "In hysteresis thresholding, a pixel with magnitude between T_min and T_max is kept if"
+    - Convolution layers
+...
+    - Pooling layers
+...
+    - Fully connected layers
+...
+  answer: 0
+  explain: Convolution layers apply many kernels across every channel at every spatial position, so they dominate the multiply-accumulate count. Pooling just sweeps each feature map independently and has no parameters at all.
+...
+- q: In a deep CNN such as VGG-19, which layer type dominates the memory requirements?
+...
   options:
-    - "it is on the image border"
-    - "it is connected to a pixel above T_max"
-    - "its magnitude is even"
-    - "always"
-  answer: 1
-  explain: "Weak pixels survive only when they continue a strong edge; isolated weak pixels are removed."
-- q: "A pixel has magnitude 15 with T_min = 25 and T_max = 80, and it is adjacent to a strong pixel. It is"
+    - Pooling layers
+...
+    - Convolution layers
+...
+    - Fully connected layers
+...
+  answer: 2
+  explain: Fully connected layers hold one weight per input-output pair and dominate the parameter count. Convolution layers share the same kernel across every spatial position, so they need far fewer parameters. Pooling layers have none.
+...
+- q: Why does the VGG family of networks have such a large number of parameters?
+...
   options:
-    - "kept, because it is connected"
-    - "rejected, because it is below T_min regardless of connectivity"
-    - "kept only if the strong pixel is diagonal"
-    - "assigned half weight"
+    - It has no pooling layers
+...
+    - It uses very large fully connected layers at the output
+...
+    - It uses small 1×1 convolutions
+...
   answer: 1
-  explain: "T_min is a hard lower bound; connectivity only matters for pixels between the two thresholds."
-- q: "In the (m, b) Hough parameter space, a single point in the image becomes"
+  explain: The large fully connected layers at the output carry most of VGG's parameters. 1×1 convolutions are an efficient way to reduce parameter counts, and VGG does use pooling — which contributes no parameters in any case.
+...
+- q: Why is a stack of 3×3 convolutions computationally efficient?
+...
   options:
-    - "a point"
-    - "a line"
-    - "a circle"
-    - "a sinusoid"
+    - It removes the need for activation functions between layers
+...
+    - It gives a receptive field equivalent to a much larger kernel while using fewer parameters
+...
+    - It increases the spatial resolution of the feature maps
+...
   answer: 1
-  explain: "All lines through (x, y) satisfy b = y − mx, a straight line in (m, b) space. In the polar version it becomes a sinusoid."
-- q: "Why is the polar (ρ, θ) parameterisation preferred over slope and intercept?"
+  explain: Two stacked 3×3 convolutions see the same 5×5 region as one 5×5 convolution but use 18 weights per channel pair instead of 25, and three stacked see 7×7 for 27 instead of 49. Activation functions are still needed between the layers — they are what makes the stack more expressive than a single large kernel.
+...
+- q: What is the reasoning behind the network-in-network concept?
+...
   options:
-    - "It uses fewer votes"
-    - "Its parameters are bounded, whereas the slope of a vertical line is infinite"
-    - "It only works for horizontal lines"
-    - "It avoids the need for edge detection"
-  answer: 1
-  explain: "ρ is limited by the image size and θ lies in [0, π), so the accumulator has finite size."
-- q: "The line through a set of collinear edge points corresponds in the accumulator to"
+    - It removes the need for convolution layers entirely
+...
+    - It reduces the spatial size of the feature maps
+...
+    - Convolution alone is linear, so a small fully connected network inside the convolution raises local representational power and reduces the need for large fully connected layers at the output
+...
+  answer: 2
+  explain: Convolution is a linear operation, so its representational power is limited. Embedding a small fully connected network raises the capacity locally. Convolution layers are still used, and the more discriminative features that result mean a global average pooling stage and a single fully connected layer can replace the large output layers.
+...
+- q: What is the function of a global average pooling layer?
+...
   options:
-    - "the cell with the fewest votes"
-    - "the cell where their sinusoids intersect, which has the most votes"
-    - "the origin"
-    - "a random cell"
+    - It pools a feature map of any spatial size down to a fixed-length vector, replacing the fully connected layers
+...
+    - It replaces the convolution layers
+...
+    - It increases the number of channels in the feature map
+...
+  answer: 0
+  explain: Global average pooling reduces any spatial size to one value per channel, so it both fixes the output length and removes the need for large fully connected layers. The convolutional part of the network must carry more capacity to compensate for the parameters given up.
+...
+- q: Why did the authors of Inception need to find a dense equivalent to a sparse network?
+...
+  options:
+    - Sparse networks are faster
+...
+    - Modern GPUs are designed for dense computation and cannot exploit sparse matrices
+...
+    - Dense networks have fewer parameters
+...
   answer: 1
-  explain: "Every collinear point votes for the same (ρ, θ), so that cell accumulates the peak."
+  explain: Sparse connectivity is attractive in theory, but GPU hardware is built for dense matrix multiplication and gains nothing from sparsity. Inception approximates the sparse structure with dense building blocks.
+...
+- q: What is the purpose of a bottleneck (1×1) convolution?
+...
+  options:
+    - To increase the number of parameters
+...
+    - To eliminate the need for pooling layers
+...
+    - To reduce the amount of computation in a convolution operation
+...
+    - To reduce the spatial dimensionality of the feature maps
+...
+  answer: 2
+  explain: A 1×1 convolution leaves the spatial size unchanged and reduces the channel count, so the larger kernel that follows operates on far fewer channels. Both the parameter count and the multiplication count fall. Because the spatial size is untouched, pooling is still needed.
+...

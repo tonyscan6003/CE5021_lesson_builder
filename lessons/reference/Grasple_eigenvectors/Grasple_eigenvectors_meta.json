@@ -1,0 +1,806 @@
+{
+  "table_of_contents": [
+    {
+      "title": "PCA & Eigenvectors/Values",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          73.43334530462846,
+          183.67800161441522
+        ],
+        [
+          336.4446126712059,
+          183.67800161441522
+        ],
+        [
+          336.4446126712059,
+          215.16565903402926
+        ],
+        [
+          73.43334530462846,
+          215.16565903402926
+        ]
+      ]
+    },
+    {
+      "title": "Exercises",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          48.92015525698662
+        ],
+        [
+          144.61873105911525,
+          48.92015525698662
+        ],
+        [
+          144.61873105911525,
+          66.1860924065113
+        ],
+        [
+          53.9510292034005,
+          66.1860924065113
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.453433990478516,
+          104.00671663880348
+        ],
+        [
+          221.04935576393262,
+          104.00671663880348
+        ],
+        [
+          221.04935576393262,
+          116.33952888846399
+        ],
+        [
+          53.453433990478516,
+          116.33952888846399
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 106986",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          146.19269516249375
+        ],
+        [
+          182.83404341152394,
+          146.19269516249375
+        ],
+        [
+          182.83404341152394,
+          160.4371116142239
+        ],
+        [
+          53.9510292034005,
+          160.4371116142239
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          43.4605513027393,
+          544.6992076933384
+        ],
+        [
+          131.88029360831234,
+          544.6992076933384
+        ],
+        [
+          131.88029360831234,
+          554.7825354884378
+        ],
+        [
+          43.4605513027393,
+          554.7825354884378
+        ]
+      ]
+    },
+    {
+      "title": "",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          42.71123145269207,
+          730.9634758124687
+        ],
+        [
+          170.84492581076827,
+          731.3357664048672
+        ],
+        [
+          170.84492581076827,
+          742.9587738770836
+        ],
+        [
+          42.71123145269207,
+          742.0242036879063
+        ]
+      ]
+    },
+    {
+      "title": "Detailed solution",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          43.4605513027393,
+          454.32191419728827
+        ],
+        [
+          131.88029360831234,
+          454.32191419728827
+        ],
+        [
+          131.88029360831234,
+          464.9470218122006
+        ],
+        [
+          43.4605513027393,
+          464.9470218122006
+        ]
+      ]
+    },
+    {
+      "title": "",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          42.414137840270996,
+          504.8231147527695
+        ],
+        [
+          170.84492581076827,
+          504.8231147527695
+        ],
+        [
+          170.84492581076827,
+          516.547522907478
+        ],
+        [
+          42.414137840270996,
+          516.547522907478
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 12,
+      "polygon": [
+        [
+          52.87241840362549,
+          37.409530490636826
+        ],
+        [
+          221.04935576393262,
+          37.409530490636826
+        ],
+        [
+          221.04935576393262,
+          49.74234274029732
+        ],
+        [
+          52.87241840362549,
+          49.74234274029732
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107146",
+      "heading_level": null,
+      "page_id": 12,
+      "polygon": [
+        [
+          53.9510292034005,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          92.96356000076526
+        ],
+        [
+          53.9510292034005,
+          92.96356000076526
+        ]
+      ]
+    },
+    {
+      "title": "What does an eigenvalue represent in the context of an eigenvector?",
+      "heading_level": null,
+      "page_id": 13,
+      "polygon": [
+        [
+          57.69762845363665,
+          75.72031903288138
+        ],
+        [
+          520.7772957828244,
+          75.72031903288138
+        ],
+        [
+          520.7772957828244,
+          130.44886645268673
+        ],
+        [
+          57.69762845363665,
+          130.44886645268673
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          38
+        ],
+        [
+          "Span",
+          18
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "SectionHeader",
+          4
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          33
+        ],
+        [
+          "Span",
+          32
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "Equation",
+          7
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          34
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Equation",
+          9
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "PageHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          5
+        ],
+        [
+          "Span",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Text",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          37
+        ],
+        [
+          "Span",
+          15
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "Equation",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          30
+        ],
+        [
+          "Span",
+          27
+        ],
+        [
+          "Equation",
+          8
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 8,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          30
+        ],
+        [
+          "Span",
+          17
+        ],
+        [
+          "Equation",
+          8
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 9,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          32
+        ],
+        [
+          "Span",
+          25
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "Equation",
+          6
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 10,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          29
+        ],
+        [
+          "Span",
+          23
+        ],
+        [
+          "Equation",
+          9
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 11,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          17
+        ],
+        [
+          "Span",
+          16
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 12,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          30
+        ],
+        [
+          "Span",
+          9
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 13,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          33
+        ],
+        [
+          "Line",
+          10
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 14,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          21
+        ],
+        [
+          "Line",
+          13
+        ],
+        [
+          "Span",
+          7
+        ],
+        [
+          "Text",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/Grasple_eigenvectors"
+}

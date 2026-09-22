@@ -1,56 +1,20 @@
-- q: "A sinusoid sin(ωt + φ) with φ = +π/2 is"
+# 1.6 Overfitting and regularisation
+# Source: reference/Grasple_convolutional_neural_networks (exercise 107563).
+# INCOMPLETE — 1 of a target 5-6 questions. Top up from
+# lesson_1_7_overfitting_regularisation and lesson_1_7_script (bias-variance,
+# training/validation curves, generalisation, curse of dimensionality,
+# L1/L2, dropout, spatial dropout, data augmentation).
+- q: Which set of measures all help to reduce overfitting when training a deep neural network?
+...
   options:
-    - "delayed by a quarter period and equal to −cos ωt"
-    - "advanced by a quarter period and equal to cos ωt"
-    - "unchanged"
-    - "inverted"
-  answer: 1
-  explain: "A positive phase advances the wave; advancing a sine by π/2 gives a cosine."
-- q: "Which statement about e^{jωt} is correct?"
-  options:
-    - "It is a real sinusoid of amplitude 2"
-    - "It describes a point moving on a circle in the complex plane; its real part is cos ωt"
-    - "Its imaginary part is cos ωt"
-    - "It is only defined for negative frequencies"
-  answer: 1
-  explain: "Euler's identity gives e^{jωt} = cos ωt + j sin ωt, circular motion whose projections are the cosine and sine."
-- q: "Why does the exponential form of the Fourier series need both positive and negative k?"
-  options:
-    - "To double the resolution"
-    - "Because each complex sinusoid rotates one way, and a pair rotating in opposite directions is needed to give a real signal"
-    - "Because the coefficients are always real"
-    - "It does not; negative k are ignored"
-  answer: 1
-  explain: "The imaginary parts of e^{jωt} and e^{−jωt} cancel, leaving a real cosine."
-- q: "A 32-point DFT of a real signal shows a peak at k = 3. Where is its mirror peak?"
-  options:
-    - "k = 16"
-    - "k = 29"
-    - "k = 3 only"
-    - "k = 35"
-  answer: 1
-  explain: "The spectrum of a real signal mirrors about N/2 = 16; the peak at k = −3 appears at k = 32 − 3 = 29."
-- q: "Spectral leakage occurs when"
-  options:
-    - "the sample rate is too high"
-    - "the DFT window does not contain a whole number of periods of the signal"
-    - "a Hann window is applied"
-    - "the signal is a square wave"
-  answer: 1
-  explain: "The DFT treats the window as one period; a fractional number of cycles implies a jump at the window edge, spreading energy across bins."
-- q: "The convolution theorem states that"
-  options:
-    - "convolution in time equals addition in frequency"
-    - "convolution in time equals multiplication in frequency"
-    - "multiplication in time equals multiplication in frequency"
-    - "the DFT of a product is zero"
-  answer: 1
-  explain: "DFT(x ∗ h) = DFT(x) · DFT(h), which is why filtering can be done by multiplying spectra."
-- q: "The overshoot that remains next to an edge no matter how many Fourier terms are added is called"
-  options:
-    - "aliasing"
-    - "leakage"
-    - "the Gibbs phenomenon"
-    - "quantisation"
+    - Increased complexity, early stopping, regularisation, dropout, batch normalisation, less training data
+...
+    - Reduced complexity, late stopping, regularisation, dropout, batch normalisation, more training data
+...
+    - Reduced complexity, early stopping, regularisation, dropout, batch normalisation, more training data
+...
+    - Reduced complexity, early stopping, regularisation, dropout, batch normalisation, less training data
+...
   answer: 2
-  explain: "The Gibbs phenomenon is the persistent overshoot of a Fourier series at a discontinuity."
+  explain: Increased model complexity and less training data both make overfitting worse. Late stopping — continuing past the point where validation error turns upward — is exactly how overfitting sets in.
+...

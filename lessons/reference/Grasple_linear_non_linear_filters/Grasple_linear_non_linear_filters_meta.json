@@ -1,0 +1,898 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Linear/Non-Linear Filters",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          72.62694835662842,
+          186.67682613056894
+        ],
+        [
+          318.4609362700724,
+          186.67682613056894
+        ],
+        [
+          318.4609362700724,
+          214.41595290499083
+        ],
+        [
+          72.62694835662842,
+          214.41595290499083
+        ]
+      ]
+    },
+    {
+      "title": "Exercises",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          50.15343648195267
+        ],
+        [
+          144.61873105911525,
+          50.15343648195267
+        ],
+        [
+          144.61873105911525,
+          66.59718614816666
+        ],
+        [
+          53.9510292034005,
+          66.59718614816666
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          104.2091519363417
+        ],
+        [
+          221.04935576393262,
+          104.2091519363417
+        ],
+        [
+          221.04935576393262,
+          117.57281011343004
+        ],
+        [
+          53.9510292034005,
+          117.57281011343004
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 105757",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          54.70034905344773,
+          146.94240129153218
+        ],
+        [
+          182.83404341152394,
+          146.94240129153218
+        ],
+        [
+          182.83404341152394,
+          159.91546550393105
+        ],
+        [
+          54.70034905344773,
+          159.91546550393105
+        ]
+      ]
+    },
+    {
+      "title": "Demonstrate Non-linear Filters",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          58.44694830368388,
+          231.44577655196193
+        ],
+        [
+          304.2238591191751,
+          230.15978161479785
+        ],
+        [
+          304.2238591191751,
+          245.42296376824382
+        ],
+        [
+          58.44694830368388,
+          246.6533164536433
+        ]
+      ]
+    },
+    {
+      "title": "\u2611 Detailed solution",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          43.4605513027393,
+          702.4746429090085
+        ],
+        [
+          131.88029360831234,
+          702.4746429090085
+        ],
+        [
+          131.88029360831234,
+          712.9705287155464
+        ],
+        [
+          43.4605513027393,
+          712.9705287155464
+        ]
+      ]
+    },
+    {
+      "title": "\u25a1 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          42.71123145269207,
+          617.0081441986274
+        ],
+        [
+          172.34356551086273,
+          617.0081441986274
+        ],
+        [
+          172.34356551086273,
+          627.5040300051655
+        ],
+        [
+          42.71123145269207,
+          627.5040300051655
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          51.129371643066406,
+          37.409530490636826
+        ],
+        [
+          221.04935576393262,
+          37.409530490636826
+        ],
+        [
+          221.04935576393262,
+          49.74234274029732
+        ],
+        [
+          51.129371643066406,
+          49.74234274029732
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 105831",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          53.9510292034005,
+          79.46884967807352
+        ],
+        [
+          180.58608386138224,
+          79.46884967807352
+        ],
+        [
+          180.58608386138224,
+          93.71326612980369
+        ],
+        [
+          53.9510292034005,
+          93.71326612980369
+        ]
+      ]
+    },
+    {
+      "title": "Check my answer",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          241.70248413085938,
+          656.7425690376642
+        ],
+        [
+          352.92964937224497,
+          656.7425690376642
+        ],
+        [
+          352.92964937224497,
+          675.838111281395
+        ],
+        [
+          241.70248413085938,
+          675.838111281395
+        ]
+      ]
+    },
+    {
+      "title": "\u25a0 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          43.28566122055054,
+          418.9045227468014
+        ],
+        [
+          171.5942456608155,
+          418.9045227468014
+        ],
+        [
+          171.5942456608155,
+          429.5929600298405
+        ],
+        [
+          43.28566122055054,
+          429.5929600298405
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 106018",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          53.9510292034005,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          93.71326612980369
+        ],
+        [
+          53.9510292034005,
+          93.71326612980369
+        ]
+      ]
+    },
+    {
+      "title": "What do we mean if a linear filter displays Shift Invariance?",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          57.69762845363665,
+          74.97061290384295
+        ],
+        [
+          472.82082537980165,
+          68.97296387153551
+        ],
+        [
+          472.82082537980165,
+          127.45004193653301
+        ],
+        [
+          57.69762845363665,
+          127.45004193653301
+        ]
+      ]
+    },
+    {
+      "title": "What is the commutative property of convolution?",
+      "heading_level": null,
+      "page_id": 13,
+      "polygon": [
+        [
+          57.69762845363665,
+          74.97061290384295
+        ],
+        [
+          500.54565983154913,
+          74.97061290384295
+        ],
+        [
+          500.54565983154913,
+          101.21032742018798
+        ],
+        [
+          57.69762845363665,
+          101.21032742018798
+        ]
+      ]
+    },
+    {
+      "title": "What is the associative property of convolution?",
+      "heading_level": null,
+      "page_id": 14,
+      "polygon": [
+        [
+          56.948308603589425,
+          74.97061290384295
+        ],
+        [
+          481.06334373032115,
+          74.97061290384295
+        ],
+        [
+          481.06334373032115,
+          100.46062129114955
+        ],
+        [
+          56.948308603589425,
+          100.46062129114955
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          35
+        ],
+        [
+          "Span",
+          20
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          34
+        ],
+        [
+          "Span",
+          11
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          16
+        ],
+        [
+          "Span",
+          10
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          22
+        ],
+        [
+          "Span",
+          18
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          31
+        ],
+        [
+          "Span",
+          22
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "Equation",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          28
+        ],
+        [
+          "Span",
+          14
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "Equation",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 8,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          32
+        ],
+        [
+          "Span",
+          25
+        ],
+        [
+          "Text",
+          9
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 9,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          26
+        ],
+        [
+          "Line",
+          22
+        ],
+        [
+          "Span",
+          8
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 10,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          18
+        ],
+        [
+          "Span",
+          9
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 11,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          13
+        ],
+        [
+          "Line",
+          10
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 12,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          16
+        ],
+        [
+          "Span",
+          7
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 13,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          39
+        ],
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 14,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          42
+        ],
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/Grasple_linear_non_linear_filters"
+}

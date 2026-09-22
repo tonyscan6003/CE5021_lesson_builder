@@ -1,48 +1,17 @@
-- q: "In what order do the four stages of SIFT occur?"
+# 3.4 Single-stage object detection
+# Source: reference/Grasple_object_detection (exercise 106864).
+# INCOMPLETE — 1 of a target 5-6 questions. Top up from
+# lesson_3_4_obj_det_partB_single_stage (anchor boxes, box parameterisation,
+# focal loss and training imbalance, the scale problem, SSD, FPN).
+- q: What is the purpose of non-maximum suppression (NMS) in object detection?
+...
   options:
-    - "descriptor, orientation, localisation, extrema"
-    - "extrema detection, localisation, orientation assignment, descriptor"
-    - "orientation, extrema, descriptor, localisation"
-    - "localisation, extrema, descriptor, orientation"
+    - To increase the number of detected objects
+...
+    - To remove duplicate detections of the same object
+...
+    - To enhance the image quality
+...
   answer: 1
-  explain: "Keypoints are detected as scale-space extrema, refined, given an orientation and finally described."
-- q: "Why does each SIFT octave compute three extra (auxiliary) Gaussian scales?"
-  options:
-    - "To increase the image resolution"
-    - "So that the DoG images of the three principal scales have neighbours above and below for the 26-neighbour search"
-    - "To remove edges"
-    - "To reduce memory use"
-  answer: 1
-  explain: "Extrema are found in three DoG scales per octave; the auxiliary scales supply the outer DoG images used only as neighbours."
-- q: "What does quadratic interpolation achieve in the localisation stage?"
-  options:
-    - "It removes duplicate keypoints"
-    - "It refines the keypoint's position and scale to values between grid samples"
-    - "It computes the descriptor"
-    - "It sharpens the image"
-  answer: 1
-  explain: "A Taylor expansion fits a quadratic to the sampled DoG values and its maximum gives sub-pixel position and scale."
-- q: "A keypoint's orientation histogram has two peaks at 92% and 85% of the maximum. SIFT"
-  options:
-    - "keeps only the largest"
-    - "assigns both orientations and creates two descriptors for the keypoint"
-    - "averages them"
-    - "discards the keypoint"
-  answer: 1
-  explain: "Every local peak within 80% of the global maximum becomes a characteristic orientation."
-- q: "The SIFT descriptor has 128 elements because"
-  options:
-    - "it uses 128 pixels"
-    - "it has a 4 × 4 grid of cells with 8 orientation bins each: 16 × 8 = 128"
-    - "there are 128 keypoints"
-    - "it uses 128 scales"
-  answer: 1
-  explain: "Sixteen 8-bin histograms are concatenated, then capped at 0.2 and renormalised."
-- q: "Which step gives SIFT some invariance to illumination changes?"
-  options:
-    - "The Gaussian pyramid"
-    - "Saturating the descriptor at 0.2 and renormalising it"
-    - "The 26-neighbour search"
-    - "Bilinear splitting between histograms"
-  answer: 1
-  explain: "Normalisation removes overall gradient scaling caused by brightness changes, and capping limits the effect of saturated gradients."
+  explain: A dense detector fires several times around the same object. NMS keeps the highest-confidence box and discards the others that overlap it above an IoU threshold, so each object ends up with one detection.
+...

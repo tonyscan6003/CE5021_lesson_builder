@@ -1,48 +1,52 @@
-- q: "When a small window is shifted along an edge, the change in intensity E is"
+# 2.3 Residual networks
+# Source: reference/Grasple_image_cls_deep_cnn (exercise 107636).
+# Complete at 4 questions; a 5th on batch-norm inference mode could be added
+# from lesson_2_3_script slide 7.
+- q: What is the key problem encountered when training very deep networks?
+...
   options:
-    - "large"
-    - "close to zero"
-    - "negative"
-    - "undefined"
+    - The vanishing gradient problem
+...
+    - Overfitting
+...
+    - Lack of computational resources
+...
+  answer: 0
+  explain: Gradients are attenuated as they propagate back through many layers, so the early layers stop learning. Very deep networks do have many parameters and can overfit, but that does not prevent training the way vanishing gradients do.
+...
+- q: How do residual networks avoid the vanishing gradient problem and allow very deep networks to be trained?
+...
+  options:
+    - They use fewer layers than a plain network
+...
+    - Short paths through the identity shortcuts carry large-magnitude gradients back to the early layers
+...
+    - Batch normalisation layers rescale the gradients
+...
   answer: 1
-  explain: "Along the edge the intensities do not change; only shifts across the edge give a large E. At a corner every shift gives a large E."
-- q: "After the Taylor expansion of E, which terms remain?"
+  explain: A ResNet behaves like an ensemble of paths of many different lengths. The short paths created by the identity shortcuts carry large gradient values straight back during backpropagation. Batch normalisation speeds training up but does not solve the vanishing gradient problem.
+...
+- q: What is the principal advantage of using batch normalisation in a neural network?
+...
   options:
-    - "Only the zero-order term"
-    - "Only the first-order (gradient) term"
-    - "Only the second-order (Hessian) term"
-    - "All three"
+    - It reduces the number of parameters
+...
+    - It removes the need for activation functions
+...
+    - It allows a higher learning rate to be used
+...
   answer: 2
-  explain: "E and its first derivatives vanish at zero shift, leaving the quadratic term built from products of image gradients."
-- q: "The second-moment matrix M = [[A, C], [C, B]] has eigenvalues λ₁ = 9, λ₂ = 0.1. The point is most likely"
+  explain: Normalising layer outputs accelerates convergence and permits a higher learning rate. It adds a small number of parameters (γ and β) rather than reducing them, and activation functions are still needed to provide non-linearity.
+...
+- q: What is the key architectural difference between DenseNet and ResNet?
+...
   options:
-    - "a corner"
-    - "an edge"
-    - "a flat region"
-    - "noise"
-  answer: 1
-  explain: "One large and one small eigenvalue means curvature in one direction only: an edge."
-- q: "The Harris response is R = det M − k (trace M)². With A = 4, B = 4, C = 0 and k = 0.05, R equals"
-  options:
-    - "16"
-    - "12.8"
-    - "0"
-    - "−3.2"
-  answer: 1
-  explain: "det M = 16, trace M = 8, so R = 16 − 0.05 × 64 = 12.8, a corner."
-- q: "Why does the Harris algorithm use det and trace instead of the eigenvalues themselves?"
-  options:
-    - "Eigenvalues cannot be computed for 2 × 2 matrices"
-    - "det and trace are cheap to compute directly from A, B and C and encode the same information"
-    - "Eigenvalues are always negative"
-    - "det and trace are rotation dependent"
-  answer: 1
-  explain: "det M = λ₁λ₂ and trace M = λ₁ + λ₂, so R can be evaluated at every pixel without a decomposition."
-- q: "The Harris detector is invariant to rotation and translation but not to"
-  options:
-    - "brightness"
-    - "scale"
-    - "the choice of k"
-    - "the image format"
-  answer: 1
-  explain: "The fixed window size means only corners of one size are detected; large smooth corners are seen as edges."
+    - DenseNet uses larger convolution filters
+...
+    - DenseNet uses pooling layers and ResNet does not
+...
+    - DenseNet concatenates feature maps, ResNet adds them
+...
+  answer: 2
+  explain: The residual block adds the shortcut to the block output; the dense block concatenates every earlier feature map onto the input. Both use pooling and both are built from stacks of small 3×3 and 1×1 convolutions. Because concatenation grows the channel count quickly, DenseNet concatenates only within blocks, not across them.
+...

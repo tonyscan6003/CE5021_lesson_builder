@@ -1,56 +1,23 @@
-- q: "With the structuring element centred on a pixel, some but not all of its 1s lie over foreground pixels. What does erosion output there?"
+# 1.5 Training neural networks
+# Source: reference/Grasple_convolutional_neural_networks (exercise 107563).
+# INCOMPLETE — 2 of a target 5-6 questions. Top up from lesson_1_5_script
+# (supervised learning, datasets, cross-entropy, backpropagation, momentum).
+- q: During training, what problems do too low and too high learning rates cause?
+...
   options:
-    - "1, because there is a hit"
-    - "0, because erosion requires a fit"
-    - "The mean of the overlapping pixels"
-    - "It depends on the size of the element"
-  answer: 1
-  explain: "Erosion outputs 1 only for a fit; a hit gives 0. Dilation would output 1 for this hit."
-- q: "Which sequence of operations is an opening?"
-  options:
-    - "Dilation then erosion"
-    - "Erosion then dilation"
-    - "Erosion twice"
-    - "Threshold then dilation"
-  answer: 1
-  explain: "Opening erodes first (removing small objects) and then dilates to restore the size of what survived."
-- q: "What is the main purpose of closing?"
-  options:
-    - "Removing small bright specks"
-    - "Filling small holes and gaps while keeping object size"
-    - "Detecting edges"
-    - "Reducing image resolution"
-  answer: 1
-  explain: "The dilation fills gaps and holes; the following erosion restores the outer size of the objects."
-- q: "In a distance transform, where are the largest values found?"
-  options:
-    - "On the object boundaries"
-    - "In the background"
-    - "At the points of the object furthest from any background pixel, such as object centres"
-    - "At the image corners"
+    - 'Too low: fast convergence; too high: smooth convergence'
+    - 'Too low: overfitting; too high: underfitting'
+    - 'Too low: slow convergence; too high: non-convergence or divergent behaviour'
   answer: 2
-  explain: "Each foreground pixel gets its distance to the nearest background pixel, so values peak at the interior points furthest from the boundary."
-- q: "The L1 distance between pixels (2, 3) and (5, 7) is"
+  explain: A low learning rate converges slowly rather than quickly. A high learning rate may not converge at all and often diverges. Overfitting is a matter of model complexity, not learning rate.
+...
+- q: How much of the training set does each update use in batch, stochastic and mini-batch gradient descent?
+...
   options:
-    - "5"
-    - "7"
-    - "√7"
-    - "12"
-  answer: 1
-  explain: "L1 adds the coordinate differences, |2 − 5| + |3 − 7| = 3 + 4 = 7. The L2 distance would be 5."
-- q: "During the first pass of connected-component labelling a pixel has two neighbours with different labels. What happens?"
-  options:
-    - "The pixel is set to 0"
-    - "A new label is created for the pixel"
-    - "One label is assigned and the equivalence between the two labels is recorded for the second pass"
-    - "The scan restarts"
+    - 'Batch: all examples at once; stochastic: a subset of examples; mini-batch: one example at a time'
+    - 'Batch: one example at a time; stochastic: all examples at once; mini-batch: a subset of examples'
+    - 'Batch: all examples at once; stochastic: one example at a time; mini-batch: a subset of examples'
+    - 'Batch: a subset of examples; stochastic: all examples at once; mini-batch: one example at a time'
   answer: 2
-  explain: "Equivalences are resolved after the scan, when all equivalent labels are merged into one class."
-- q: "Greyscale dilation with a 5 × 5 structuring element outputs at each pixel"
-  options:
-    - "the minimum intensity under the element"
-    - "the maximum intensity under the element"
-    - "the median intensity under the element"
-    - "the sum of intensities under the element"
-  answer: 1
-  explain: "Greyscale dilation takes the maximum; greyscale erosion takes the minimum."
+  explain: Batch gradient descent uses the whole training set for each update, stochastic gradient descent uses a single example, and mini-batch gradient descent uses a subset — the usual compromise between gradient quality and update frequency.
+...

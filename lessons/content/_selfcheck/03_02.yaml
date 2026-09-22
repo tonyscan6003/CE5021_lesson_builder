@@ -1,48 +1,45 @@
-- q: "Why is the Gaussian used to build scale spaces?"
+# 3.2 Region proposals
+# Source: reference/Grasple_object_detection (exercise 106864). These three
+# questions are about the sliding-window/image-pyramid approach that region
+# proposals replace, which is exactly how lesson_3_2_script motivates the
+# topic; the HOG-specific question from the same exercise is classical
+# machine vision and is not used.
+# INCOMPLETE — 3 of a target 5-6 questions. Top up from
+# lesson_3_2_region_proposals (objectness cues, selective search, region
+# similarity measures).
+- q: Why is a sliding window necessary in a classical object detector?
+...
   options:
-    - "It is the cheapest kernel"
-    - "It removes fine structure without introducing artefacts"
-    - "It sharpens edges"
-    - "It is the only separable kernel"
-  answer: 1
-  explain: "Gaussian blurring progressively removes information but creates no new structure, unlike box or sinc kernels."
-- q: "What is the characteristic scale of an image feature?"
+    - To reduce noise in the image
+...
+    - To increase the resolution of the image
+...
+    - To find objects anywhere in the image by applying the detector at every grid position
+...
+  answer: 2
+  explain: The detector only sees one window at a time, so it is swept across the image on a regular grid — much like convolution — and evaluated at each position. Noise reduction and resolution are unrelated concerns.
+...
+- q: What additional problem, beyond object position, does an image pyramid solve for a fixed-size detection window?
+...
   options:
-    - "The scale at which the image is smallest"
-    - "The scale at which a normalised derivative function, such as the normalised Laplacian, reaches its maximum at that point"
-    - "The scale with the most keypoints"
-    - "Always σ = 1"
-  answer: 1
-  explain: "Lindeberg's principle: the scale of the maximum over scales reflects the size of the structure."
-- q: "What is the role of the σ² factor in the normalised Laplacian σ²∇²L?"
+    - It allows objects in different positions to be detected
+...
+    - It allows rotated objects to be detected
+...
+    - It allows objects of different scales to be detected
+...
+  answer: 2
+  explain: The detection window is a fixed number of pixels, so an object larger than the window cannot be detected directly. Scaling the image down repeatedly eventually brings a large object within the window. Position is handled by the sliding window, and rotation by neither.
+...
+- q: What is the main drawback of the sliding window and image pyramid approach?
+...
   options:
-    - "It converts pixels to millimetres"
-    - "It compensates for the amplitude loss caused by Gaussian smoothing so the correct scale maximum is found"
-    - "It makes the kernel symmetric"
-    - "It has no effect"
-  answer: 1
-  explain: "Without normalisation the response decreases with σ and the maximum would always be at the smallest scale."
-- q: "A feature has characteristic scale σ* = 4 in an image. In a copy enlarged three times it will have characteristic scale about"
-  options:
-    - "4"
-    - "12"
-    - "4/3"
-    - "16"
-  answer: 1
-  explain: "The characteristic scale tracks the feature's size in pixels, so it scales with the image."
-- q: "The 26 neighbours used to test for a scale-space maximum are"
-  options:
-    - "26 pixels in the same scale"
-    - "8 in the same scale, 9 in the scale below and 9 in the scale above"
-    - "13 in the scale below and 13 in the scale above"
-    - "the 26 nearest keypoints"
-  answer: 1
-  explain: "The search is a 3 × 3 × 3 cube in (x, y, scale) minus the centre."
-- q: "The difference of two Gaussians of widths ρσ and σ, divided by (ρ − 1), approximates"
-  options:
-    - "the gradient magnitude"
-    - "σ ∂G/∂σ, which equals the normalised Laplacian of Gaussian"
-    - "a box filter"
-    - "the Harris response"
-  answer: 1
-  explain: "It is a finite-difference derivative with respect to σ, and the approximation improves as ρ → 1."
+    - It reduces the image resolution
+...
+    - It decreases detection accuracy
+...
+    - It increases computation time
+...
+  answer: 2
+  explain: More pyramid levels and smaller window steps give better accuracy but multiply the number of detector evaluations. That cost is exactly what region proposal methods set out to reduce. The original image is retained, so no information is lost.
+...

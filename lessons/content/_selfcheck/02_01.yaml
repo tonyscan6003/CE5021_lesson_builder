@@ -1,48 +1,50 @@
-- q: "The Prewitt X-direction kernel responds most strongly to"
+# 2.1 Introduction to image classification
+# Source: reference/Grasple_image_cls_deep_cnn (exercises 107568, 107571).
+# Complete at 5 questions.
+- q: In Top-1 accuracy, the highest-probability prediction must match the ground truth.
+...
   options:
-    - "horizontal edges"
-    - "vertical edges"
-    - "diagonal edges only"
-    - "flat regions"
-  answer: 1
-  explain: "The X kernel differentiates along rows, so it detects intensity changes across vertical edges."
-- q: "Why is a Gaussian smoothing step applied before a derivative edge detector?"
-  options:
-    - "To make the edges thicker"
-    - "To suppress noise, which would otherwise produce many false edges"
-    - "To convert the image to binary"
-    - "To increase the image resolution"
-  answer: 1
-  explain: "Derivative filters amplify rapid changes, including noise; smoothing first removes the false responses."
-- q: "What distinguishes the Sobel kernel from the Prewitt kernel?"
-  options:
-    - "Sobel detects horizontal edges and Prewitt vertical ones"
-    - "Sobel includes an averaging component [1 2 1] along the edge, reducing noise sensitivity"
-    - "Sobel is a second-order operator"
-    - "Sobel needs no smoothing at all"
-  answer: 1
-  explain: "Sobel X = [1 2 1]ᵀ ⊗ [1 0 −1]: the same central difference combined with averaging."
-- q: "Gx = 3 and Gy = 4 at a pixel. The gradient magnitude is"
-  options:
-    - "7"
-    - "5"
-    - "1"
-    - "12"
-  answer: 1
-  explain: "|G| = √(3² + 4²) = 5."
-- q: "A Gaussian derivative filter with a large σ"
-  options:
-    - "responds to fine, small-scale edges"
-    - "responds only to coarse, large-scale edges"
-    - "is identical to the Laplacian"
-    - "produces no output"
-  answer: 1
-  explain: "Large σ smooths away fine structure before differentiating, leaving only the coarse edges."
-- q: "Where does the Laplacian of an edge cross zero?"
-  options:
-    - "At the true position of the edge"
-    - "One pixel to the left of the edge"
-    - "It never crosses zero"
-    - "At the image border"
+    - 'True'
+    - 'False'
   answer: 0
-  explain: "The second derivative has a positive-negative pair around an edge with its zero crossing at the edge itself."
+  explain: 'Top-1 accuracy is the conventional multi-class accuracy: the single highest-probability prediction must equal the true label for the prediction to count as a true positive.'
+- q: In Top-5 accuracy, the highest-probability prediction must match the ground truth.
+...
+  options:
+    - 'True'
+    - 'False'
+  answer: 1
+  explain: Top-5 accuracy counts a true positive if the true label appears anywhere among the five highest-probability predictions, not only at the top.
+...
+- q: In Top-5 accuracy, the order of the five probabilities matters.
+...
+  options:
+    - 'True'
+    - 'False'
+  answer: 1
+  explain: Order is irrelevant. As long as the correct label is one of the top five, the prediction counts as a true positive.
+...
+- q: Confusion in a deep neural network image classifier occurs when
+...
+  options:
+    - the network mislabels similar objects
+...
+    - the network has no training data
+...
+    - the network correctly labels all objects
+...
+  answer: 0
+  explain: Confusion is systematic mislabelling between visually or semantically similar classes, and shows up as off-diagonal mass in the confusion matrix between those classes.
+...
+- q: Bias in a neural network classifier arises principally from
+...
+  options:
+    - underrepresentation of genders or ethnic groups in the training images
+...
+    - random initialisation of the weights
+...
+    - overrepresentation of certain classes in the training data
+...
+  answer: 0
+  explain: Bias comes from the training data, specifically from groups that are underrepresented in it, so the network performs worse on them. Weight initialisation is random but not a source of this kind of bias.
+...

@@ -1,0 +1,342 @@
+{
+  "table_of_contents": [
+    {
+      "title": "<u>View subject</u> | <u>Edit subject</u>",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          52.452389503306044,
+          151.44063806576276
+        ],
+        [
+          210.55887786327142,
+          151.44063806576276
+        ],
+        [
+          210.55887786327142,
+          170.93299742076192
+        ],
+        [
+          52.452389503306044,
+          170.93299742076192
+        ]
+      ]
+    },
+    {
+      "title": "Corner Detection",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          51.703069653258815,
+          184.42770774345365
+        ],
+        [
+          243.5289512653495,
+          182.17858935633836
+        ],
+        [
+          243.5289512653495,
+          215.9153651630677
+        ],
+        [
+          51.703069653258815,
+          218.16448355018298
+        ]
+      ]
+    },
+    {
+      "title": "Exercises",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          50.15343648195267
+        ],
+        [
+          144.61873105911525,
+          50.15343648195267
+        ],
+        [
+          144.61873105911525,
+          66.59718614816666
+        ],
+        [
+          53.9510292034005,
+          66.59718614816666
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          103.59562289714813
+        ],
+        [
+          221.04935576393262,
+          103.59562289714813
+        ],
+        [
+          221.04935576393262,
+          116.75062263011934
+        ],
+        [
+          53.9510292034005,
+          116.75062263011934
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 105758",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          54.61546516418457,
+          146.94240129153218
+        ],
+        [
+          182.83404341152394,
+          146.94240129153218
+        ],
+        [
+          182.83404341152394,
+          159.91546550393105
+        ],
+        [
+          54.61546516418457,
+          159.91546550393105
+        ]
+      ]
+    },
+    {
+      "title": "Harris Corner Algorithm",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          58.44694830368388,
+          230.15978161479785
+        ],
+        [
+          248.7741902156801,
+          230.15978161479785
+        ],
+        [
+          248.7741902156801,
+          249.12280744314197
+        ],
+        [
+          58.44694830368388,
+          249.12280744314197
+        ]
+      ]
+    },
+    {
+      "title": "\u00d7 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          42.71123145269207,
+          472.3148612942106
+        ],
+        [
+          171.5942456608155,
+          472.3148612942106
+        ],
+        [
+          171.5942456608155,
+          482.8107471007486
+        ],
+        [
+          42.71123145269207,
+          482.8107471007486
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Text",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          30
+        ],
+        [
+          "Span",
+          18
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "SectionHeader",
+          4
+        ],
+        [
+          "TableCell",
+          4
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          30
+        ],
+        [
+          "Span",
+          14
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "Equation",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/Grasple_corner_detection"
+}

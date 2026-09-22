@@ -1,0 +1,2344 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Convolutional Neural Networks",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          52.452389503306044,
+          187.42653225960737
+        ],
+        [
+          380.65448382399245,
+          185.17741387249208
+        ],
+        [
+          380.65448382399245,
+          214.41595290499083
+        ],
+        [
+          52.452389503306044,
+          216.66507129210612
+        ]
+      ]
+    },
+    {
+      "title": "Exercises",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          50.15343648195267
+        ],
+        [
+          144.61873105911525,
+          50.15343648195267
+        ],
+        [
+          144.61873105911525,
+          66.59718614816666
+        ],
+        [
+          53.9510292034005,
+          66.59718614816666
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.453433990478516,
+          104.00671663880348
+        ],
+        [
+          221.04935576393262,
+          104.00671663880348
+        ],
+        [
+          221.04935576393262,
+          116.33952888846399
+        ],
+        [
+          53.453433990478516,
+          116.33952888846399
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107366",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          146.19269516249375
+        ],
+        [
+          182.83404341152394,
+          146.19269516249375
+        ],
+        [
+          182.83404341152394,
+          160.4371116142239
+        ],
+        [
+          53.9510292034005,
+          160.4371116142239
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          43.4605513027393,
+          35.35406178236008
+        ],
+        [
+          131.88029360831234,
+          35.35406178236008
+        ],
+        [
+          131.88029360831234,
+          46.86468654870987
+        ],
+        [
+          43.4605513027393,
+          46.86468654870987
+        ]
+      ]
+    },
+    {
+      "title": "Question at wrong answer",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          42.414137840270996,
+          664.9893364570869
+        ],
+        [
+          170.84492581076827,
+          664.9893364570869
+        ],
+        [
+          170.84492581076827,
+          675.4270175397396
+        ],
+        [
+          42.414137840270996,
+          675.4270175397396
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107415",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          54.61546516418457,
+          80.1632796227932
+        ],
+        [
+          182.83404341152394,
+          80.1632796227932
+        ],
+        [
+          182.83404341152394,
+          92.96356000076526
+        ],
+        [
+          54.61546516418457,
+          92.96356000076526
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          43.4605513027393,
+          226.51265165209773
+        ],
+        [
+          131.88029360831234,
+          226.51265165209773
+        ],
+        [
+          131.88029360831234,
+          237.65684290518215
+        ],
+        [
+          43.4605513027393,
+          237.65684290518215
+        ]
+      ]
+    },
+    {
+      "title": "\u25a1 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          42.71123145269207,
+          583.2713683918981
+        ],
+        [
+          171.5942456608155,
+          583.2713683918981
+        ],
+        [
+          171.5942456608155,
+          593.7672541984361
+        ],
+        [
+          42.71123145269207,
+          593.7672541984361
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107478",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          54.70034905344773,
+          80.1632796227932
+        ],
+        [
+          182.83404341152394,
+          80.1632796227932
+        ],
+        [
+          182.83404341152394,
+          92.96356000076526
+        ],
+        [
+          54.70034905344773,
+          92.96356000076526
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          42.99515342712402,
+          36.176249265670776
+        ],
+        [
+          131.88029360831234,
+          36.176249265670776
+        ],
+        [
+          131.88029360831234,
+          47.68687403202057
+        ],
+        [
+          42.99515342712402,
+          47.68687403202057
+        ]
+      ]
+    },
+    {
+      "title": "Question at wrong answer",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          43.28566122055054,
+          555.5322416174763
+        ],
+        [
+          170.84492581076827,
+          555.5322416174763
+        ],
+        [
+          170.84492581076827,
+          566.8982697427273
+        ],
+        [
+          43.28566122055054,
+          566.8982697427273
+        ]
+      ]
+    },
+    {
+      "title": "Calculate the number of parameters in the convolution layer (assume no bias parameter).",
+      "heading_level": null,
+      "page_id": 13,
+      "polygon": [
+        [
+          58.44694830368388,
+          76.8745296895504
+        ],
+        [
+          466.8262665794238,
+          76.8745296895504
+        ],
+        [
+          466.8262665794238,
+          127.45004193653301
+        ],
+        [
+          58.44694830368388,
+          127.45004193653301
+        ]
+      ]
+    },
+    {
+      "title": "\u2611 Detailed solution",
+      "heading_level": null,
+      "page_id": 13,
+      "polygon": [
+        [
+          43.4605513027393,
+          300.50952515006065
+        ],
+        [
+          132.6296134583596,
+          300.50952515006065
+        ],
+        [
+          132.6296134583596,
+          311.19796243309975
+        ],
+        [
+          43.4605513027393,
+          311.19796243309975
+        ]
+      ]
+    },
+    {
+      "title": "\u00d7 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 13,
+      "polygon": [
+        [
+          42.414137840270996,
+          603.5134338759358
+        ],
+        [
+          171.5942456608155,
+          603.5134338759358
+        ],
+        [
+          171.5942456608155,
+          614.0093196824737
+        ],
+        [
+          42.414137840270996,
+          614.0093196824737
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 15,
+      "polygon": [
+        [
+          43.4605513027393,
+          300.0984314084053
+        ],
+        [
+          132.6296134583596,
+          300.0984314084053
+        ],
+        [
+          132.6296134583596,
+          311.6090561747551
+        ],
+        [
+          43.4605513027393,
+          311.6090561747551
+        ]
+      ]
+    },
+    {
+      "title": "\u25a0 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 16,
+      "polygon": [
+        [
+          42.71123145269207,
+          107.70656031370164
+        ],
+        [
+          171.5942456608155,
+          107.70656031370164
+        ],
+        [
+          171.5942456608155,
+          119.95298064614872
+        ],
+        [
+          42.71123145269207,
+          119.95298064614872
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107544",
+      "heading_level": null,
+      "page_id": 17,
+      "polygon": [
+        [
+          54.70034905344773,
+          79.75218588113785
+        ],
+        [
+          182.83404341152394,
+          79.75218588113785
+        ],
+        [
+          182.83404341152394,
+          92.96356000076526
+        ],
+        [
+          54.70034905344773,
+          92.96356000076526
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 18,
+      "polygon": [
+        [
+          43.4605513027393,
+          303.79827508330345
+        ],
+        [
+          132.6296134583596,
+          303.79827508330345
+        ],
+        [
+          132.6296134583596,
+          314.48671236634254
+        ],
+        [
+          43.4605513027393,
+          314.48671236634254
+        ]
+      ]
+    },
+    {
+      "title": "\u22c9 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 19,
+      "polygon": [
+        [
+          42.99515342712402,
+          43.16484287381172
+        ],
+        [
+          171.5942456608155,
+          43.16484287381172
+        ],
+        [
+          171.5942456608155,
+          53.97884129076692
+        ],
+        [
+          42.99515342712402,
+          53.97884129076692
+        ]
+      ]
+    },
+    {
+      "title": "Calculate the number of parameters in the convolution layer (assume no bias parameter).",
+      "heading_level": null,
+      "page_id": 20,
+      "polygon": [
+        [
+          58.44694830368388,
+          76.8745296895504
+        ],
+        [
+          466.8262665794238,
+          76.8745296895504
+        ],
+        [
+          466.8262665794238,
+          127.45004193653301
+        ],
+        [
+          58.44694830368388,
+          127.45004193653301
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 20,
+      "polygon": [
+        [
+          43.4605513027393,
+          296.8096814751625
+        ],
+        [
+          132.6296134583596,
+          296.8096814751625
+        ],
+        [
+          132.6296134583596,
+          310.3783374219098
+        ],
+        [
+          43.4605513027393,
+          310.3783374219098
+        ]
+      ]
+    },
+    {
+      "title": "\u00d7 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 20,
+      "polygon": [
+        [
+          42.71123145269207,
+          603.5134338759358
+        ],
+        [
+          171.5942456608155,
+          603.5134338759358
+        ],
+        [
+          171.5942456608155,
+          614.0093196824737
+        ],
+        [
+          42.71123145269207,
+          614.0093196824737
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 22,
+      "polygon": [
+        [
+          42.99515342712402,
+          303.79827508330345
+        ],
+        [
+          132.6296134583596,
+          303.79827508330345
+        ],
+        [
+          132.6296134583596,
+          314.8765741961404
+        ],
+        [
+          42.99515342712402,
+          314.8765741961404
+        ]
+      ]
+    },
+    {
+      "title": "\u25a0 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 23,
+      "polygon": [
+        [
+          43.4605513027393,
+          171.8371840119362
+        ],
+        [
+          171.5942456608155,
+          171.8371840119362
+        ],
+        [
+          171.5942456608155,
+          183.67800161441522
+        ],
+        [
+          43.4605513027393,
+          183.67800161441522
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107547",
+      "heading_level": null,
+      "page_id": 24,
+      "polygon": [
+        [
+          53.9510292034005,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          92.96356000076526
+        ],
+        [
+          53.9510292034005,
+          92.96356000076526
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 25,
+      "polygon": [
+        [
+          42.414137840270996,
+          36.176249265670776
+        ],
+        [
+          131.88029360831234,
+          36.176249265670776
+        ],
+        [
+          131.88029360831234,
+          47.68687403202057
+        ],
+        [
+          42.414137840270996,
+          47.68687403202057
+        ]
+      ]
+    },
+    {
+      "title": "",
+      "heading_level": null,
+      "page_id": 26,
+      "polygon": [
+        [
+          42.71123145269207,
+          666.3829552233219
+        ],
+        [
+          172.34356551086273,
+          666.3829552233219
+        ],
+        [
+          172.34356551086273,
+          677.7343406507403
+        ],
+        [
+          42.71123145269207,
+          677.7343406507403
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107549",
+      "heading_level": null,
+      "page_id": 28,
+      "polygon": [
+        [
+          53.9510292034005,
+          77.96943741999667
+        ],
+        [
+          182.83404341152394,
+          77.96943741999667
+        ],
+        [
+          182.83404341152394,
+          94.46297225884211
+        ],
+        [
+          53.9510292034005,
+          94.46297225884211
+        ]
+      ]
+    },
+    {
+      "title": "Detailed solution",
+      "heading_level": null,
+      "page_id": 29,
+      "polygon": [
+        [
+          41.83312225341797,
+          35.76515552401543
+        ],
+        [
+          131.88029360831234,
+          35.76515552401543
+        ],
+        [
+          131.88029360831234,
+          46.45359280705452
+        ],
+        [
+          41.83312225341797,
+          46.45359280705452
+        ]
+      ]
+    },
+    {
+      "title": "\u25a1 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 29,
+      "polygon": [
+        [
+          42.71123145269207,
+          227.33483913540843
+        ],
+        [
+          170.84492581076827,
+          227.33483913540843
+        ],
+        [
+          170.84492581076827,
+          239.66765138506892
+        ],
+        [
+          42.71123145269207,
+          239.66765138506892
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 30,
+      "polygon": [
+        [
+          52.87241840362549,
+          37.485306451921474
+        ],
+        [
+          221.79867561397984,
+          36.735600322883045
+        ],
+        [
+          221.79867561397984,
+          49.480604516536346
+        ],
+        [
+          52.87241840362549,
+          50.230310645574775
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107563",
+      "heading_level": null,
+      "page_id": 30,
+      "polygon": [
+        [
+          53.9510292034005,
+          77.96943741999667
+        ],
+        [
+          182.83404341152394,
+          77.96943741999667
+        ],
+        [
+          182.83404341152394,
+          94.46297225884211
+        ],
+        [
+          53.9510292034005,
+          94.46297225884211
+        ]
+      ]
+    },
+    {
+      "title": "What are the key differences between batch gradient descent, stochastic gradient descent, and mini-batch gradient descent?",
+      "heading_level": null,
+      "page_id": 32,
+      "polygon": [
+        [
+          57.69762845363665,
+          76.4700251619198
+        ],
+        [
+          526.7718545832022,
+          76.4700251619198
+        ],
+        [
+          526.7718545832022,
+          159.68740548518548
+        ],
+        [
+          57.69762845363665,
+          159.68740548518548
+        ]
+      ]
+    },
+    {
+      "title": "Name some solutions to overfitting when training deep neural networks.",
+      "heading_level": null,
+      "page_id": 34,
+      "polygon": [
+        [
+          57.69762845363665,
+          76.4700251619198
+        ],
+        [
+          496.799060581313,
+          74.97061290384295
+        ],
+        [
+          496.799060581313,
+          130.44886645268673
+        ],
+        [
+          57.69762845363665,
+          130.44886645268673
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 36,
+      "polygon": [
+        [
+          52.87241840362549,
+          37.485306451921474
+        ],
+        [
+          221.04935576393262,
+          37.485306451921474
+        ],
+        [
+          221.04935576393262,
+          49.480604516536346
+        ],
+        [
+          52.87241840362549,
+          49.480604516536346
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107720",
+      "heading_level": null,
+      "page_id": 36,
+      "polygon": [
+        [
+          54.70034905344773,
+          80.1632796227932
+        ],
+        [
+          182.83404341152394,
+          80.1632796227932
+        ],
+        [
+          182.83404341152394,
+          92.96356000076526
+        ],
+        [
+          54.70034905344773,
+          92.96356000076526
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 36,
+      "polygon": [
+        [
+          43.4605513027393,
+          515.7978167784395
+        ],
+        [
+          131.88029360831234,
+          515.7978167784395
+        ],
+        [
+          131.88029360831234,
+          527.4332705438137
+        ],
+        [
+          43.4605513027393,
+          527.4332705438137
+        ]
+      ]
+    },
+    {
+      "title": "Question at wrong answer",
+      "heading_level": null,
+      "page_id": 37,
+      "polygon": [
+        [
+          43.28566122055054,
+          264.3332758843899
+        ],
+        [
+          170.84492581076827,
+          264.3332758843899
+        ],
+        [
+          170.84492581076827,
+          275.1421493571036
+        ],
+        [
+          43.28566122055054,
+          275.1421493571036
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          24
+        ],
+        [
+          "Span",
+          16
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          35
+        ],
+        [
+          "Span",
+          15
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "Equation",
+          4
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          17
+        ],
+        [
+          "Span",
+          11
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          38
+        ],
+        [
+          "Span",
+          20
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "PageHeader",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          48
+        ],
+        [
+          "Span",
+          30
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Span",
+          26
+        ],
+        [
+          "Line",
+          25
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "Equation",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 8,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          38
+        ],
+        [
+          "Span",
+          33
+        ],
+        [
+          "Text",
+          9
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 9,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          28
+        ],
+        [
+          "Span",
+          19
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "PageHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 10,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          22
+        ],
+        [
+          "Span",
+          6
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 11,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          39
+        ],
+        [
+          "Span",
+          34
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 12,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          18
+        ],
+        [
+          "Span",
+          12
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 13,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          36
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 14,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          14
+        ],
+        [
+          "Span",
+          11
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 15,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          38
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 16,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          28
+        ],
+        [
+          "Span",
+          23
+        ],
+        [
+          "Text",
+          9
+        ],
+        [
+          "Equation",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 17,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          28
+        ],
+        [
+          "Span",
+          21
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "PageHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 18,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          47
+        ],
+        [
+          "Span",
+          35
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 19,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          32
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 20,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          36
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 21,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          14
+        ],
+        [
+          "Span",
+          11
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 22,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          34
+        ],
+        [
+          "Span",
+          23
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 23,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          31
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Text",
+          10
+        ],
+        [
+          "Equation",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 24,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          31
+        ],
+        [
+          "Span",
+          17
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 25,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          40
+        ],
+        [
+          "Span",
+          31
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 26,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Span",
+          40
+        ],
+        [
+          "Line",
+          38
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 27,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          37
+        ],
+        [
+          "Span",
+          25
+        ],
+        [
+          "Text",
+          9
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 28,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          21
+        ],
+        [
+          "Span",
+          9
+        ],
+        [
+          "Text",
+          3
+        ],
+        [
+          "Picture",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "PageHeader",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 29,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          26
+        ],
+        [
+          "Span",
+          14
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 30,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          48
+        ],
+        [
+          "Line",
+          15
+        ],
+        [
+          "Span",
+          7
+        ],
+        [
+          "Text",
+          3
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 31,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          6
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 32,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          48
+        ],
+        [
+          "Line",
+          12
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 33,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          13
+        ],
+        [
+          "Span",
+          6
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 34,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          38
+        ],
+        [
+          "Line",
+          10
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 35,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          19
+        ],
+        [
+          "Span",
+          9
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 36,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          38
+        ],
+        [
+          "Span",
+          28
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 37,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          34
+        ],
+        [
+          "Span",
+          20
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/Grasple_convolutional_neural_networks"
+}

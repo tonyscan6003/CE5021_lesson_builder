@@ -1,0 +1,304 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Segmentation",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          72.68402545458123,
+          183.67800161441522
+        ],
+        [
+          212.8068374134131,
+          183.67800161441522
+        ],
+        [
+          212.8068374134131,
+          216.66507129210612
+        ],
+        [
+          72.68402545458123,
+          216.66507129210612
+        ]
+      ]
+    },
+    {
+      "title": "Exercises",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          47.98119225845949
+        ],
+        [
+          145.36805090916246,
+          47.98119225845949
+        ],
+        [
+          145.36805090916246,
+          66.72384548442022
+        ],
+        [
+          53.9510292034005,
+          66.72384548442022
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.20170935335327,
+          102.70973967826484
+        ],
+        [
+          221.04935576393262,
+          102.70973967826484
+        ],
+        [
+          221.04935576393262,
+          117.16171637177469
+        ],
+        [
+          53.20170935335327,
+          117.16171637177469
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 106238",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          143.94357677537846
+        ],
+        [
+          182.83404341152394,
+          143.94357677537846
+        ],
+        [
+          182.83404341152394,
+          161.93652387230077
+        ],
+        [
+          53.9510292034005,
+          161.93652387230077
+        ]
+      ]
+    },
+    {
+      "title": "In the watershed algorithm without markers, where does the flooding start from?",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          57.69762845363665,
+          230.15978161479785
+        ],
+        [
+          514.0334171323992,
+          230.15978161479785
+        ],
+        [
+          514.0334171323992,
+          281.8895045184495
+        ],
+        [
+          57.69762845363665,
+          281.8895045184495
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          40
+        ],
+        [
+          "Line",
+          16
+        ],
+        [
+          "Span",
+          8
+        ],
+        [
+          "SectionHeader",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          8
+        ],
+        [
+          "Line",
+          5
+        ],
+        [
+          "Span",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Text",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          10
+        ],
+        [
+          "TableCell",
+          10
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/Grasple_segmentation"
+}

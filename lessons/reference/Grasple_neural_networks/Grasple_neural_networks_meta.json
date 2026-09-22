@@ -1,0 +1,824 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Neural Networks",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          74.18266515467569,
+          187.42653225960737
+        ],
+        [
+          241.28099171520782,
+          185.17741387249208
+        ],
+        [
+          242.03031156525503,
+          212.16683451787554
+        ],
+        [
+          74.18266515467569,
+          214.41595290499083
+        ]
+      ]
+    },
+    {
+      "title": "Exercises",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          47.98119225845949
+        ],
+        [
+          144.61873105911525,
+          49.33124899864197
+        ],
+        [
+          144.61873105911525,
+          66.72384548442022
+        ],
+        [
+          53.9510292034005,
+          65.9741393553818
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          52.87241840362549,
+          104.00671663880348
+        ],
+        [
+          221.04935576393262,
+          104.00671663880348
+        ],
+        [
+          221.04935576393262,
+          116.33952888846399
+        ],
+        [
+          52.87241840362549,
+          116.33952888846399
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107269",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          54.70034905344773,
+          146.76046577095985
+        ],
+        [
+          182.83404341152394,
+          146.76046577095985
+        ],
+        [
+          182.83404341152394,
+          159.68740548518548
+        ],
+        [
+          54.70034905344773,
+          159.68740548518548
+        ]
+      ]
+    },
+    {
+      "title": "Check my answer",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          242.77963141530228,
+          626.754323876127
+        ],
+        [
+          352.92964937224497,
+          626.754323876127
+        ],
+        [
+          352.92964937224497,
+          642.5395182073116
+        ],
+        [
+          242.77963141530228,
+          642.5395182073116
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          43.4605513027393,
+          679.2337529088171
+        ],
+        [
+          131.88029360831234,
+          679.2337529088171
+        ],
+        [
+          131.88029360831234,
+          688.5820172727108
+        ],
+        [
+          43.4605513027393,
+          688.5820172727108
+        ]
+      ]
+    },
+    {
+      "title": "",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          42.12363004684448,
+          314.8978061079979
+        ],
+        [
+          170.84492581076827,
+          314.8978061079979
+        ],
+        [
+          170.84492581076827,
+          326.87187226075525
+        ],
+        [
+          42.12363004684448,
+          326.87187226075525
+        ]
+      ]
+    },
+    {
+      "title": "Check my answer",
+      "heading_level": null,
+      "page_id": 4,
+      "polygon": [
+        [
+          241.9929919242859,
+          314.0756186246872
+        ],
+        [
+          352.92964937224497,
+          314.0756186246872
+        ],
+        [
+          352.92964937224497,
+          330.5193682909012
+        ],
+        [
+          241.9929919242859,
+          330.5193682909012
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          51.129371643066406,
+          37.409530490636826
+        ],
+        [
+          221.04935576393262,
+          37.409530490636826
+        ],
+        [
+          221.04935576393262,
+          49.74234274029732
+        ],
+        [
+          51.129371643066406,
+          49.74234274029732
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107287",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          53.9510292034005,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          93.71326612980369
+        ],
+        [
+          53.9510292034005,
+          93.71326612980369
+        ]
+      ]
+    },
+    {
+      "title": "Detailed solution",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          43.4605513027393,
+          498.5545758105556
+        ],
+        [
+          131.88029360831234,
+          498.5545758105556
+        ],
+        [
+          131.88029360831234,
+          509.0504616170936
+        ],
+        [
+          43.4605513027393,
+          509.0504616170936
+        ]
+      ]
+    },
+    {
+      "title": "\u25a0 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          42.70464563369751,
+          329.12099064787054
+        ],
+        [
+          171.5942456608155,
+          329.12099064787054
+        ],
+        [
+          171.5942456608155,
+          341.2078055739403
+        ],
+        [
+          42.70464563369751,
+          341.2078055739403
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 107288",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          53.9510292034005,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          93.71326612980369
+        ],
+        [
+          53.9510292034005,
+          93.71326612980369
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 8,
+      "polygon": [
+        [
+          41.83312225341797,
+          35.35406178236008
+        ],
+        [
+          131.88029360831234,
+          35.35406178236008
+        ],
+        [
+          131.88029360831234,
+          46.86468654870987
+        ],
+        [
+          41.83312225341797,
+          46.86468654870987
+        ]
+      ]
+    },
+    {
+      "title": "\u25a0 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 8,
+      "polygon": [
+        [
+          42.70464563369751,
+          211.3021832108498
+        ],
+        [
+          171.5942456608155,
+          211.3021832108498
+        ],
+        [
+          171.5942456608155,
+          223.41242645345199
+        ],
+        [
+          42.70464563369751,
+          223.41242645345199
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          43.4605513027393,
+          393.5957177451755
+        ],
+        [
+          132.6296134583596,
+          393.5957177451755
+        ],
+        [
+          132.6296134583596,
+          405.33842927217484
+        ],
+        [
+          43.4605513027393,
+          405.33842927217484
+        ]
+      ]
+    },
+    {
+      "title": "\u25a1 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          42.71123145269207,
+          570.5981134176254
+        ],
+        [
+          172.34356551086273,
+          570.5981134176254
+        ],
+        [
+          172.34356551086273,
+          581.0222500047828
+        ],
+        [
+          42.71123145269207,
+          581.0222500047828
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          28
+        ],
+        [
+          "Span",
+          24
+        ],
+        [
+          "TableCell",
+          10
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          28
+        ],
+        [
+          "Span",
+          14
+        ],
+        [
+          "Text",
+          9
+        ],
+        [
+          "Equation",
+          4
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          38
+        ],
+        [
+          "Span",
+          23
+        ],
+        [
+          "Text",
+          14
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          22
+        ],
+        [
+          "Span",
+          19
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "TableCell",
+          4
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          24
+        ],
+        [
+          "Span",
+          21
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          29
+        ],
+        [
+          "Span",
+          9
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 8,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          24
+        ],
+        [
+          "Span",
+          19
+        ],
+        [
+          "Text",
+          6
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 9,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          40
+        ],
+        [
+          "Span",
+          26
+        ],
+        [
+          "Text",
+          8
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 10,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          5
+        ],
+        [
+          "Span",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Text",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/Grasple_neural_networks"
+}

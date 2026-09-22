@@ -1,0 +1,1211 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Feature Detection",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          73.43334530462846,
+          186.67682613056894
+        ],
+        [
+          251.02214976582178,
+          186.67682613056894
+        ],
+        [
+          251.02214976582178,
+          214.41595290499083
+        ],
+        [
+          73.43334530462846,
+          214.41595290499083
+        ]
+      ]
+    },
+    {
+      "title": "Exercises",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          47.98119225845949
+        ],
+        [
+          145.36805090916246,
+          47.98119225845949
+        ],
+        [
+          145.36805090916246,
+          66.72384548442022
+        ],
+        [
+          53.9510292034005,
+          66.72384548442022
+        ]
+      ]
+    },
+    {
+      "title": "<u>View exercise</u> | <u>Edit exercise</u>",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.20170935335327,
+          102.70973967826484
+        ],
+        [
+          221.79867561397984,
+          102.70973967826484
+        ],
+        [
+          221.79867561397984,
+          116.954156129995
+        ],
+        [
+          53.20170935335327,
+          116.954156129995
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 106282",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          53.9510292034005,
+          143.94357677537846
+        ],
+        [
+          182.83404341152394,
+          143.94357677537846
+        ],
+        [
+          182.83404341152394,
+          161.93652387230077
+        ],
+        [
+          53.9510292034005,
+          161.93652387230077
+        ]
+      ]
+    },
+    {
+      "title": "List some qualities of a good feature detector",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          58.44694830368388,
+          229.41007548575942
+        ],
+        [
+          458.5837482289043,
+          229.41007548575942
+        ],
+        [
+          458.5837482289043,
+          251.58936989307406
+        ],
+        [
+          58.44694830368388,
+          251.58936989307406
+        ]
+      ]
+    },
+    {
+      "title": "In feature matching of images, how is a match between two descriptor vectors detected?",
+      "heading_level": null,
+      "page_id": 4,
+      "polygon": [
+        [
+          57.69762845363665,
+          76.4700251619198
+        ],
+        [
+          465.32762687932933,
+          76.4700251619198
+        ],
+        [
+          465.32762687932933,
+          129.08343487977982
+        ],
+        [
+          57.69762845363665,
+          131.19857258172516
+        ]
+      ]
+    },
+    {
+      "title": "If the Laplacian of Gaussian \"blob\" feature detector is\nto be made scale invariant, how will this be achieved?",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          57.69762845363665,
+          76.4700251619198
+        ],
+        [
+          528.2704942832966,
+          76.4700251619198
+        ],
+        [
+          528.2704942832966,
+          129.6991603236483
+        ],
+        [
+          57.69762845363665,
+          128.19974806557144
+        ]
+      ]
+    },
+    {
+      "title": "What is the primary purpose of the SIFT algorithm?",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          57.69762845363665,
+          74.22090677480452
+        ],
+        [
+          507.2895384819742,
+          74.22090677480452
+        ],
+        [
+          507.2895384819742,
+          100.46062129114955
+        ],
+        [
+          57.69762845363665,
+          100.46062129114955
+        ]
+      ]
+    },
+    {
+      "title": "What is the reason behind determining the characteristic orientation in the SIFT keypoint descriptor?",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          57.69762845363665,
+          76.46343594789505
+        ],
+        [
+          457.83442837885707,
+          74.97061290384295
+        ],
+        [
+          457.83442837885707,
+          159.68740548518548
+        ],
+        [
+          57.69762845363665,
+          159.68740548518548
+        ]
+      ]
+    },
+    {
+      "title": "Which function is used to produce the Scale-Spaces used in the Extrema Detection stage of the SIFT algorithm?",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          57.69762845363665,
+          75.72031903288138
+        ],
+        [
+          511.78545758225755,
+          76.46343594789505
+        ],
+        [
+          511.78545758225755,
+          159.68740548518548
+        ],
+        [
+          57.69762845363665,
+          159.68740548518548
+        ]
+      ]
+    },
+    {
+      "title": "How are keypoints assigned orientations in the SIFT algorithm?",
+      "heading_level": null,
+      "page_id": 13,
+      "polygon": [
+        [
+          57.69762845363665,
+          74.97061290384295
+        ],
+        [
+          514.7827369824465,
+          74.97061290384295
+        ],
+        [
+          514.7827369824465,
+          130.44886645268673
+        ],
+        [
+          57.69762845363665,
+          130.44886645268673
+        ]
+      ]
+    },
+    {
+      "title": "What is the typical size of the feature vector used in the SIFT Algorithm",
+      "heading_level": null,
+      "page_id": 14,
+      "polygon": [
+        [
+          58.44694830368388,
+          77.96943741999667
+        ],
+        [
+          512.5347774323048,
+          77.96943741999667
+        ],
+        [
+          512.5347774323048,
+          127.45004193653301
+        ],
+        [
+          58.44694830368388,
+          127.45004193653301
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Feedback for answer: 1",
+      "heading_level": null,
+      "page_id": 14,
+      "polygon": [
+        [
+          42.99515342712402,
+          372.60394613209945
+        ],
+        [
+          156.6078486598709,
+          372.60394613209945
+        ],
+        [
+          156.6078486598709,
+          383.5504609644413
+        ],
+        [
+          42.99515342712402,
+          383.5504609644413
+        ]
+      ]
+    },
+    {
+      "title": "What technique is used to detect stable keypoint locations in the scale-space?",
+      "heading_level": null,
+      "page_id": 15,
+      "polygon": [
+        [
+          57.69762845363665,
+          75.72031903288138
+        ],
+        [
+          489.3058620808407,
+          75.72031903288138
+        ],
+        [
+          489.3058620808407,
+          130.44886645268673
+        ],
+        [
+          57.69762845363665,
+          130.44886645268673
+        ]
+      ]
+    },
+    {
+      "title": "Exercise 106300",
+      "heading_level": null,
+      "page_id": 17,
+      "polygon": [
+        [
+          53.9510292034005,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          78.7191435490351
+        ],
+        [
+          182.83404341152394,
+          93.31827935576439
+        ],
+        [
+          53.9510292034005,
+          93.31827935576439
+        ]
+      ]
+    },
+    {
+      "title": "Check my answer",
+      "heading_level": null,
+      "page_id": 18,
+      "polygon": [
+        [
+          242.86451530456543,
+          130.72780984640121
+        ],
+        [
+          352.92964937224497,
+          130.72780984640121
+        ],
+        [
+          352.92964937224497,
+          145.5271845459938
+        ],
+        [
+          242.86451530456543,
+          145.5271845459938
+        ]
+      ]
+    },
+    {
+      "title": "\u2713 Detailed solution",
+      "heading_level": null,
+      "page_id": 18,
+      "polygon": [
+        [
+          43.4605513027393,
+          184.42770774345365
+        ],
+        [
+          131.88029360831234,
+          184.42770774345365
+        ],
+        [
+          131.88029360831234,
+          195.26952728629112
+        ],
+        [
+          43.4605513027393,
+          195.26952728629112
+        ]
+      ]
+    },
+    {
+      "title": "\u25a1 Question at wrong answer",
+      "heading_level": null,
+      "page_id": 19,
+      "polygon": [
+        [
+          42.70464563369751,
+          301.7428063750267
+        ],
+        [
+          172.34356551086273,
+          301.7428063750267
+        ],
+        [
+          172.34356551086273,
+          313.2534311413765
+        ],
+        [
+          42.70464563369751,
+          313.2534311413765
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          9
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          38
+        ],
+        [
+          "Line",
+          18
+        ],
+        [
+          "Span",
+          8
+        ],
+        [
+          "SectionHeader",
+          4
+        ],
+        [
+          "Text",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          20
+        ],
+        [
+          "Span",
+          9
+        ],
+        [
+          "Text",
+          7
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          39
+        ],
+        [
+          "Line",
+          10
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          33
+        ],
+        [
+          "Line",
+          11
+        ],
+        [
+          "Span",
+          6
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          33
+        ],
+        [
+          "Line",
+          8
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 8,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          8
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 9,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          27
+        ],
+        [
+          "Line",
+          12
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 10,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          15
+        ],
+        [
+          "Span",
+          7
+        ],
+        [
+          "Text",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 11,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          36
+        ],
+        [
+          "Line",
+          11
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 12,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          7
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 13,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          22
+        ],
+        [
+          "Line",
+          10
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 14,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          33
+        ],
+        [
+          "Span",
+          15
+        ],
+        [
+          "Text",
+          11
+        ],
+        [
+          "TableCell",
+          10
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 15,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          39
+        ],
+        [
+          "Line",
+          10
+        ],
+        [
+          "Span",
+          5
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 16,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          8
+        ],
+        [
+          "Span",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 17,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          21
+        ],
+        [
+          "Span",
+          18
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "PageHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 18,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          43
+        ],
+        [
+          "Span",
+          16
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 19,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          36
+        ],
+        [
+          "Span",
+          15
+        ],
+        [
+          "Text",
+          4
+        ],
+        [
+          "Equation",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Figure",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 20,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          10
+        ],
+        [
+          "Line",
+          5
+        ],
+        [
+          "Span",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Text",
+          1
+        ],
+        [
+          "Form",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/Grasple_feature_detection"
+}
