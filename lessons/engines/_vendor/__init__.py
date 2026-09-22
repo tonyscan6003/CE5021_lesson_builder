@@ -1,8 +1,16 @@
-"""Question generators vendored from the CE6021 question-bank repo.
+"""Question generators vendored from the question-bank repo (autoquiz).
 
 Only `generate_params()` / `compute()` / `render()` are used, to produce the
 worked numerical examples embedded in lessons. Files are copied verbatim
 apart from the `..utils` import being redirected to `._utils`.
+
+Re-vendor after an upstream change with:
+
+    git clone https://github.com/tonyscan6003/autoquiz.git autoquiz
+    for g in $(python -c 'from lessons.engines._vendor import TYPES; print(*TYPES)'); do
+        sed 's/from \\.\\.utils import/from ._utils import/' \\
+            autoquiz/question_tool/generators/$g.py > lessons/engines/_vendor/$g.py
+    done
 """
 from __future__ import annotations
 
@@ -10,7 +18,22 @@ import importlib
 import re
 from pathlib import Path
 
-TYPES = [
+# Deep-learning generators: the worked examples for CE5021. None of them draws
+# a figure, so `worked_example()` never needs a fig_dir for these.
+DL_TYPES = [
+    "single_neu", "softmax_act", "fc_param", "cross_ent",
+    "conv_param1", "conv_param2", "mult_kernel_conv", "max_pool",
+    "global_avg_pool", "rfield", "mat_conv",
+    "bottleneck_conv", "inception_block", "depthwise_sep_conv",
+    "bat_norm1", "bat_norm2", "dropout",
+    "lr_schedule", "lr_schedule_cos",
+    "dilated_conv", "transpose_conv1", "transpose_conv2",
+]
+
+# Classical machine-vision generators, kept from the CE6021 build. CE5021 uses
+# the convolution-arithmetic and detection-metric ones; the rest are unused by
+# the current lesson set but are cheap to keep and still pass their smoke test.
+CV_TYPES = [
     "conv1d", "conv2d",
     "conv_arith1", "conv_arith2", "conv_arith3", "conv_arith4",
     "conv_arith5", "conv_arith6",
@@ -22,6 +45,8 @@ TYPES = [
     "iou", "objdet_pre", "con_mat", "hausdorff", "int_img", "haar_feature",
     "hog_calc", "hog_bilin", "pca_project",
 ]
+
+TYPES = DL_TYPES + CV_TYPES
 
 
 def get(type_name: str):

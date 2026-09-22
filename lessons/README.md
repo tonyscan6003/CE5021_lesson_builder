@@ -1,10 +1,15 @@
 # lessons/
 
-Home for everything new in this repository: the CE6021 HTML lessons, the
+Home for everything new in this repository: the CE5021 HTML lessons, the
 Python engines that draw their figures, and the interactive examples that are
 published to a public student repo.
 
 See `COURSE_PLAN.md` for the full lesson map, engine list and build order.
+
+> **Conversion in progress.** The lesson map, `_course.yaml` and the vendored
+> question generators are CE5021. The lesson markdown and figure engines still
+> present are the CE6021 originals and are being replaced. The CE6021 course is
+> preserved in this repository's first commit.
 
 ## Layout
 
@@ -18,7 +23,8 @@ See `COURSE_PLAN.md` for the full lesson map, engine list and build order.
 | `examples/app.py` | Streamlit app exposing every engine's `demo()` |
 | `data/` | Image subset the engines need |
 | `site/` | Generated HTML output (rebuilt by the build script) |
-| `reference/legacy_md/` | Old slide decks and narration scripts converted from PDF (input only) |
+| `reference/pdf_for_conversion/` | The source lecture PDFs (gitignored, input only) |
+| `reference/legacy_md/` | Those slide decks and narration scripts converted to markdown (input only) |
 
 ## Build the site
 
@@ -66,14 +72,31 @@ behaviour with library calls on different images (see `COURSE_PLAN.md`,
 
 ## Regenerating the reference markdown
 
-The slide decks and narration scripts under `reference/legacy_md/` were
-converted from the original lecture PDFs. Those PDFs are not kept in this
-repository. To convert a fresh set:
+The slide decks and narration scripts under `reference/legacy_md/` are
+converted from the lecture PDFs in `reference/pdf_for_conversion/`. The PDFs
+are gitignored (53 MB, input only); the markdown is tracked.
 
 ```bash
 python lessons/build/convert_pdfs.py \
-    --input-dir path/to/pdfs \
+    --input-dir lessons/reference/pdf_for_conversion \
     --output-dir lessons/reference/legacy_md --force
 ```
 
 Uses PyMuPDF text-layer extraction, no OCR.
+
+## Re-vendoring the question generators
+
+The worked examples come from the question-bank repo. Clone it beside
+`lessons/` (the clone is gitignored) and copy the generators across:
+
+```bash
+git clone https://github.com/tonyscan6003/autoquiz.git autoquiz
+for g in $(python -c 'from lessons.engines._vendor import TYPES; print(*TYPES)'); do
+    sed 's/from \.\.utils import/from ._utils import/' \
+        autoquiz/question_tool/generators/$g.py > lessons/engines/_vendor/$g.py
+done
+```
+
+That import redirect is the only change made to the files. `_vendor/__init__.py`
+splits the list into `DL_TYPES` (deep learning, used by CE5021) and `CV_TYPES`
+(classical machine vision, kept from CE6021).
