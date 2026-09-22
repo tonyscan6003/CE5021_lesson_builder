@@ -1,4 +1,4 @@
-"""CE6021 interactive examples.
+"""CE5021 interactive examples.
 
 Run from the repository root:
 
@@ -17,7 +17,7 @@ sys.path.insert(0, str(REPO))
 
 from lessons.engines import REGISTRY  # noqa: E402
 
-st.set_page_config(page_title="CE6021 examples", layout="wide")
+st.set_page_config(page_title="CE5021 examples", layout="wide")
 
 pages = []
 for modpath, lesson_id, title in REGISTRY:

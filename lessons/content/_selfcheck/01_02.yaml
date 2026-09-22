@@ -1,0 +1,52 @@
+# 1.2 Fully connected layers and classifiers
+# No Grasple MCQ source: Grasple_neural_networks contains only numeric-entry
+# exercises, already covered by the single_neu / softmax_act / fc_param
+# worked examples. Authored from lesson_1_2_script and lesson_1_2_FC_layers.
+- q: "What is the purpose of the activation function in a neuron?"
+  options:
+    - "To keep the output bounded between 0 and 1"
+    - "To normalise the inputs before they are weighted"
+    - "To introduce non-linearity so the network can learn complex functions"
+    - "To reduce the number of parameters in the layer"
+  answer: 2
+  explain: "Without a non-linear activation, a stack of layers collapses into a single linear map however deep it is, and could only ever produce a linear decision boundary. Some activations happen to be bounded, but that is not the point of having one."
+- q: "What does it mean for a layer to be fully connected?"
+  options:
+    - "Every neuron receives every output of the previous layer"
+    - "Every neuron shares the same weights"
+    - "Every neuron uses the same activation function"
+    - "The layer has the same number of neurons as the previous one"
+  answer: 0
+  explain: "Full connectivity means one weight for every input-neuron pair, which is why the parameter count is (inputs × neurons) plus one bias per neuron."
+- q: "Why are the sigmoid and tanh activations a problem in deep networks?"
+  options:
+    - "They cannot produce negative outputs"
+    - "They saturate, so the gradient reaching earlier layers is very small"
+    - "They are linear, so stacking them achieves nothing"
+    - "They have learnable parameters that increase the model size"
+  answer: 1
+  explain: "For inputs far from zero both curves flatten and their derivative approaches zero. Backpropagation multiplies by that derivative, so almost no gradient reaches the early layers and learning stalls. Both are non-linear and neither has parameters."
+- q: "A fully connected layer has 4 inputs and 3 neurons. How many parameters does it have?"
+  options:
+    - "12"
+    - "7"
+    - "15"
+    - "24"
+  answer: 2
+  explain: "4 × 3 = 12 weights, one for each input-neuron connection, plus one bias per neuron: 12 + 3 = 15."
+- q: "A 6 × 6 feature map with 8 channels is flattened and connected to a layer of 20 neurons. How many parameters does that layer have?"
+  options:
+    - "5,780"
+    - "288"
+    - "5,760"
+    - "180"
+  answer: 0
+  explain: "The flattened vector has 6 · 6 · 8 = 288 values. Weights are 288 · 20 = 5,760, and there are 20 biases, giving 5,780 in total."
+- q: "Why does the final layer of a multi-class classifier use softmax rather than a sigmoid on each neuron?"
+  options:
+    - "Softmax is faster to compute than a sigmoid"
+    - "Softmax prevents the network from overfitting"
+    - "Softmax acts across all the output neurons at once so the probabilities sum to 1"
+    - "Softmax removes the need for a bias term in the last layer"
+  answer: 2
+  explain: "Independent sigmoids would each give a value in [0, 1] but they would not sum to 1, so they could not be read as a distribution over mutually exclusive classes. Softmax normalises across the whole layer."

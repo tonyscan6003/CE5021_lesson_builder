@@ -6,9 +6,8 @@ published to a public student repo.
 
 See `COURSE_PLAN.md` for the full lesson map, engine list and build order.
 
-> **Conversion in progress.** The lesson map, `_course.yaml` and the vendored
-> question generators are CE5021. The lesson markdown and figure engines still
-> present are the CE6021 originals and are being replaced. The CE6021 course is
+> **Conversion in progress.** Lessons 1.1–1.3 are built; the other 14 are not
+> written yet and show as "coming soon" on the index. The CE6021 course is
 > preserved in this repository's first commit.
 
 ## Layout

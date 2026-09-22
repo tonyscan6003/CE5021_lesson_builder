@@ -1,0 +1,53 @@
+# 1.3 Advanced convolution
+# The bottleneck MCQ is from reference/Grasple_image_cls_deep_cnn
+# (exercise 107573), where it sits with the architecture questions; it
+# belongs here, where bottlenecks are introduced. The rest are authored from
+# lesson_1_3_script and lesson_1_3_advanced_convolution.
+- q: "An input feature map has C channels. How many channels must each convolution kernel have?"
+  options:
+    - "One, regardless of C"
+    - "C"
+    - "As many as there are kernels in the layer"
+    - "Three, matching the RGB channels of the original image"
+  answer: 1
+  explain: "Each channel of the kernel is convolved with the matching channel of the input and the results are summed, so the kernel depth must equal the input depth."
+- q: "A convolution layer applies N kernels to an input with C channels. How many feature maps does it output?"
+  options:
+    - "N"
+    - "C"
+    - "N × C"
+    - "One — the N results are summed"
+  answer: 0
+  explain: "Each kernel produces exactly one 2D feature map, whatever the input depth, and those maps are stacked. So the input's channel count sets the kernel depth, and the number of kernels sets the output depth."
+- q: "A layer has N kernels of size k × k acting on an input with C channels, with one bias per output feature map. How many parameters does it have?"
+  options:
+    - "k · k · C + N"
+    - "N · k · k + C"
+    - "N · k · k · C · m′ · n′"
+    - "N · k · k · C + N"
+  answer: 3
+  explain: "Each of the N kernels holds k · k · C weights, and each of the N output feature maps gets one bias. The expression with m′ · n′ is the multiplication count, not the parameter count."
+- q: "What is the quickest way to find the number of kernel positions when counting multiplications?"
+  options:
+    - "Work it out from the input size, stride and padding"
+    - "It equals the spatial size of the output feature map, m′ × n′"
+    - "It equals the number of kernels N"
+    - "It equals the number of input channels C"
+  answer: 1
+  explain: "Every position in the output corresponds to exactly one position the kernel occupied in the input, so reading m′ × n′ off the output avoids having to reason about stride and padding at all."
+- q: "Which statement about a 1 × 1 convolution is correct?"
+  options:
+    - "It halves the spatial size of the feature map"
+    - "It requires 'same' padding to preserve the spatial size"
+    - "It leaves the spatial size unchanged and needs no padding"
+    - "It has no parameters, like a pooling layer"
+  answer: 2
+  explain: "A 1 × 1 kernel fits at every pixel with nothing hanging over the edge, so no padding is needed and the output is the same spatial size as the input. It does have parameters — 1 · 1 · C per kernel — and it computes a weighted sum across channels at each pixel."
+- q: "What is the purpose of a bottleneck (1 × 1) convolution?"
+  options:
+    - "To increase the number of parameters"
+    - "To reduce the amount of computation in a convolution operation"
+    - "To reduce the spatial dimensionality of the feature maps"
+    - "To eliminate the need for pooling layers"
+  answer: 1
+  explain: "A 1 × 1 convolution leaves the spatial size unchanged and cuts the channel count, so the larger kernel that follows operates on far fewer channels and both the parameter count and the multiplication count fall. Because the spatial size is untouched, pooling is still needed."

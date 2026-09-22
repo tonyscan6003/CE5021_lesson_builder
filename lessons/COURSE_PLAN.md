@@ -1,6 +1,8 @@
 # CE5021 Deep Learning for Computer Vision — Lesson Builder Course Plan
 
-Status: **planning complete, build not started** (22 Sep 2026).
+Status: **Section 1 lessons 1.1–1.3 built; 14 lessons to go** (22 Sep 2026).
+`lessons/site/` holds the index, 3 lesson pages and 17 figures. The remaining
+14 lessons appear greyed out as "coming soon" on the index.
 
 This repository was inherited from the CE6021 Machine Vision lesson builder.
 The build system, figure-engine contract, page templates, publishing scripts
@@ -17,7 +19,10 @@ can be recovered from there at any time.
 | 22 deep-learning generators vendored into `engines/_vendor/` | done, all 22 render |
 | CE6021 baseline captured as the initial commit | done |
 | Lesson map and engine list (this document) | done |
-| Lesson prose, figure engines, self-checks | **not started** |
+| 27 self-check MCQs recovered from the Grasple exports | done |
+| CE6021 content and engines retired; `s1_convnets/` created | done |
+| **Lessons 1.1, 1.2, 1.3** — prose, 17 figures, 12 worked examples, self-checks | done |
+| Lessons 1.4 – 3.6 (14 lessons) | **not started** |
 
 ### Decisions taken
 
@@ -136,12 +141,32 @@ pages stay out of scope here, as in CE6021.
 
 ### Self-check MCQs — written fresh
 
-**This is the one genuine gap.** The CE6021 self-checks came from Grasple
-exports in a `conversions/` folder that no longer exists in any repository, and
-`autoquiz` has no MCQ source of any kind. The 17 CE5021 `_selfcheck/*.yaml`
-files must therefore be **authored from the narration scripts**, 5–6 questions
-per lesson in the existing schema (`q`, `options`, `answer`, `explain`). If a
-Grasple deep-learning export does turn up, it should be preferred.
+The Grasple exports are in `reference/Grasple_*/`. All 18 sets were surveyed.
+They hold two kinds of question: **numeric/matrix entry**, which the autoquiz
+generators already cover as worked examples and which yields nothing here, and
+**true MCQs**, which is what `_selfcheck/*.yaml` needs.
+
+The deep-learning MCQ yield is 27 questions covering 8 lessons:
+
+| Set | Questions | Lessons |
+|---|---|---|
+| `Grasple_convolutional_neural_networks` | 3 | 1.5, 1.6 |
+| `Grasple_image_cls_deep_cnn` | 20 | 2.1, 2.2, 2.3, 2.4, and the bottleneck one in 1.3 |
+| `Grasple_object_detection` | 4 | 3.2, 3.4 (sliding window, image pyramid, NMS) |
+
+Three caveats, each recorded in the affected file: some source questions marked
+**two** options 100% correct, which the single-answer widget cannot express, so
+those are rewritten to combine both into one option; one question lost its
+options in PDF conversion and they are reconstructed from its parallel
+question; and option order is shuffled deterministically per file so the right
+answer is not always first.
+
+**Nine lessons still have no MCQ source** and must be authored from the
+narration scripts: 1.1, 1.2, 1.4, 2.5, 3.1, 3.3, 3.5, 3.6. (`Grasple_segmentation`
+turns out to be classical watershed segmentation, not semantic segmentation, so
+it does not help 3.5; `Grasple_obj_det_deep_learning` and
+`Grasple_transpose_dilated_conv` are entirely numeric.) 1.1, 1.2 and 1.3 have
+now been written this way, 6 questions each.
 
 ### Images
 
@@ -376,13 +401,35 @@ folder of relative-path HTML and can be hosted inside Brightspace instead,
 where students already authenticate. KaTeX and Plotly are loaded from CDNs and
 would need vendoring locally first if the LMS blocks external scripts.
 
-## 8. Before the build starts — open points
+## 8. Open points
 
-1. **Self-check MCQs have no source** (see section 2). They will be written
-   from the scripts unless a Grasple deep-learning export exists somewhere.
-2. **`publish/released.txt` still lists CE6021 lesson ids** and must be rewritten.
-3. **`autoquiz/` is a temporary clone.** Once the 22 generators are settled it
-   can be deleted; `engines/_vendor/` is self-contained and nothing under
-   `lessons/` imports from outside it.
-4. **Two new images** are wanted in `data/sources.yaml` (a multi-object street
-   scene for detection, a stuff/thing scene for segmentation).
+1. **Nine lessons still need self-check MCQs authored** from the scripts
+   (see section 2).
+2. **`autoquiz/` is a temporary clone.** Now that the 22 generators are vendored
+   and verified it can be deleted; `engines/_vendor/` is self-contained and
+   nothing under `lessons/` imports from outside it.
+3. **Two new images** are wanted in `data/sources.yaml` (a multi-object street
+   scene for detection, a stuff/thing scene for segmentation). Lessons 1.1–1.3
+   need none — every figure in them is synthetic or computed, so `data/` is
+   currently unused.
+4. **The slides have an arithmetic slip** in the lesson 1.3 bottleneck example:
+   the script gives 2,654,308 multiplications where the correct value is
+   12·3·3·24·32·32 = **2,654,208**. The figure computes it at build time and so
+   prints the right number; the slide deck should be corrected.
+
+## 9. Notes from building 1.1–1.3
+
+- `engines/s1_convnets/_volume()` draws the cuboid diagrams. Its depth is
+  **logarithmically compressed** in the channel count: a linear mapping makes a
+  256-channel volume 60 times deeper than a 4-channel one and the figure
+  becomes unreadable. It returns its right-hand extent so callers can lay
+  volumes out left to right and set `xlim` from the result rather than guessing.
+- Draw network nodes with `ax.scatter`, not `plt.Circle`: patch radii are in
+  data units, so circles come out as ellipses unless the axes aspect is equal.
+- Where two curves coincide over part of their range (ReLU and leaky ReLU for
+  z > 0), dash one of them or the lower one is invisible.
+- Marking *every* kernel position on a grid is unreadable at stride 1. Mark each
+  position's anchor cell with a small ring and draw one full kernel outline.
+- The worked examples validate against the Grasple solutions where the two
+  overlap: the 1.3 multi-channel example reproduces Grasple exercise 107366's
+  answer, and 1.1's pooling figure reproduces exercise 107288's.
