@@ -1,20 +1,52 @@
 # 1.6 Overfitting and regularisation
 # Source: reference/Grasple_convolutional_neural_networks (exercise 107563).
-# INCOMPLETE — 1 of a target 5-6 questions. Top up from
-# lesson_1_7_overfitting_regularisation and lesson_1_7_script (bias-variance,
-# training/validation curves, generalisation, curse of dimensionality,
-# L1/L2, dropout, spatial dropout, data augmentation).
+# The first is from Grasple; the rest are authored from lesson_1_7_script and
+# lesson_1_7_overfitting_regularisation. Complete at 6 questions.
 - q: Which set of measures all help to reduce overfitting when training a deep neural network?
-...
   options:
     - Increased complexity, early stopping, regularisation, dropout, batch normalisation, less training data
-...
     - Reduced complexity, late stopping, regularisation, dropout, batch normalisation, more training data
-...
     - Reduced complexity, early stopping, regularisation, dropout, batch normalisation, more training data
-...
     - Reduced complexity, early stopping, regularisation, dropout, batch normalisation, less training data
-...
   answer: 2
   explain: Increased model complexity and less training data both make overfitting worse. Late stopping — continuing past the point where validation error turns upward — is exactly how overfitting sets in.
-...
+- q: A model has high bias and low variance. What is it doing?
+  options:
+    - Fitting optimally
+    - Underfitting — it is too simple to capture the structure in the data
+    - Failing to converge because the learning rate is wrong
+    - Overfitting — it is following the noise in the training data
+  answer: 1
+  explain: High bias means the model class itself cannot represent the data, for instance a linear boundary on curved data. Low variance means the fit barely changes with different training data, which is the other half of the same story. Overfitting is the opposite corner — low bias, high variance.
+- q: During training the training error keeps falling while the validation error bottoms out and begins to rise. What does this indicate, and what is the standard response?
+  options:
+    - The validation set is too small; enlarge it
+    - Overfitting; stop at the minimum of the validation curve
+    - The learning rate is too high; reduce it
+    - Underfitting; train for longer
+  answer: 1
+  explain: Divergence between the two curves is the signature of overfitting — the model is fitting the training set ever more closely at the cost of generalisation. Stopping at the validation minimum is early stopping. This is also why the training error alone cannot be used to decide when to stop.
+- q: What distinguishes L1 from L2 regularisation?
+  options:
+    - L1 applies to convolution layers and L2 to dense layers
+    - L1 penalises absolute weight values and tends to drive some weights to exactly zero, while L2 penalises squared values and shrinks weights without eliminating them
+    - L1 is applied during inference and L2 during training
+    - L1 increases the number of parameters and L2 reduces it
+  answer: 1
+  explain: The behaviour follows from the shape of the constraint region — L1's diamond has corners on the axes, so the optimum often lands on one and zeroes a weight, giving sparsity; L2's circle has none. Both are training-time penalties on the loss, applicable to any layer, and neither changes the parameter count.
+- q: Why is spatial dropout preferred to ordinary dropout in a convolutional layer?
+  options:
+    - It removes the need for an activation function
+    - Neighbouring pixels in a feature map are highly correlated, so dropping scattered pixels barely changes the convolution's output
+    - It is faster to compute than ordinary dropout
+    - Ordinary dropout cannot be applied to 2D data
+  answer: 1
+  explain: Because the surrounding values still carry nearly the same information, knocking out individual pixels achieves little regularisation. Spatial dropout removes whole feature maps, which does substantially affect specific kernel channels. Ordinary dropout works on 2D data perfectly well — it is just ineffective there.
+- q: Data augmentation reduces overfitting by
+  options:
+    - reducing the number of parameters in the network
+    - removing noisy examples from the training set
+    - creating new training examples by transforming the existing images
+    - increasing the learning rate so training finishes sooner
+  answer: 2
+  explain: 'Affine transforms, flips and photometric changes turn one labelled image into many, so the network sees fewer exact repeats. Note the balance: too little and it still overfits, too much and it underfits.'

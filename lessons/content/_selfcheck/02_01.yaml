@@ -2,49 +2,34 @@
 # Source: reference/Grasple_image_cls_deep_cnn (exercises 107568, 107571).
 # Complete at 5 questions.
 - q: In Top-1 accuracy, the highest-probability prediction must match the ground truth.
-...
   options:
     - 'True'
     - 'False'
   answer: 0
   explain: 'Top-1 accuracy is the conventional multi-class accuracy: the single highest-probability prediction must equal the true label for the prediction to count as a true positive.'
 - q: In Top-5 accuracy, the highest-probability prediction must match the ground truth.
-...
   options:
     - 'True'
     - 'False'
   answer: 1
   explain: Top-5 accuracy counts a true positive if the true label appears anywhere among the five highest-probability predictions, not only at the top.
-...
 - q: In Top-5 accuracy, the order of the five probabilities matters.
-...
   options:
     - 'True'
     - 'False'
   answer: 1
   explain: Order is irrelevant. As long as the correct label is one of the top five, the prediction counts as a true positive.
-...
 - q: Confusion in a deep neural network image classifier occurs when
-...
   options:
     - the network mislabels similar objects
-...
     - the network has no training data
-...
     - the network correctly labels all objects
-...
   answer: 0
   explain: Confusion is systematic mislabelling between visually or semantically similar classes, and shows up as off-diagonal mass in the confusion matrix between those classes.
-...
 - q: Bias in a neural network classifier arises principally from
-...
   options:
     - underrepresentation of genders or ethnic groups in the training images
-...
     - random initialisation of the weights
-...
     - overrepresentation of certain classes in the training data
-...
   answer: 0
   explain: Bias comes from the training data, specifically from groups that are underrepresented in it, so the network performs worse on them. Weight initialisation is random but not a source of this kind of bias.
-...

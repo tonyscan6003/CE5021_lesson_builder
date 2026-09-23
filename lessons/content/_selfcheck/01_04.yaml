@@ -1,0 +1,51 @@
+# 1.4 Convolutional neural networks
+# No Grasple MCQ source for this lesson (the CNN set's MCQs are about training
+# and belong to 1.5/1.6). Authored from lesson_1_4_script and lesson_1_4_cnns.
+- q: "Why is a fully connected layer a poor first layer for a 256 × 256 image?"
+  options:
+    - "It cannot represent non-linear functions"
+    - "It needs one weight per pixel per neuron, so the parameter count is enormous, and flattening discards the spatial arrangement"
+    - "It can only accept greyscale input"
+    - "It requires the image to be square"
+  answer: 1
+  explain: "A 256 × 256 greyscale image flattens to 65,536 values; connecting that to only 100 neurons already needs over 6.5 million parameters. Flattening also throws away which pixels were neighbours, which is exactly the structure a vision model should exploit."
+- q: "What are the two properties that distinguish a convolution layer from a dense layer when it is redrawn as a neural network?"
+  options:
+    - "Local connectivity and weight sharing"
+    - "Non-linearity and bias terms"
+    - "Random initialisation and dropout"
+    - "Pooling and flattening"
+  answer: 0
+  explain: "Each neuron connects only to the pixels under the kernel rather than to every pixel, which saves computation; and all the neurons share one set of kernel weights and one bias, which saves memory. Both layers have biases and activations, so those are not the distinction."
+- q: "Which statement about a pooling layer is correct?"
+  options:
+    - "It has one weight per window position"
+    - "It increases the spatial size of the feature map"
+    - "It has no learnable parameters and leaves the number of channels unchanged"
+    - "It changes the number of channels but not the spatial size"
+  answer: 2
+  explain: "Pooling applies a fixed maximum or mean to each window, so there is nothing to learn, and it acts on each feature map independently, so the channel count is untouched. What it reduces is the spatial size."
+- q: "A network has a convolution with k = 3, s = 1, then pooling with k = 2, s = 2, then another convolution with k = 3, s = 1. What is the receptive field of a neuron in the final layer?"
+  options:
+    - "6 input positions"
+    - "8 input positions"
+    - "7 input positions"
+    - "9 input positions"
+  answer: 1
+  explain: "Work backwards with r = s·r + (k − s) from r = 1. Through the last convolution: 1·1 + 2 = 3. Through the pooling layer: 2·3 + 0 = 6. Through the first convolution: 1·6 + 2 = 8. Note how the stride-2 pooling layer multiplies everything accumulated after it."
+- q: "Where does a CNN's translation invariance come from?"
+  options:
+    - "From the softmax activation on the output layer"
+    - "From the flatten layer, which discards position"
+    - "From the bias terms, which are shared across positions"
+    - "From applying the same kernel at every position, reinforced by pooling"
+  answer: 3
+  explain: "Because one kernel is swept over the whole image, a feature is detected wherever it appears. Pooling adds to this: a small shift often leaves the maximum inside the same pooling window, so the pooled output does not change at all."
+- q: "In LeNet-5 the second convolution produces 16 feature maps from the 6 maps before it. How many channels does each of its kernels have, and how many kernels are there?"
+  options:
+    - "6 channels, 16 kernels"
+    - "16 channels, 6 kernels"
+    - "1 channel, 16 kernels"
+    - "6 channels, 6 kernels"
+  answer: 0
+  explain: "The kernel depth is set by the input, which has 6 channels; the number of kernels is set by the desired output, which is 16 feature maps. This is the same rule as in Lesson 1.3 — input sets the kernel depth, kernel count sets the output depth."

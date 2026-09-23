@@ -1,18 +1,15 @@
 # 1.5 Training neural networks
 # Source: reference/Grasple_convolutional_neural_networks (exercise 107563).
-# INCOMPLETE — 2 of a target 5-6 questions. Top up from lesson_1_5_script
-# (supervised learning, datasets, cross-entropy, backpropagation, momentum).
+# The first two are from Grasple; the rest are authored from lesson_1_5_script
+# and lesson_1_5_training_nn. Complete at 6 questions.
 - q: During training, what problems do too low and too high learning rates cause?
-...
   options:
     - 'Too low: fast convergence; too high: smooth convergence'
     - 'Too low: overfitting; too high: underfitting'
     - 'Too low: slow convergence; too high: non-convergence or divergent behaviour'
   answer: 2
   explain: A low learning rate converges slowly rather than quickly. A high learning rate may not converge at all and often diverges. Overfitting is a matter of model complexity, not learning rate.
-...
 - q: How much of the training set does each update use in batch, stochastic and mini-batch gradient descent?
-...
   options:
     - 'Batch: all examples at once; stochastic: a subset of examples; mini-batch: one example at a time'
     - 'Batch: one example at a time; stochastic: all examples at once; mini-batch: a subset of examples'
@@ -20,4 +17,35 @@
     - 'Batch: a subset of examples; stochastic: all examples at once; mini-batch: one example at a time'
   answer: 2
   explain: Batch gradient descent uses the whole training set for each update, stochastic gradient descent uses a single example, and mini-batch gradient descent uses a subset — the usual compromise between gradient quality and update frequency.
-...
+- q: What is the defining feature of supervised learning?
+  options:
+    - The use of a convolutional architecture
+    - A labelled training set
+    - The use of a validation set
+    - The use of gradient descent
+  explain: Supervised learning is learning from labelled examples. Gradient descent and validation sets are used in supervised learning but are not what defines it, and the architecture is a separate choice entirely.
+  answer: 1
+- q: With a one-hot ground truth, which predicted probabilities affect the categorical cross-entropy loss?
+  options:
+    - All of them equally
+    - Only the probability assigned to the correct class
+    - Only the largest probability
+    - The difference between the two largest probabilities
+  explain: "The loss is −Σ y_k log(p_k), and every y_k is zero except for the true class, so every term but one is multiplied by zero. Note this is not the same as saying the other probabilities do not matter: softmax makes them sum to 1, so raising the true class's probability necessarily lowers the others."
+  answer: 1
+- q: Why is backpropagation used rather than estimating each parameter's gradient separately?
+  options:
+    - It gives more accurate gradients than the chain rule would
+    - It removes the need to choose a learning rate
+    - It allows the network to be trained without labels
+    - It obtains every parameter's gradient in a single backward pass rather than one pass per parameter
+  explain: "Perturbing parameters one at a time would need as many forward passes as there are parameters — hopeless for a network with millions. Backpropagation applies the chain rule to get them all in one sweep. It is exact, not approximate, and it does not change the need for a learning rate or for labels."
+  answer: 3
+- q: What does adding momentum to stochastic gradient descent achieve?
+  options:
+    - It guarantees convergence to the global minimum
+    - It removes the need for a learning rate
+    - It carries the optimiser through flat regions and shallow local minima by preserving the trend in the gradient
+    - It reduces the number of parameters that must be updated
+  explain: "The velocity term v ← γv + η·∇J accumulates past gradients, damping noise and maintaining direction, so the optimiser keeps moving across a flat shelf and through a shallow dip. It still needs a learning rate, it updates every parameter, and it guarantees nothing about finding a global minimum."
+  answer: 2

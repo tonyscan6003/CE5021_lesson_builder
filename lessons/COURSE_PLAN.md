@@ -1,8 +1,8 @@
 # CE5021 Deep Learning for Computer Vision — Lesson Builder Course Plan
 
-Status: **Section 1 lessons 1.1–1.3 built; 14 lessons to go** (22 Sep 2026).
-`lessons/site/` holds the index, 3 lesson pages and 17 figures. The remaining
-14 lessons appear greyed out as "coming soon" on the index.
+Status: **Section 1 complete (6 lessons); 11 lessons to go** (23 Sep 2026).
+`lessons/site/` holds the index, 6 lesson pages and 39 figures. The remaining
+11 lessons appear greyed out as "coming soon" on the index.
 
 This repository was inherited from the CE6021 Machine Vision lesson builder.
 The build system, figure-engine contract, page templates, publishing scripts
@@ -21,8 +21,8 @@ can be recovered from there at any time.
 | Lesson map and engine list (this document) | done |
 | 27 self-check MCQs recovered from the Grasple exports | done |
 | CE6021 content and engines retired; `s1_convnets/` created | done |
-| **Lessons 1.1, 1.2, 1.3** — prose, 17 figures, 12 worked examples, self-checks | done |
-| Lessons 1.4 – 3.6 (14 lessons) | **not started** |
+| **Section 1, all six lessons** — prose, 39 figures, 18 worked examples, 36 self-check questions | done |
+| Sections 2 and 3 (11 lessons) | **not started** |
 
 ### Decisions taken
 
@@ -267,7 +267,9 @@ Seventeen lessons. Each row gives the lesson id and page, the source files in
 
 ### Section 1 — Convolution and neural network fundamentals
 
-Package `engines/s1_convnets/`.
+Package `engines/s1_convnets/` — **built**. Module names as written:
+`convolution` (1.1), `fc_layers` (1.2), `advanced_convolution` (1.3),
+`cnns` (1.4), `training` (1.5), `regularisation` (1.6).
 
 | # | Page / source | Engines (figures) | Worked examples |
 |---|---|---|---|
@@ -412,10 +414,15 @@ would need vendoring locally first if the LMS blocks external scripts.
    scene for detection, a stuff/thing scene for segmentation). Lessons 1.1–1.3
    need none — every figure in them is synthetic or computed, so `data/` is
    currently unused.
-4. **The slides have an arithmetic slip** in the lesson 1.3 bottleneck example:
-   the script gives 2,654,308 multiplications where the correct value is
-   12·3·3·24·32·32 = **2,654,208**. The figure computes it at build time and so
-   prints the right number; the slide deck should be corrected.
+4. **Two things in the slides worth checking.** The lesson 1.3 bottleneck
+   example gives 2,654,308 multiplications where 12·3·3·24·32·32 =
+   **2,654,208**; the figure computes it at build time and prints the right
+   number. And the lesson 1.4 receptive-field slide quotes **7** for neuron C
+   with conv(3,1) → pool(2,2) → conv(3,1); the recurrence gives **8**, and 7 is
+   what you count if the drawing clips the padded position at the image
+   boundary. The lesson uses valid padding so the picture and the formula agree
+   exactly; the deck's figure could not be checked because the converted
+   markdown holds no numbers for it.
 
 ## 9. Notes from building 1.1–1.3
 

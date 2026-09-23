@@ -12,4 +12,7 @@ REGISTRY = [
     ("s1_convnets.convolution",          "01_01", "1.1 2D convolution"),
     ("s1_convnets.fc_layers",            "01_02", "1.2 Fully connected layers"),
     ("s1_convnets.advanced_convolution", "01_03", "1.3 Advanced convolution"),
+    ("s1_convnets.cnns",                 "01_04", "1.4 Convolutional neural networks"),
+    ("s1_convnets.training",             "01_05", "1.5 Training neural networks"),
+    ("s1_convnets.regularisation",       "01_06", "1.6 Overfitting and regularisation"),
 ]
