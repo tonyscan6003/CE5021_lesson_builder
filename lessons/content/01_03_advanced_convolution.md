@@ -52,7 +52,11 @@ So the input's channel count sets the kernel's depth, and the number of kernels 
 
 ## Volumes
 
-When a convolution involves hundreds of feature maps, drawing each one is impractical. Architecture diagrams instead use a compact representation in which a whole stack of feature maps is a single **volume** whose depth is the channel count. A small $k \times k$ square is often projected onto the input face to indicate a convolution.
+When a convolution involves hundreds of feature maps, drawing each one is impractical. Architecture diagrams instead use a compact representation in which a whole stack of feature maps is a single **volume**.
+
+Note the orientation, which is the standard one in the literature and the one used throughout this module: the **horizontal axis is the channel axis**, and the two spatial dimensions form the square **end cap**. A volume with more channels is therefore a *longer* box, and one with a larger spatial size has a *bigger end cap*. As you go deeper into a typical network the volumes get longer and their end caps shrink.
+
+The convolution itself is usually marked by a dashed cube drawn **inside** the input volume. That cube runs the full length of the volume — because a kernel must span every input channel — while covering only a $k \times k$ patch spatially.
 
 {{fig conv_volumes}}
 

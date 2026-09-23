@@ -419,11 +419,24 @@ would need vendoring locally first if the LMS blocks external scripts.
 
 ## 9. Notes from building 1.1–1.3
 
-- `engines/s1_convnets/_volume()` draws the cuboid diagrams. Its depth is
-  **logarithmically compressed** in the channel count: a linear mapping makes a
-  256-channel volume 60 times deeper than a 4-channel one and the figure
-  becomes unreadable. It returns its right-hand extent so callers can lay
+- **Volume orientation.** `engines/s1_convnets/_volume()` draws volumes the way
+  the CNN literature and the course videos do: the **horizontal x axis is the
+  channel axis**, and y/z are the spatial dimensions, so a volume with many
+  channels is a *long box* whose square *end cap* is its spatial extent. Deeper
+  into a network the boxes get longer and the end caps smaller. A convolution is
+  marked by a dashed cube inside the input (`_kernel_cube()`) that runs the
+  **full length** of the volume — because a kernel spans every input channel —
+  while covering only a k × k patch spatially. Any new volume diagram must
+  follow this; the first version of these figures had spatial on the visible
+  face with channels receding diagonally, which is the wrong way round.
+- Channel extent is **log-compressed** (`_chan_len`) because a 512-channel
+  volume drawn to scale beside a 3-channel one runs off the canvas. Spatial
+  extent is **sqrt-compressed** (`_spatial_side`), not log: the lessons point
+  at spatial halving repeatedly and under log compression a 32 → 16 halving is
+  barely visible. `_volume()` returns its right-hand extent so callers lay
   volumes out left to right and set `xlim` from the result rather than guessing.
+- When stacking volumes vertically, the pitch must clear the end-cap side **plus
+  its oblique rise** (`side * (1 + OBLIQUE[1])`), or they overlap.
 - Draw network nodes with `ax.scatter`, not `plt.Circle`: patch radii are in
   data units, so circles come out as ellipses unless the axes aspect is equal.
 - Where two curves coincide over part of their range (ReLU and leaky ReLU for

@@ -69,36 +69,90 @@ def bottleneck_cost(m, n, c, k, N, p):
                 total=reduce_ + expand, saved=plain - (reduce_ + expand))
 
 
-def _depth(channels: int) -> float:
-    """Visual cuboid depth for a channel count.
+# ---------------------------------------------------------------------------
+# Volume drawing
+#
+# Volumes follow the convention of the CNN literature and of the course videos:
+# the horizontal x direction is the channel (depth) axis, and the y and z axes
+# are the spatial dimensions. A volume with many channels is therefore a LONG
+# box, and the square end cap you see at its right is the spatial extent. This
+# is the orientation used in the AlexNet/VGG-style architecture diagrams, and it
+# is what makes the kernel read correctly: a kernel spans every channel of its
+# input, so it is drawn as a dashed cube running the full length of the input
+# volume but covering only a small patch of the spatial cross-section.
+# ---------------------------------------------------------------------------
 
-    Compressed logarithmically: a 256-channel volume should read as deeper than
-    a 4-channel one without being 64 times the size of the whole figure.
+OBLIQUE = (0.36, 0.28)      # (dx, dy) per unit of end-cap side, for the z axis
+
+
+def _chan_len(channels: int) -> float:
+    """Horizontal extent of a volume — its channel count, log-compressed.
+
+    Compressed because a 512-channel volume drawn to scale beside a 3-channel
+    one would be off the canvas.
     """
     c = max(int(channels), 1)
-    return 0.28 + 0.85 * np.log10(c) / np.log10(256)
+    return 0.34 + 1.75 * np.log10(c) / np.log10(512)
 
 
-def _volume(ax, x0, ytop, w, h, channels, face, label=None, lw=1.3, alpha=0.95):
-    """Draw a feature-map volume as a cuboid; return its right-hand extent.
+def _spatial_side(size: int) -> float:
+    """Side of the square end cap — the spatial size.
 
-    (x0, ytop) is the top-left of the *front* face, which is what the caller
-    lines things up against; the cuboid extends up and to the right from there.
+    Square-root rather than log compression: halving the spatial size is a
+    thing the lessons point at repeatedly, and under log compression a 32 -> 16
+    halving is barely visible.
     """
-    d = _depth(channels)
-    dx, dy = d * 0.72, d * 0.52
-    ybot = ytop - h
-    ax.add_patch(plt.Polygon([(x0, ytop), (x0 + dx, ytop + dy),
-                              (x0 + w + dx, ytop + dy), (x0 + w, ytop)],
-                             fc=face, ec=C["ink"], lw=lw, alpha=alpha * 0.72))
-    ax.add_patch(plt.Polygon([(x0 + w, ytop), (x0 + w + dx, ytop + dy),
-                              (x0 + w + dx, ybot + dy), (x0 + w, ybot)],
-                             fc=face, ec=C["ink"], lw=lw, alpha=alpha * 0.52))
-    ax.add_patch(plt.Rectangle((x0, ybot), w, h, fc=face, ec=C["ink"],
-                               lw=lw, alpha=alpha))
+    s = max(int(size), 1)
+    return 0.35 + 1.45 * np.sqrt(s / 64.0)
+
+
+def _volume(ax, x0, ymid, length, side, face, label=None, *, dashed=False,
+            lw=1.3, alpha=0.95, zorder=2, fontsize=9.5, label_dy=0.17):
+    """Draw a feature-map volume as a cuboid lying along the channel axis.
+
+    `x0` is the left end and `ymid` the vertical centre; `length` is the extent
+    along the channel axis and `side` the spatial end-cap side. Returns the
+    right-hand extent (oblique offset included) so callers can lay volumes out
+    left to right and set `xlim` from the result rather than guessing.
+    """
+    ox, oy = OBLIQUE[0] * side, OBLIQUE[1] * side
+    y0 = ymid - side / 2
+    kw = dict(ec=C["red"] if dashed else C["ink"], lw=lw, zorder=zorder,
+              ls=(0, (4, 2.5)) if dashed else "solid")
+    fc = "none" if dashed else face
+    al = 1.0 if dashed else alpha
+    # top face
+    ax.add_patch(plt.Polygon([(x0, y0 + side), (x0 + ox, y0 + side + oy),
+                              (x0 + length + ox, y0 + side + oy),
+                              (x0 + length, y0 + side)],
+                             fc=fc, alpha=al * (1 if dashed else 0.70), **kw))
+    # right end cap: the spatial cross-section
+    ax.add_patch(plt.Polygon([(x0 + length, y0), (x0 + length + ox, y0 + oy),
+                              (x0 + length + ox, y0 + side + oy),
+                              (x0 + length, y0 + side)],
+                             fc=fc, alpha=al * (1 if dashed else 0.52), **kw))
+    # long front face: height is spatial, length is the channel count
+    ax.add_patch(plt.Rectangle((x0, y0), length, side, fc=fc, alpha=al, **kw))
     if label:
-        ax.text(x0 + w / 2, ybot - 0.18, label, ha="center", va="top", fontsize=9.5)
-    return x0 + w + dx
+        ax.text(x0 + (length + ox) / 2, y0 - label_dy, label,
+                ha="center", va="top", fontsize=fontsize)
+    return x0 + length + ox
+
+
+def _kernel_cube(ax, x0, ymid, channels, host_side, frac=0.34, label=None):
+    """Dashed kernel cube inside a host volume.
+
+    The kernel must have as many channels as the input, so it runs the full
+    length of the host volume; spatially it covers only a small patch. Drawn
+    with no fill so the host volume shows through.
+    """
+    side = host_side * frac
+    right = _volume(ax, x0, ymid, _chan_len(channels), side, None,
+                    dashed=True, lw=1.5, zorder=6)
+    if label:
+        ax.text(x0 + _chan_len(channels) / 2, ymid - side / 2 - 0.10, label,
+                ha="center", va="top", fontsize=8.5, color=C["red"])
+    return right
 
 
 # ---------------------------------------------------------------------------
@@ -144,69 +198,103 @@ def fig_multi_channel_conv(ctx: BuildContext) -> Figure:
 
 def fig_multi_kernel_conv(ctx: BuildContext) -> Figure:
     c, N = 5, 4
-    fig, ax = plt.subplots(figsize=(11.5, 4.8))
-    x_in = _volume(ax, 0.2, 3.3, 1.3, 2.2, c, C["light"],
-                   f"input  m × n × C\n(C = {c})")
-    ys = [3.55 - i * 0.92 for i in range(N)]
-    x_ker = 3.0
+    # One spatial end-cap size shared by the input, every feature map and the
+    # stacked output, because they all have the same spatial extent. Only the
+    # lengths differ: C for the input, 1 per feature map, N for the output. The
+    # kernels are the odd ones out - full length, but only k x k spatially.
+    # Vertical pitch must clear the end-cap side PLUS its oblique rise, or the
+    # stacked feature maps run into each other.
+    side, k_side = 0.80, 0.30
+    pitch = side * (1 + OBLIQUE[1]) + 0.18
+    fig, ax = plt.subplots(figsize=(12.5, 5.8))
+
+    y_in = 2.6
+    x_in = _volume(ax, 0.2, y_in, _chan_len(c), side, C["light"],
+                   f"input  m × n × C   (C = {c})")
+    _kernel_cube(ax, 0.2, y_in - side * 0.24, c, side, frac=0.33)
+
+    x_k, x_fm = 2.5, 5.3
+    ys = [y_in + pitch * (N - 1) / 2 - i * pitch for i in range(N)]
     for i, y in enumerate(ys):
-        _volume(ax, x_ker, y, 0.42, 0.42, 2, SERIES[i % len(SERIES)], None, lw=1.0)
-        ax.annotate("", xy=(x_ker - 0.12, y - 0.21), xytext=(x_in + 0.15, 2.2),
-                    arrowprops=dict(arrowstyle="->", color=C["grey"], lw=0.9, alpha=0.5))
-        ax.annotate("", xy=(4.95, y - 0.21), xytext=(4.15, y - 0.21),
+        col = SERIES[i % len(SERIES)]
+        # each kernel is as long as the input is deep: it must span every channel
+        x_ke = _volume(ax, x_k, y, _chan_len(c), k_side, col, lw=1.0)
+        ax.annotate("", xy=(x_k - 0.14, y), xytext=(x_in + 0.12, y_in + 0.22),
+                    arrowprops=dict(arrowstyle="->", color=C["grey"], lw=0.9,
+                                    alpha=0.45))
+        ax.annotate("", xy=(x_fm - 0.16, y), xytext=(x_ke + 0.12, y),
                     arrowprops=dict(arrowstyle="->", color=C["grey"], lw=1.1))
-        ax.add_patch(plt.Rectangle((5.05, y - 0.42), 0.85, 0.42,
-                                   fc=SERIES[i % len(SERIES)], ec=C["ink"],
-                                   lw=1.1, alpha=0.8))
-    ax.text(x_ker + 0.4, 4.35, f"N = {N} kernels,\neach k × k × C", ha="center",
-            fontsize=9.5)
-    ax.text(5.5, 4.35, f"N = {N} output\nfeature maps", ha="center", fontsize=9.5)
-    ax.annotate("", xy=(7.0, 2.1), xytext=(6.2, 2.1),
+        # one output feature map: same spatial size, exactly 1 channel deep
+        _volume(ax, x_fm, y, _chan_len(1), side, col, lw=1.0, alpha=0.85)
+    y_head = ys[0] + side / 2 + 0.55
+    ax.text(x_k + _chan_len(c) / 2, y_head,
+            f"N = {N} kernels, each k × k × C\n(full depth, small spatially)",
+            ha="center", va="bottom", fontsize=9.5)
+    ax.text(x_fm + 0.35, y_head, f"N = {N} output feature maps\n(1 channel each)",
+            ha="center", va="bottom", fontsize=9.5)
+
+    ax.annotate("", xy=(x_fm + 1.85, y_in), xytext=(x_fm + 1.05, y_in),
                 arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.6))
-    ax.text(6.6, 2.3, "stack", ha="center", fontsize=9)
-    x_out = _volume(ax, 7.2, 3.3, 1.1, 2.2, N, C["sky"],
-                    f"output  m′ × n′ × N\n(N = {N})")
-    ax.set_xlim(-0.2, x_out + 0.4); ax.set_ylim(0.0, 4.9); ax.axis("off")
+    ax.text(x_fm + 1.45, y_in + 0.16, "stack", ha="center", fontsize=9)
+    x_out = _volume(ax, x_fm + 2.0, y_in, _chan_len(N), side, C["sky"],
+                    f"output  m′ × n′ × N   (N = {N})")
+    ax.set_xlim(-0.2, x_out + 0.4)
+    ax.set_ylim(ys[-1] - side / 2 - 0.55, y_head + 0.85)
+    ax.axis("off")
     png = save_mpl(fig, ctx, "multi_kernel_conv")
     return Figure("multi_kernel_conv",
                   f"A convolution layer uses several kernels in parallel. Every one of "
                   f"the N = {N} kernels has the same number of channels as the input "
-                  f"(C = {c}) and is convolved with the whole input in the way the "
-                  "previous figure shows, producing one 2D feature map each. Stacking "
-                  "them gives an output with N channels. This is the rule to remember: "
-                  "the kernel's channel count is set by the input, and the output's "
-                  "channel count is set by the number of kernels. The spatial size "
-                  "follows the same arithmetic as plain 2D convolution.", png=png)
+                  f"(C = {c}) — which is why each kernel is drawn the same length as "
+                  "the input volume — and is convolved with the whole input in the way "
+                  "the previous figure shows, producing one 2D feature map each. Those "
+                  "feature maps are one channel deep, so they draw as thin slices; "
+                  "stacking them gives an output N channels long. This is the rule to "
+                  "remember: the kernel's channel count is set by the input, and the "
+                  "output's channel count is set by the number of kernels. The spatial "
+                  "size follows the same arithmetic as plain 2D convolution.", png=png)
 
 
 def fig_conv_volumes(ctx: BuildContext) -> Figure:
-    fig, ax = plt.subplots(figsize=(10.5, 4.6))
-    x_in = _volume(ax, 0.3, 3.5, 1.9, 2.4, 32, C["light"], "input   m × n × C")
-    # kernel projected onto the input face, as the slides draw it
-    ax.add_patch(plt.Rectangle((0.55, 1.55), 0.55, 0.55, fc=C["orange"],
-                               ec=C["ink"], lw=1.4, alpha=0.9))
-    ax.text(0.83, 1.40, "k × k", ha="center", va="top", fontsize=8.5, color=C["red"])
-    ax.annotate("", xy=(x_in + 1.1, 2.3), xytext=(x_in + 0.15, 2.3),
+    fig, ax = plt.subplots(figsize=(11, 4.8))
+    # A typical stride-2 stage: spatial size halves while the channel count
+    # doubles, so the box gets longer as its end cap shrinks.
+    ymid, in_side, out_side = 2.5, _spatial_side(32), _spatial_side(16)
+    x_in = _volume(ax, 0.3, ymid, _chan_len(64), in_side, C["light"],
+                   "input   m × n × C")
+    # The kernel spans every input channel, so it runs the full length of the
+    # input volume and covers only a small spatial patch. Drawn dashed, inside.
+    _kernel_cube(ax, 0.3, ymid - in_side * 0.18, 64, in_side, frac=0.32,
+                 label="one kernel, k × k × C")
+    ax.annotate("", xy=(x_in + 1.25, ymid), xytext=(x_in + 0.18, ymid),
                 arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.8))
-    ax.text(x_in + 0.62, 2.5, "N kernels\nof size k × k × C", ha="center", fontsize=9.5)
-    x_out = _volume(ax, x_in + 1.25, 3.5, 1.4, 2.4, 96, C["sky"],
+    ax.text(x_in + 0.71, ymid + 0.20, "N kernels\nof size k × k × C",
+            ha="center", fontsize=9.5)
+    x_out = _volume(ax, x_in + 1.4, ymid, _chan_len(256), out_side, C["sky"],
                     "output   m′ × n′ × N")
-    ax.text((x_out) / 2, 0.45,
-            "Read off the shapes:  C input channels ⇒ every kernel has C channels.\n"
-            "N output channels ⇒ there are N kernels.  So the layer holds "
-            "N × k × k × C weights (+ N biases).",
+    ax.text(x_out / 2, 0.72,
+            "The x axis is the channel axis: a deeper volume is a longer box, and the "
+            "end cap is the spatial size.\n"
+            "Read the shapes off it — C input channels ⇒ every kernel has C channels;  "
+            "N output channels ⇒ there are N kernels.\n"
+            "So the layer holds N × k × k × C weights (+ N biases).",
             ha="center", va="top", fontsize=9.5)
-    ax.set_xlim(-0.2, x_out + 0.4); ax.set_ylim(-0.5, 4.6); ax.axis("off")
+    ax.set_xlim(-0.2, x_out + 0.4); ax.set_ylim(-0.35, 4.3); ax.axis("off")
     png = save_mpl(fig, ctx, "conv_volumes")
     return Figure("conv_volumes",
                   "Real networks have hundreds of feature maps, so drawing each one is "
                   "impractical. Architecture diagrams instead show a whole stack as a "
-                  "single volume whose depth is the channel count, often with a small "
-                  "k × k square projected onto the input face to mark a convolution. "
-                  "Nothing is lost: the input depth tells you how many channels each "
-                  "kernel must have and the output depth tells you how many kernels "
-                  "there are, so the layer's shape and cost can be recovered from the "
-                  "diagram alone.", png=png)
+                  "single volume. Note the orientation, which is the standard one: the "
+                  "horizontal axis is the channel axis, so a volume with more channels "
+                  "is a longer box, and the square end cap is the spatial size m × n. "
+                  "Going deeper into a network, volumes typically get longer and their "
+                  "end caps smaller. The convolution is marked by a dashed cube inside "
+                  "the input: it runs the full length of the volume, because a kernel "
+                  "must span every input channel, but covers only a k × k patch "
+                  "spatially. Nothing is lost by the compact notation — the input "
+                  "length tells you how many channels each kernel has and the output "
+                  "length tells you how many kernels there are, so the layer's shape "
+                  "and cost can be recovered from the diagram alone.", png=png)
 
 
 def fig_conv_cost(ctx: BuildContext) -> Figure:
@@ -260,31 +348,38 @@ def fig_conv_cost(ctx: BuildContext) -> Figure:
 def fig_one_by_one_conv(ctx: BuildContext) -> Figure:
     c = 6
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.0))
+    side = _spatial_side(32)
     for ax, N, title in [(axes[0], 1, "(a) one 1 × 1 kernel → one feature map"),
                          (axes[1], 4, "(b) N 1 × 1 kernels → N feature maps")]:
-        x_in = _volume(ax, 0.2, 2.9, 1.2, 1.9, c, C["light"],
-                       f"input  m × n × C\n(C = {c})")
-        ax.add_patch(plt.Rectangle((0.42, 1.55), 0.18, 0.18, fc=C["orange"],
-                                   ec=C["ink"], lw=1.3))
-        ax.text(0.51, 1.42, "1×1", ha="center", va="top", fontsize=8, color=C["red"])
-        ax.annotate("", xy=(x_in + 1.15, 1.9), xytext=(x_in + 0.15, 1.9),
+        ymid = 2.0
+        x_in = _volume(ax, 0.2, ymid, _chan_len(c), side, C["light"],
+                       f"input  m × n × C   (C = {c})")
+        # a 1x1 kernel: still the full depth of the input, but a single pixel
+        # of spatial extent, so it draws as a long thin rod inside the volume
+        _kernel_cube(ax, 0.2, ymid - side * 0.22, c, side, frac=0.13,
+                     label=f"1 × 1 × {c}")
+        ax.annotate("", xy=(x_in + 1.05, ymid), xytext=(x_in + 0.15, ymid),
                     arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.6))
-        ax.text(x_in + 0.65, 2.1, f"{N} kernel{'s' if N > 1 else ''}\n1 × 1 × {c}",
+        ax.text(x_in + 0.60, ymid + 0.18,
+                f"{N} kernel{'s' if N > 1 else ''}\n1 × 1 × {c}",
                 ha="center", fontsize=9)
-        x_out = _volume(ax, x_in + 1.3, 2.9, 1.2, 1.9, N, C["sky"],
+        x_out = _volume(ax, x_in + 1.2, ymid, _chan_len(N), side, C["sky"],
                         f"output  m × n × {N}")
-        ax.set_xlim(-0.2, x_out + 0.35); ax.set_ylim(0.2, 3.7); ax.axis("off")
+        ax.set_xlim(-0.2, x_out + 0.35); ax.set_ylim(0.35, 3.5); ax.axis("off")
         ax.set_title(title, fontsize=10)
     png = save_mpl(fig, ctx, "one_by_one_conv")
     return Figure("one_by_one_conv",
                   "A 1 × 1 convolution is an ordinary convolution with the smallest "
-                  "possible kernel. It still spans the full depth of the input, so "
-                  "each kernel is 1 × 1 × C and computes a weighted sum across "
-                  "channels at every pixel independently. Two properties make it "
-                  "useful: it needs no padding and leaves the spatial size unchanged, "
-                  "and it has the smallest parameter count of any kernel. What it "
-                  "changes is the number of channels — which is exactly what a "
-                  "bottleneck layer needs.", png=png)
+                  "possible kernel. It still spans the full depth of the input, which "
+                  "the dashed cube shows clearly: the kernel runs the whole length of "
+                  "the input volume but is only one pixel across, so it computes a "
+                  "weighted sum across channels at each pixel independently. Two "
+                  "properties make it useful: it needs no padding and leaves the "
+                  "spatial size unchanged — the end caps are the same in the input and "
+                  "the output — and it has the smallest parameter count of any kernel. "
+                  "What it changes is the number of channels, which is the length of "
+                  "the box, and that is exactly what a bottleneck layer needs.",
+                  png=png)
 
 
 def fig_bottleneck_conv(ctx: BuildContext) -> Figure:
@@ -294,33 +389,37 @@ def fig_bottleneck_conv(ctx: BuildContext) -> Figure:
                              gridspec_kw=dict(height_ratios=[1.25, 1]))
 
     ax = axes[0]
-    x = _volume(ax, 0.2, 2.6, 1.0, 1.7, b["C"], C["light"],
+    side, ymid = _spatial_side(b["m"]), 1.9
+    x = _volume(ax, 0.2, ymid, _chan_len(b["C"]), side, C["light"],
                 f"input\n{b['m']}×{b['n']}×{b['C']}")
-    ax.annotate("", xy=(x + 1.15, 1.75), xytext=(x + 0.15, 1.75),
+    _kernel_cube(ax, 0.2, ymid - side * 0.22, b["C"], side, frac=0.26)
+    ax.annotate("", xy=(x + 1.0, ymid), xytext=(x + 0.14, ymid),
                 arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.6))
-    ax.text(x + 0.65, 1.95, f"{b['N']} × {b['k']}×{b['k']}", ha="center", fontsize=9)
-    xa = _volume(ax, x + 1.3, 2.6, 1.0, 1.7, b["N"], C["sky"],
+    ax.text(x + 0.57, ymid + 0.16, f"{b['N']} × {b['k']}×{b['k']}",
+            ha="center", fontsize=9)
+    xa = _volume(ax, x + 1.15, ymid, _chan_len(b["N"]), side, C["sky"],
                  f"output\n{b['m']}×{b['n']}×{b['N']}")
-    ax.text(xa / 2, -0.15, f"(a) plain:  {r['plain']:,} multiplications", ha="center",
+    ax.text(xa / 2, 0.45, f"(a) plain:  {r['plain']:,} multiplications", ha="center",
             va="top", fontsize=10.5, color=C["red"])
 
-    x0 = xa + 1.4
-    x = _volume(ax, x0, 2.6, 1.0, 1.7, b["C"], C["light"],
+    x0 = xa + 1.5
+    x = _volume(ax, x0, ymid, _chan_len(b["C"]), side, C["light"],
                 f"input\n{b['m']}×{b['n']}×{b['C']}")
-    ax.annotate("", xy=(x + 0.75, 1.75), xytext=(x + 0.12, 1.75),
+    _kernel_cube(ax, x0, ymid - side * 0.22, b["C"], side, frac=0.12)
+    ax.annotate("", xy=(x + 0.78, ymid), xytext=(x + 0.12, ymid),
                 arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.6))
-    ax.text(x + 0.44, 1.95, "1×1", ha="center", fontsize=8.5)
-    x = _volume(ax, x + 0.9, 2.6, 0.9, 1.7, b["P"], C["orange"],
+    ax.text(x + 0.45, ymid + 0.16, "1×1", ha="center", fontsize=8.5)
+    x = _volume(ax, x + 0.92, ymid, _chan_len(b["P"]), side, C["orange"],
                 f"bottleneck\n{b['m']}×{b['n']}×{b['P']}")
-    ax.annotate("", xy=(x + 0.75, 1.75), xytext=(x + 0.12, 1.75),
+    ax.annotate("", xy=(x + 0.78, ymid), xytext=(x + 0.12, ymid),
                 arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.6))
-    ax.text(x + 0.44, 1.95, f"{b['k']}×{b['k']}", ha="center", fontsize=8.5)
-    xb = _volume(ax, x + 0.9, 2.6, 1.0, 1.7, b["N"], C["sky"],
+    ax.text(x + 0.45, ymid + 0.16, f"{b['k']}×{b['k']}", ha="center", fontsize=8.5)
+    xb = _volume(ax, x + 0.92, ymid, _chan_len(b["N"]), side, C["sky"],
                  f"output\n{b['m']}×{b['n']}×{b['N']}")
-    ax.text((x0 + xb) / 2, -0.15,
+    ax.text((x0 + xb) / 2, 0.45,
             f"(b) bottleneck:  {r['reduce']:,} + {r['expand']:,} = {r['total']:,}",
             ha="center", va="top", fontsize=10.5, color=C["green"])
-    ax.set_xlim(-0.3, xb + 0.4); ax.set_ylim(-0.9, 3.6); ax.axis("off")
+    ax.set_xlim(-0.3, xb + 0.4); ax.set_ylim(-0.35, 3.3); ax.axis("off")
 
     ax = axes[1]
     labels = ["plain\n3×3", "bottleneck\n1×1 stage", "bottleneck\n3×3 stage"]
