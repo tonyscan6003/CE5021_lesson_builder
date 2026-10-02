@@ -15,4 +15,6 @@ REGISTRY = [
     ("s1_convnets.cnns",                 "01_04", "1.4 Convolutional neural networks"),
     ("s1_convnets.training",             "01_05", "1.5 Training neural networks"),
     ("s1_convnets.regularisation",       "01_06", "1.6 Overfitting and regularisation"),
+    ("s2_classification.intro_classification", "02_01", "2.1 Image classification"),
+    ("s2_classification.architectures",  "02_02", "2.2 Architectures"),
 ]

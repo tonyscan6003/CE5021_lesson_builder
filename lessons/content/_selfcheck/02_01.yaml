@@ -1,6 +1,7 @@
 # 2.1 Introduction to image classification
-# Source: reference/Grasple_image_cls_deep_cnn (exercises 107568, 107571).
-# Complete at 5 questions.
+# Source: reference/Grasple_image_cls_deep_cnn (exercises 107568, 107571); the
+# precision/recall question is authored from lesson_2_1_script slide 9.
+# Complete at 6 questions.
 - q: In Top-1 accuracy, the highest-probability prediction must match the ground truth.
   options:
     - 'True'
@@ -33,3 +34,11 @@
     - overrepresentation of certain classes in the training data
   answer: 0
   explain: Bias comes from the training data, specifically from groups that are underrepresented in it, so the network performs worse on them. Weight initialisation is random but not a source of this kind of bias.
+- q: A pedestrian classifier has high precision but low recall. What does that mean in practice?
+  options:
+    - When it reports a pedestrian it is usually right, but it misses many real pedestrians
+    - It is right on most images, pedestrian or not
+    - It is equally likely to make either kind of error
+    - It finds almost every pedestrian, but many of its reports are false alarms
+  answer: 0
+  explain: Precision = TP/(TP+FP) is about how trustworthy a positive report is; recall = TP/(TP+FN) is about how many real positives are found. High precision with low recall means few false positives but many false negatives — for a pedestrian detector, a dangerous combination.
