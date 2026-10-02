@@ -18,4 +18,5 @@ REGISTRY = [
     ("s2_classification.intro_classification", "02_01", "2.1 Image classification"),
     ("s2_classification.architectures",  "02_02", "2.2 Architectures"),
     ("s2_classification.resnets",        "02_03", "2.3 Residual networks"),
+    ("s2_classification.transfer",       "02_04", "2.4 Transfer learning"),
 ]

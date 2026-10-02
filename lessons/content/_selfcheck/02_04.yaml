@@ -1,7 +1,6 @@
 # 2.4 Transfer learning
-# Source: reference/Grasple_image_cls_deep_cnn (exercise 107641).
-# INCOMPLETE — 3 of a target 5-6 questions. Top up from lesson_2_4_script
-# (which layers to freeze, specialised target domains, pretrained model zoo).
+# Source: reference/Grasple_image_cls_deep_cnn (exercise 107641); the last three
+# are authored from lesson_2_4_script. Complete at 6 questions.
 - q: Which statement best describes transfer learning for image classification?
   options:
     - Using a pre-trained network's feature extractor with a new classifier
@@ -23,3 +22,27 @@
     - To improve the final accuracy
   answer: 0
   explain: Starting from features that are already close to useful converges much faster than starting from random weights. With enough data, a network trained from scratch can reach the same accuracy, provided it has enough capacity; and the parameter count depends on the architecture chosen, not on whether it was pre-trained.
+- q: He et al. (2018) compared detection networks trained from scratch with ones pre-trained on ImageNet, given plenty of target data. What did they find?
+  options:
+    - Networks trained from scratch cannot learn object detection
+    - Pre-trained networks reach a much higher final accuracy
+    - Pre-training makes no difference to the speed of convergence
+    - Pre-trained networks converge faster but reach the same final accuracy
+  answer: 3
+  explain: Pre-training speeds up convergence but does not raise the accuracy finally reached; training from scratch gets there too, just more slowly. The exception is a very small target dataset, where scratch may fail to catch up.
+- q: When is a frozen pre-trained feature extractor (only the new classifier trained) most likely to work well?
+  options:
+    - Whenever the source network was trained on ImageNet
+    - When the target task closely resembles the source task and there is little target data
+    - When the target domain is very different from the source, such as medical images
+    - When the target dataset is very large
+  answer: 1
+  explain: Freezing only works if the source features are already the right ones for the target, which needs the tasks and domains to be similar. With dissimilar domains the features must be fine-tuned, and with plenty of target data there is little reason to freeze at all.
+- q: In Keras, what does include_top=False do when instantiating a pre-trained model?
+  options:
+    - Loads the model without its pre-trained weights
+    - Removes the fully connected classifier, leaving only the feature extractor
+    - Freezes all of the model's layers
+    - Removes the first convolution layer so a new input size can be used
+  answer: 1
+  explain: The 'top' is the classification part. Without it the model is a feature extractor to which a new classifier can be attached; freezing is controlled separately, through the layers' trainable flag.
