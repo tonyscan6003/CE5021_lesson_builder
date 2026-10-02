@@ -17,4 +17,5 @@ REGISTRY = [
     ("s1_convnets.regularisation",       "01_06", "1.6 Overfitting and regularisation"),
     ("s2_classification.intro_classification", "02_01", "2.1 Image classification"),
     ("s2_classification.architectures",  "02_02", "2.2 Architectures"),
+    ("s2_classification.resnets",        "02_03", "2.3 Residual networks"),
 ]

@@ -1,7 +1,6 @@
 # 2.3 Residual networks
-# Source: reference/Grasple_image_cls_deep_cnn (exercise 107636).
-# Complete at 4 questions; a 5th on batch-norm inference mode could be added
-# from lesson_2_3_script slide 7.
+# Source: reference/Grasple_image_cls_deep_cnn (exercise 107636); the last two
+# are authored from lesson_2_3_script. Complete at 6 questions.
 - q: What is the key problem encountered when training very deep networks?
   options:
     - The vanishing gradient problem
@@ -30,3 +29,19 @@
     - DenseNet concatenates feature maps, ResNet adds them
   answer: 2
   explain: The residual block adds the shortcut to the block output; the dense block concatenates every earlier feature map onto the input. Both use pooling and both are built from stacks of small 3×3 and 1×1 convolutions. Because concatenation grows the channel count quickly, DenseNet concatenates only within blocks, not across them.
+- q: During training, a batch norm layer normalises with the mean and variance of the current mini-batch. What does it use at inference, when a single image is classified?
+  options:
+    - The running mean and variance accumulated during training
+    - The mean and variance of that single image
+    - Nothing — batch norm layers are removed at inference
+    - A mean of 0 and a variance of 1, with γ and β ignored
+  answer: 0
+  explain: A single image gives no batch statistics, so the running (global) mean and variance accumulated during training with μ ← dμ + (1−d)μ_B are used. γ and β are still applied, so the layer becomes a fixed scale and shift.
+- q: A 56-layer plain network has a higher TRAINING error than a 20-layer one. What does this indicate?
+  options:
+    - The deeper network is harder to optimise, not short of capacity
+    - The deeper network needs more training data
+    - The learning rate is too low for the shallower network
+    - The deeper network is overfitting
+  answer: 0
+  explain: Overfitting would show as low training error and high test error. Here the training error itself is worse, although the deeper network could in principle copy the shallow one and make its extra layers do nothing — so the problem is optimisation. This degradation is what residual connections solve.
