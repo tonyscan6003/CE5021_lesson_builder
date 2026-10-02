@@ -1,8 +1,9 @@
 # CE5021 Deep Learning for Computer Vision — Lesson Builder Course Plan
 
-Status: **Section 1 complete (6 lessons); 11 lessons to go** (23 Sep 2026).
-`lessons/site/` holds the index, 6 lesson pages and 39 figures. The remaining
-11 lessons appear greyed out as "coming soon" on the index.
+Status: **Sections 1 and 2 complete (11 lessons); Section 3's 6 to go** (2 Oct 2026).
+`lessons/site/` holds the index, 11 lesson pages and 77 figures. Section 3's
+lessons appear greyed out as "coming soon" on the index. A full clean build
+takes about 1 min 45 s, most of it lesson 2.5's image optimisations.
 
 This repository was inherited from the CE6021 Machine Vision lesson builder.
 The build system, figure-engine contract, page templates, publishing scripts
@@ -22,7 +23,9 @@ can be recovered from there at any time.
 | 27 self-check MCQs recovered from the Grasple exports | done |
 | CE6021 content and engines retired; `s1_convnets/` created | done |
 | **Section 1, all six lessons** — prose, 39 figures, 18 worked examples, 36 self-check questions | done |
-| Sections 2 and 3 (11 lessons) | **not started** |
+| **Section 2, all five lessons** — prose, 38 figures, 6 worked examples, 32 self-check questions | done |
+| Shared infrastructure: `_arch.py`, `_tinynet.py`, `_fixednet.py`, `_volumes.py`, `build/selfcheck_tools.py` | done (section 10) |
+| Section 3 (6 lessons) | **not started** |
 
 ### Decisions taken
 
@@ -161,12 +164,15 @@ options in PDF conversion and they are reconstructed from its parallel
 question; and option order is shuffled deterministically per file so the right
 answer is not always first.
 
-**Nine lessons still have no MCQ source** and must be authored from the
-narration scripts: 1.1, 1.2, 1.4, 2.5, 3.1, 3.3, 3.5, 3.6. (`Grasple_segmentation`
+Some lessons have no MCQ source and are authored from the narration scripts;
+others have too few and are topped up the same way. (`Grasple_segmentation`
 turns out to be classical watershed segmentation, not semantic segmentation, so
 it does not help 3.5; `Grasple_obj_det_deep_learning` and
-`Grasple_transpose_dilated_conv` are entirely numeric.) 1.1, 1.2 and 1.3 have
-now been written this way, 6 questions each.
+`Grasple_transpose_dilated_conv` are entirely numeric.) **Sections 1 and 2 are
+now complete at 6 questions per lesson (8 for 2.2).** Section 3 remains: 3.1,
+3.3, 3.5 and 3.6 have no source, and 3.2 (3) and 3.4 (1) need topping up. Each
+file's header records which questions are from Grasple and which authored.
+Always write these files through `build/selfcheck_tools.py` (section 10).
 
 ### Images
 
@@ -282,7 +288,12 @@ Package `engines/s1_convnets/` — **built**. Module names as written:
 
 ### Section 2 — Image classification with deep networks
 
-Package `engines/s2_classification/`.
+Package `engines/s2_classification/` — **built**. Module names as written:
+`intro_classification` (2.1), `architectures` (2.2), `resnets` (2.3),
+`transfer` (2.4), `visualisation` (2.5). The figure lists below are the
+original plan; the engines' docstrings list what was actually built, which
+departs from the plan where a computed version turned out to be possible or
+where a planned figure would not have been honest (section 10).
 
 | # | Page / source | Engines (figures) | Worked examples |
 |---|---|---|---|
@@ -328,10 +339,13 @@ figures showing real feature maps from a real trained network.
 
 What the NumPy-only decision costs, concretely:
 
-- 2.5 feature visualisation shows the *method* (activation maximisation, deep
-  dream, Gram-matrix style loss) rather than a gallery of real optimised
-  inputs. The Gram matrices and the FGSM arithmetic are genuinely computed;
-  the "what layer 5 likes" gallery is synthetic and says so.
+- 2.5 runs every visualisation algorithm for real, but on a *fixed* Gabor-filter
+  network (`_fixednet.py`) rather than a trained CNN, so it shows how each
+  technique works and how depth changes what survives — not what a trained
+  network's deep layers know. Full style transfer is shown as a diagram plus
+  genuine Gram-matrix texture synthesis, because with one fixed layer of
+  features the full transfer was not convincing. The adversarial and
+  generalisation figures attack a genuinely trained classifier on the digits.
 - 3.3–3.6 show detector and segmentation *mechanisms* (RoI projection, anchor
   matching, NMS, transpose convolution, RoIAlign, CRF mean-field) computed
   exactly, but not inference output from a pretrained detector on a photograph.
@@ -358,12 +372,11 @@ falling back to the schematic versions when the import fails.
 3. **Section 1** (6 lessons, ~38 engines). Most of the reusable primitives get
    written here: the tensor-shape block diagram, the parameter/MAC cost table,
    the small-matrix convolution stepper.
-4. **Lesson 3.1** out of order, because the detection metrics (IoU, PR, AP) are
-   the densest exam material and the figures are self-contained.
-5. **Section 2** (5 lessons, ~33 engines). Needs an architecture-spec data
-   module: layer tables for AlexNet, VGG, Inception, ResNet, DenseNet from
-   which every parameter and FLOP figure is computed.
-6. **Section 3** remainder (5 lessons, ~25 engines).
+4. **Section 2** (5 lessons) — done, with the architecture-spec module
+   `_arch.py` from which every parameter and FLOP figure is computed.
+5. **Section 3** (6 lessons). `_arch.py` already has MobileNetV2 (for 3.4's
+   depthwise separable convolution) and should be extended for SSD, FPN and
+   U-Net rather than hard-coding their numbers.
 7. **Self-checks** for all 17 lessons, written against the finished prose.
 8. **Publish**: update `publish/released.txt`, `publish_site.sh` repo name to
    `CE5021_*`, then `--dry-run` and `--create`.
@@ -405,8 +418,7 @@ would need vendoring locally first if the LMS blocks external scripts.
 
 ## 8. Open points
 
-1. **Nine lessons still need self-check MCQs authored** from the scripts
-   (see section 2).
+1. **Section 3's self-checks** need authoring or topping up (see section 2).
 2. **`autoquiz/` is a temporary clone.** Now that the 22 generators are vendored
    and verified it can be deleted; `engines/_vendor/` is self-contained and
    nothing under `lessons/` imports from outside it.
@@ -423,6 +435,22 @@ would need vendoring locally first if the LMS blocks external scripts.
    boundary. The lesson uses valid padding so the picture and the formula agree
    exactly; the deck's figure could not be checked because the converted
    markdown holds no numbers for it.
+5. **Section 2 points against the sources**, each stated on the page:
+   - AlexNet's 55 × 55 conv1 output needs a **227** input; the paper and slide
+     say 224. The lesson uses 227 and says why — it is a good exercise in
+     lesson 1.1's formula.
+   - The lesson 2.2 script gives AlexNet "600 million" operations. Computed:
+     **0.72 G** multiply-accumulates for the original two-GPU network and
+     **1.14 G** for the single-GPU form the slide draws. Both are shown.
+   - GoogLeNet's paper (and the script) says 12× fewer parameters than AlexNet;
+     computing from its own layer table gives **~7.0 M vs 61 M, about 9×**.
+   - The 2.3 script says squeeze-and-excite gives "a 10% improvement" for
+     ResNet-50; that is a roughly 10% *relative* reduction in error, not ten
+     percentage points, and the lesson words it that way.
+6. **Build time.** Lesson 2.5 takes ~95 s of the ~105 s full build (image
+   optimisation by L-BFGS). Acceptable for now; if Section 3 adds similar
+   work, a small on-disk cache of figure results keyed by engine source hash
+   would be the fix.
 
 ## 9. Notes from building 1.1–1.3
 
@@ -453,3 +481,57 @@ would need vendoring locally first if the LMS blocks external scripts.
 - The worked examples validate against the Grasple solutions where the two
   overlap: the 1.3 multi-channel example reproduces Grasple exercise 107366's
   answer, and 1.1's pooling figure reproduces exercise 107288's.
+
+## 10. Notes from building Section 2
+
+**Shared infrastructure, all under `engines/`:**
+
+- `_arch.py` — layer-spec cost calculator: shapes, parameters and
+  multiply-accumulates, using exactly the formulas the lessons teach.
+  `verify()` runs on every build of 2.2–2.4 and asserts against published
+  counts: VGG-16, ResNet-18/34/50/101/152, DenseNet-121 and MobileNetV2 match
+  torchvision **exactly**; the original two-GPU AlexNet gives exactly
+  60,965,224; SE-ResNet-50 exactly the paper's 28.09 M. A wrong formula fails
+  the build instead of printing a wrong number.
+- `_tinynet.py` — a small MLP with hand-written backprop, gradient-checked to
+  1e-7, for training experiments on the sklearn digits (2.3 degradation,
+  2.4 transfer). Each runs in seconds.
+- `_fixednet.py` — Gabor filter bank → ReLU → pooling, with an exact input
+  gradient (checked to 1e-9) and the four 2.5 techniques built on it.
+  Convolutions are one broadcast FFT call (matches direct correlation to
+  1e-15). Note SciPy's `fftconvolve(mode="same")` crops *every* axis to the
+  first argument's shape, including un-convolved ones — broadcast first.
+- `_volumes.py` — the volume-drawing helpers, moved out of 1.3's engine.
+- `build/selfcheck_tools.py` — writes and validates the self-check YAML.
+  Use it for every new question: `yaml.dump()` on a scalar appends the
+  document-end marker "...", which corrupted eight files once.
+
+**What the experiments showed, and how the pages report it:**
+
+- 2.3: a 40-layer plain network stays at the chance loss (ln 10) while the
+  40-layer residual one beats a 3-layer network. Veit's path argument,
+  measured in that trained network: 99.98% of the gradient travels along paths
+  through ≤ 10 of its 39 blocks.
+- 2.4: transfer to a *related* task (digit identity → parity) wins clearly with
+  few labels and a frozen extractor matches fine-tuning; transfer to *new
+  classes* (0–4 → 5–9) gives no advantage at any size. The first attempt
+  sought a small-data win on new classes and could not get one honestly — raw
+  digits are nearly linearly separable, so a from-scratch model is not short
+  of features — so the pages report the nuance, which is what the slides'
+  He et al. and Raghu et al. material argues anyway.
+- 2.4's convergence figure uses a shared learning rate of 0.005, stated in the
+  caption: at 0.03 both methods reach 96% by epoch 3 and the effect vanishes.
+
+**Lessons for Section 3:**
+
+- Compute caption claims from the same numbers the figure draws, or check
+  them after the build. Four captions in Section 2 asserted things the figure
+  did not show (a "confident" misclassification at 46%; "not tidy digits" when
+  some were; a convergence gap the computed title contradicted; 99.98% printed
+  as "100.0%"). Each was caught only by reading the rendered figure.
+- When an experiment is meant to demonstrate a claim, put an `assert` on the
+  claim (as `momentum_path` and `translation_invariance` do) so that a change
+  in parameters cannot silently turn the figure into a counter-example.
+- Prefer genuine data (sklearn digits, credited photos) over invented numbers;
+  where a number is illustrative (2.1's top-k probabilities, 2.4's detection
+  feature map), say so in the caption.

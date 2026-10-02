@@ -1,0 +1,51 @@
+# 2.5 Feature visualisation and adversarial attacks
+# No Grasple MCQ source for this lesson; authored from lesson_2_5_script.
+# Complete at 6 questions.
+- q: What do reconstruction, activation maximisation, style transfer and deep dream have in common?
+  options:
+    - They retrain the network's weights on a new dataset
+    - They remove layers from the network to see which matter
+    - They keep the network fixed and optimise the input image by gradient-based methods
+    - They require labelled training data
+  answer: 2
+  explain: All four freeze the network and adjust the pixels of an input image — towards matching stored features, towards maximising a neuron, or both — using gradients with respect to the input.
+- q: Why does activation maximisation add a regularisation penalty to the objective?
+  options:
+    - To make the receptive field smaller
+    - To stop the network's weights changing
+    - Because many unnatural noise patterns also maximise the neuron, and the penalty steers the search towards natural-looking images
+    - To speed up gradient ascent
+  answer: 2
+  explain: Without a penalty the optimiser finds extreme, noisy patterns that excite the neuron but tell us little. The penalty keeps the image plausible.
+- q: In activation maximisation of VGG-16, why do the images found for deeper layers cover a larger area?
+  options:
+    - The optimiser runs for longer on deeper layers
+    - Deeper layers use larger kernels
+    - Deeper neurons have larger receptive fields
+    - Deeper layers have more channels
+  answer: 2
+  explain: A neuron can only respond to the region of the input it can see, and that region — the receptive field — grows with depth through stacked convolutions and pooling (Lesson 1.4).
+- q: In style transfer, how is the style of an image represented?
+  options:
+    - By the feature maps of a single deep layer
+    - By the network's classifier output
+    - By the pixel colour histogram
+    - By the Gram matrices — inner products between pairs of feature maps — of the convolution layers
+  answer: 3
+  explain: Summing products of feature maps over all positions discards where things are and keeps which features occur together, which is what texture is. Content is taken from a deep layer's feature maps instead.
+- q: Random noise of size ε barely changes a classifier's accuracy, yet a fast gradient sign perturbation of the same size ε destroys it. Why?
+  options:
+    - The FGSM perturbation is larger in total
+    - 'The FGSM perturbation is aimed: each pixel moves in the direction that most increases the loss, so many small changes add up at the output'
+    - Random noise is removed by the network's pooling layers
+    - FGSM also changes the network's weights
+  answer: 1
+  explain: Both perturbations change every pixel by at most ε. Random signs largely cancel out, whereas following the sign of the gradient makes every change push the output the same way.
+- q: A classifier trained on upright images misclassifies the same objects when they are rotated. Which problem does this illustrate?
+  options:
+    - An adversarial attack
+    - Overfitting to the training set
+    - A vanishing gradient
+    - A lack of generalisation to images outside the training distribution
+  answer: 3
+  explain: No one is attacking the network; the test images simply lie outside the conditions represented in training. Training and test sets usually come from the same pool, so ordinary test accuracy does not reveal this.
