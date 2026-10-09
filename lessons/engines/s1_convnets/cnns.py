@@ -311,80 +311,119 @@ def fig_learned_features(ctx: BuildContext) -> Figure:
                   "covers how real learned features are visualised.", png=png)
 
 
+def rf_layer_stack(layers, n_in=12, unit=None):
+    """Lay out every layer of a 1D network for drawing the receptive field.
+
+    Returns one row per layer, input first and deepest last — the same order as
+    the worked example's table, where layer 1 acts on the input and the last
+    layer is the deepest. Each row gives its cells' centres in input coordinates
+    (so the cone lines up), the cell pitch, and the span of cells that feed the
+    chosen unit of the deepest layer.
+    """
+    centres = [np.arange(n_in, dtype=float)]
+    pitch = [1.0]
+    for _, k, s in layers:
+        prev = centres[-1]
+        n = (len(prev) - k) // s + 1                  # valid padding
+        centres.append(np.array([prev[i * s:i * s + k].mean() for i in range(n)]))
+        pitch.append(pitch[-1] * s)
+    unit = len(centres[-1]) // 2 if unit is None else unit
+    spans = [(unit, unit)]
+    for _, k, s in reversed(layers):                  # trace back towards the input
+        lo, hi = spans[0]
+        spans.insert(0, (lo * s, hi * s + k - 1))
+    return centres, pitch, spans
+
+
 def fig_receptive_field(ctx: BuildContext) -> Figure:
     r_total, steps = receptive_field(RF_LAYERS)
-    n_in = 12
-    # the input pixels feeding one deepest-layer neuron, traced back layer by layer
-    spans = []
-    lo, hi = 0, 0                       # one neuron at the deepest layer
-    for name, k, s in reversed(RF_LAYERS):
-        lo, hi = lo * s, hi * s + (k - 1)
-        spans.append((name, lo, hi))
+    L = len(RF_LAYERS)
+    centres, pitch, spans = rf_layer_stack(RF_LAYERS)
+    # r_l for each row, input (l = 0) first, exactly as the worked example labels them
+    r_vals = [hi - lo + 1 for lo, hi in spans]
+    assert r_vals[0] == r_total and r_vals[-1] == 1
+    names = ["input"] + [f"layer {i + 1}: {nm}" for i, (nm, _, _) in enumerate(RF_LAYERS)]
+    names[-1] += " (deepest)"
+    ys = [L - i for i in range(L + 1)]                 # input at the top
 
-    fig, axes = plt.subplots(len(spans) + 1, 1, figsize=(10, 5.6), sharex=True)
-    titles = ["deepest layer: one neuron"] + [f"back through {n}" for n, _, _ in spans]
-    extents = [(0, 0)] + [(lo, hi) for _, lo, hi in spans]
-    for ax, title, (lo_, hi_) in zip(axes, titles, extents):
-        for i in range(n_in):
-            inside = lo_ <= i <= hi_
-            ax.add_patch(plt.Rectangle((i, 0), 0.9, 0.8,
+    fig, ax = plt.subplots(figsize=(11, 5.4))
+    for row, (cx, pt, (lo, hi), y) in enumerate(zip(centres, pitch, spans, ys)):
+        w = 0.82 * min(pt, 2.0)
+        for j, x in enumerate(cx):
+            inside = lo <= j <= hi
+            ax.add_patch(plt.Rectangle((x - w / 2, y - 0.2), w, 0.4,
                                        fc=C["red"] if inside else C["light"],
-                                       ec=C["grey"], lw=0.8,
-                                       alpha=0.85 if inside else 0.6))
-        ax.set_xlim(-0.3, n_in); ax.set_ylim(-0.1, 0.95)
-        ax.set_yticks([])
-        ax.set_title(f"{title}  →  {hi_ - lo_ + 1} input positions", fontsize=9.5,
-                     loc="left")
-        for s in ax.spines.values():
-            s.set_visible(False)
-    axes[-1].set_xticks(range(n_in))
-    axes[-1].set_xlabel("position along the 1D input")
-    fig.suptitle(f"receptive field at the input = {r_total} positions      "
-                 r"$r_{l-1} = s_l \cdot r_l + (k_l - s_l)$", fontsize=10.5)
+                                       ec=C["grey"], lw=0.8, alpha=0.85 if inside else 0.6,
+                                       zorder=3))
+        # connections from each highlighted cell to the cells above that feed it
+        if row > 0:
+            _, k, s = RF_LAYERS[row - 1]
+            for j in range(lo, hi + 1):
+                for src in range(j * s, j * s + k):
+                    ax.plot([cx[j], centres[row - 1][src]], [y + 0.2, ys[row - 1] - 0.2],
+                            color=C["red"], lw=0.7, alpha=0.45, zorder=1)
+        ax.text(-1.1, y, names[row], ha="right", va="center", fontsize=9.5)
+        ax.text(len(centres[0]) + 0.2, y, f"$r_{row} = {r_vals[row]}$", va="center",
+                fontsize=11, color=C["red"])
+    ax.text(len(centres[0]) + 0.2, ys[0] + 0.62, "receptive field\n(cells of this row\n"
+            "that feed the unit)", fontsize=8.5, color=C["grey"], va="bottom")
+    ax.set_xlim(-6.2, len(centres[0]) + 3.2); ax.set_ylim(-0.7, L + 1.2)
+    ax.axis("off")
+    ax.set_title(f"one unit of the deepest layer sees {r_total} input positions   ·   "
+                 r"working upwards: $r_{l-1} = s_l \cdot r_l + (k_l - s_l)$, from $r_3 = 1$",
+                 fontsize=10.5)
     png = save_mpl(fig, ctx, "receptive_field")
 
-    # interactive: step back one layer at a time, with the arithmetic shown
-    fig2 = go.Figure()
+    # interactive: reveal one layer at a time, starting from the deepest unit
+    def shapes(upto):
+        out = []
+        for row, (cx, pt, (lo, hi), y) in enumerate(zip(centres, pitch, spans, ys)):
+            w = 0.82 * min(pt, 2.0)
+            lit = row >= L - upto
+            for j, x in enumerate(cx):
+                on = lit and lo <= j <= hi
+                out.append(dict(type="rect", x0=x - w / 2, x1=x + w / 2, y0=y - 0.2,
+                                y1=y + 0.2, line=dict(color=C["grey"], width=1),
+                                fillcolor=C["red"] if on else C["light"]))
+        return out
+
     frames = []
-    running = [("deepest layer", 1)] + [(n, r) for n, _, _, r in steps]
-    for i, ((lo_, hi_), (name, r)) in enumerate(zip(extents, running)):
-        colours = [C["red"] if lo_ <= j <= hi_ else C["light"] for j in range(n_in)]
+    for i in range(L + 1):
         if i == 0:
-            expl = "start at the deepest layer: r = 1"
+            expl = f"start at the deepest unit (layer {L}): r_{L} = 1"
         else:
             nm, k, s, rv = steps[i - 1]
-            prev = running[i - 1][1]
-            expl = f"back through {nm}:  r = {s}·{prev} + ({k} − {s}) = {rv}"
-        frames.append(go.Frame(name=str(i), data=[
-            go.Bar(x=list(range(n_in)), y=[1] * n_in, marker_color=colours,
-                   hoverinfo="skip")],
-            traces=[0], layout=go.Layout(title=expl)))
-    fig2.add_trace(frames[0].data[0])
+            l = L - i + 1
+            expl = (f"up through layer {l} ({nm}):  r_{l - 1} = {s}·{r_vals[l]} + "
+                    f"({k} − {s}) = {rv}")
+        frames.append(go.Frame(name=str(i), layout=go.Layout(shapes=shapes(i), title=expl)))
+    fig2 = go.Figure(go.Scatter(x=[-1.1] * (L + 1), y=ys, mode="text", text=names,
+                                textposition="middle left", hoverinfo="skip"))
     fig2.frames = frames
-    fig2.update_layout(**slider_frames_layout(list(range(len(frames))),
-                                              "layers back: "),
-                       title=frames[0].layout.title.text, showlegend=False,
-                       bargap=0.12)
-    fig2.update_yaxes(showticklabels=False, range=[0, 1.25])
-    fig2.update_xaxes(title_text="position along the 1D input",
-                      tickmode="array", tickvals=list(range(n_in)))
+    fig2.update_layout(**slider_frames_layout(list(range(L + 1)), "layers traced: "),
+                       shapes=frames[0].layout.shapes, title=frames[0].layout.title.text,
+                       showlegend=False)
+    fig2.update_xaxes(visible=False, range=[-7.5, len(centres[0]) + 0.5])
+    fig2.update_yaxes(visible=False, range=[-0.7, L + 0.7])
     return Figure("receptive_field",
                   "The **receptive field** of a neuron is the size of the region of "
                   "the input it can respond to. It matters for recognition: the "
                   "receptive field has to be large enough to cover the object being "
-                  "detected. It is found by working backwards through the preceding "
-                  "convolution and pooling layers with "
-                  r"$r_{l-1} = s_l \cdot r_l + (k_l - s_l)$, starting from $r = 1$ at "
-                  "the deepest layer. Here a 3-kernel convolution, a 2/2 pooling layer "
-                  "and another 3-kernel convolution, all with valid padding, give a "
-                  f"receptive field of {r_total} input positions — and the red cells "
-                  "counted in the bottom row agree with the recurrence, because with "
-                  "valid padding the traced region never runs off the edge of the "
-                  "input. Note how the pooling layer's stride of 2 doubles the effect "
-                  "of everything before it. Deeper into a network the receptive field "
-                  "generally grows, which is the point: later layers need to see "
-                  "enough of the image to recognise whole objects.",
-                  png=png, html=plotly_html(fig2, height=430), kind="plotly")
+                  "detected. The layers are drawn as in the worked example's table — "
+                  "the input at the top, then layers 1 to 3, with layer 3 the deepest — "
+                  "and each row is drawn at its own length, so the layers really do "
+                  "shrink. Starting from one unit of the deepest layer ($r_3 = 1$), "
+                  r"work **upwards** with $r_{l-1} = s_l \cdot r_l + (k_l - s_l)$, "
+                  "following the connections to the cells that feed it. A 3-kernel "
+                  "convolution, a 2/2 pooling layer and another 3-kernel convolution, "
+                  "all with valid padding, give a receptive field of "
+                  f"$r_0 = {r_total}$ input positions, and the red cells in the input "
+                  "row agree with the recurrence. Note how the pooling layer's stride "
+                  "of 2 doubles the effect of everything below it. Deeper into a "
+                  "network the receptive field generally grows, which is the point: "
+                  "later layers need to see enough of the image to recognise whole "
+                  "objects.",
+                  png=png, html=plotly_html(fig2, height=450), kind="plotly")
 
 
 def _shift_right(x, n, fill=1):
