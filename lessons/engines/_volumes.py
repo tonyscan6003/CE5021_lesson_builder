@@ -90,3 +90,103 @@ def kernel_cube(ax, x0, ymid, channels, host_side, frac=0.34, label=None):
         ax.text(x0 + chan_len(channels) / 2, ymid - side / 2 - 0.10, label,
                 ha="center", va="top", fontsize=8.5, color=C["red"])
     return right
+
+
+def network_diagram(ax, maps, vecs=(), *, ymid=0.0, side_fn=spatial_side,
+                    chan_scale=1.0, gap=1.4, vec_gap=1.1, vec_height=None,
+                    vertical=False, fontsize=8.5, op_y=None, shape_y=None,
+                    faces=None):
+    """Draw a CNN as a row of volumes, each operation in the gap it performs.
+
+    maps  list of dicts {h, c, kind, op, k}: one feature-map volume each, in
+          order. `kind` is input / conv / pool (sets the colour), `op` the label
+          of the operation that PRODUCED this map (None for the input) and `k`
+          its kernel or window size, which sets the dashed cube's size.
+    vecs  list of dicts {n, op}: flattened / dense layers, drawn as bars.
+
+    For every operation a dashed cube is drawn inside its input volume — full
+    length, because a kernel spans every input channel — with dotted
+    projection lines to the single output cell it produces, and the label sits
+    in the gap between the two volumes. With `vertical=True` the operation and
+    shape labels are rotated to read upwards, which lets a deep network fit;
+    otherwise they sit on two rows at `op_y` and `shape_y`.
+
+    Returns (right edge, lowest y used) so callers can set limits.
+    """
+    faces = faces or {"input": C["light"], "conv": C["sky"], "pool": C["orange"]}
+    proj = dict(color=C["red"], lw=0.9, ls=":", zorder=7)
+    rot = dict(rotation=90, rotation_mode="anchor") if vertical else {}
+    low = ymid
+
+    def op_text(xc, top, s):
+        if vertical:
+            ax.text(xc, top, s, ha="right", va="center", fontsize=fontsize, **rot)
+        else:
+            ax.text(xc, op_y, s, ha="center", va="top", fontsize=fontsize)
+
+    def shape_text(xc, below, s):
+        nonlocal low
+        if vertical:
+            ax.text(xc, below, s, ha="right", va="center", fontsize=fontsize,
+                    color=C["red"], family="monospace", **rot)
+            low = min(low, below - 0.13 * fontsize * len(s) / 8.5 * 1.1)
+        else:
+            ax.text(xc, shape_y, s, ha="center", va="top", fontsize=fontsize,
+                    color=C["red"], family="monospace")
+
+    x, prev = 0.0, None
+    for m in maps:
+        side, length = side_fn(m["h"]), chan_scale * chan_len(m["c"])
+        if prev is not None:
+            ps = prev["side"]
+            frac = min(max(m["k"] / prev["h"], 0.22), 0.6)
+            ks = ps * frac
+            ky = ymid + ps / 2 - ks / 2 - 0.10 * ps
+            # dashed kernel: full length of the input volume, k × k spatially
+            volume(ax, prev["x"], ky, prev["len"], ks, None, dashed=True, lw=1.4,
+                   zorder=6)
+            cell = max(side / m["h"], 0.05)
+            cy = ymid + (ky - ymid) / ps * side
+            ax.add_patch(plt.Rectangle((x, cy - cell / 2), 0.05, cell,
+                                       fc=C["red"], ec=C["red"], zorder=8))
+            xr = prev["x"] + prev["len"]
+            for dx, dy in [(0, -ks / 2), (0, ks / 2),
+                           (OBLIQUE[0] * ks, ks / 2 + OBLIQUE[1] * ks)]:
+                ax.plot([xr + dx, x], [ky + dy, cy], **proj)
+            op_text((prev["right"] + x) / 2, ymid - 0.12, m["op"])
+        right = volume(ax, x, ymid, length, side, faces[m["kind"]], lw=1.1, alpha=0.9)
+        shape_text(x + length / 2, ymid - side / 2 - 0.10,
+                   f"{m['h']}×{m['h']}×{m['c']}")
+        low = min(low, ymid - side / 2)
+        prev = dict(m, x=x, side=side, len=length, right=right)
+        x = right + gap
+
+    if not vecs:
+        return prev["right"], low
+    vec_height = vec_height or (lambda n: 0.3 + np.sqrt(n / vecs[0]["n"]))
+    x -= gap - vec_gap
+    bars = []
+    for v in vecs:
+        h = vec_height(v["n"])
+        ax.add_patch(plt.Rectangle((x, ymid - h / 2), 0.22, h, fc=C["purple"],
+                                   ec=C["ink"], lw=1.1, alpha=0.6))
+        shape_text(x + 0.11, ymid - h / 2 - 0.10, str(v["n"]))
+        bars.append((x, h, v["op"]))
+        x += 0.22 + vec_gap
+    # flatten: the whole last volume feeds the first vector
+    xl, s = prev["x"] + prev["len"], prev["side"]
+    x0, h0, op0 = bars[0]
+    for sgn in (1, -1):
+        ax.plot([xl, x0], [ymid + sgn * s / 2, ymid + sgn * h0 / 2], **proj)
+    op_text((prev["right"] + x0) / 2,
+            ymid - max(s, h0) / 2 - 0.12 if vertical else None, op0)
+    # dense: every unit to every unit
+    for (xa, ha, _), (xb, hb, op) in zip(bars, bars[1:]):
+        for s0 in (1, -1):
+            for s1 in (1, -1):
+                ax.plot([xa + 0.22, xb], [ymid + s0 * ha / 2, ymid + s1 * hb / 2], **proj)
+        if vertical:
+            op_text((xa + 0.22 + xb) / 2, ymid - max(ha, hb) / 2 - 0.12, op)
+        else:
+            op_text((xa + 0.22 + xb) / 2, None, op)
+    return x - vec_gap, low

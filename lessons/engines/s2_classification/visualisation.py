@@ -162,20 +162,21 @@ def fig_reconstruction(ctx: BuildContext) -> Figure:
         ax.set_xticks([]); ax.set_yticks([])
     png = save_mpl(fig, ctx, "reconstruction")
     return Figure("reconstruction",
-                  "**Reconstruction** (inversion): what information do a layer's "
-                  "feature maps keep about the image? The target is passed through the "
-                  "network and its features at one depth stored. Then, starting from "
-                  "random noise, gradient descent adjusts the *pixels* until the noise "
-                  "image produces the same features, with a smoothness penalty as the "
-                  "regulariser that keeps the result natural-looking. From the earliest "
-                  "features the reconstruction is almost exact. From deeper ones detail "
-                  "is lost and only an increasingly abstract composition of the image "
-                  "survives, as the falling correlation with the original shows. The "
-                  "network here is a fixed one — oriented Gabor filters, ReLU and "
-                  "pooling, where 'deeper' means more pooling — not a trained CNN, so "
-                  "it shows the algorithm and the effect of depth honestly but not what "
-                  "a trained network's deep layers encode. In a trained network the "
-                  "deep layers keep *semantic* information about objects instead.",
+                  "**Reconstruction** (inversion) is used to determine what information "
+                  "about the image is retained in the feature maps of a layer. The target is "
+                  "passed through the network and its features at one depth are stored. "
+                  "Starting from random noise, the *pixels* are then adjusted by gradient "
+                  "descent until the same features are produced by the noise image, with a "
+                  "smoothness penalty used as a regulariser so that the result looks "
+                  "natural. From the earliest features the reconstruction is almost exact. "
+                  "From deeper features detail is lost, and only an increasingly abstract "
+                  "composition of the image is retained, as shown by the decreasing "
+                  "correlation with the original. The network used here is fixed, consisting "
+                  "of oriented Gabor filters, ReLU and pooling, with 'deeper' meaning more "
+                  "pooling, rather than a trained CNN; it therefore shows the algorithm and "
+                  "the effect of depth, but not what is encoded in the deep layers of a "
+                  "trained network. In a trained network, *semantic* information about "
+                  "objects is retained in the deep layers instead.",
                   png=png)
 
 
@@ -201,25 +202,25 @@ def fig_activation_maximisation(ctx: BuildContext) -> Figure:
         axes[i, 0].set_ylabel(f"filter {f // 2 + 1}", fontsize=9)
     png = save_mpl(fig, ctx, "activation_maximisation")
     return Figure("activation_maximisation",
-                  "**Activation maximisation**: which input makes one neuron respond "
-                  "most strongly? Starting from a near-blank image, **gradient ascent** "
-                  "— ascent, because we are maximising — changes the pixels to increase "
-                  "the output of one unit, here the centre of one feature map, while a "
-                  "penalty on the pixel values keeps the image from running away to "
-                  "extreme noise patterns that also excite the unit. Each row is a "
-                  "different filter, each column a deeper layer of the same fixed "
-                  "network. The preferred stimulus is that filter's oriented grating, "
-                  "and it **grows with depth**, because the unit's receptive field "
-                  "grows — the dashed square is the receptive field computed with "
-                  "Lesson 1.4's formula. That growth is exactly what the slide's "
-                  "VGG-16 visualisations show. In a trained network the content also "
-                  "changes with depth, from edges and colour blobs to textures to "
-                  "object parts; this fixed network has only edges to offer, so only "
-                  "the size changes here.", png=png)
+                  "**Activation maximisation** is used to find the input to which one neuron "
+                  "responds most strongly. Starting from a near-blank image, the pixels are "
+                  "changed by **gradient ascent**, as the quantity is to be maximised, to "
+                  "increase the output of one unit, here the centre of one feature map. A "
+                  "penalty on the pixel values prevents the image from developing extreme "
+                  "noise patterns that would also excite the unit. Each row corresponds to a "
+                  "different filter, and each column to a deeper layer of the same fixed "
+                  "network. The preferred stimulus is the oriented grating of that filter, "
+                  "and it **increases in size with depth**, as the receptive field of the "
+                  "unit increases; the dashed square is the receptive field calculated with "
+                  "the formula of Lesson 1.4. The same increase is seen in the VGG-16 "
+                  "visualisations in the lecture slides. In a trained network the content "
+                  "also changes with depth, from edges and colour blobs to textures to parts "
+                  "of objects; as this fixed network detects only edges, only the size "
+                  "changes here.",
+                  png=png)
 
 
 def fig_class_templates(ctx: BuildContext) -> Figure:
-    use_source("sklearn_digits")
     m = digits_classifier()
     W = m["W"]
     acc = (m["clf"].predict(m["Xte"]) == m["yte"]).mean()
@@ -238,21 +239,22 @@ def fig_class_templates(ctx: BuildContext) -> Figure:
                  "what each output neuron responds to", fontsize=10.5)
     png = save_mpl(fig, ctx, "class_templates")
     return Figure("class_templates",
-                  "Activation maximisation on a genuinely **trained** model, a "
-                  "classifier for handwritten digits with one output neuron per class. "
-                  "For a single layer like this the answer can be read straight off "
-                  "the weights (top row: red pixels raise the score, blue lower it), "
-                  "and the input image that maximises each neuron is just the pixels "
-                  "with positive weight (bottom row). Some, like '0' and '7', look like "
-                  "the digit. Others are only fragments, and every neuron cares as much "
-                  "about where ink must be *absent* — the blue weights, such as the "
-                  "empty centre of the '0' — as about where it should be, because that "
-                  "is what separates its class from the others. "
-                  "This is the point of the slide on visualisation for understanding: "
-                  "a network may recognise a class by properties that merely co-occur "
-                  "with it — the fluffiness of clouds, the sky behind a building — "
-                  "rather than by the object itself, which can cause confusion when it "
-                  "is deployed.", png=png)
+                  "Activation maximisation on a **trained** model, a classifier for "
+                  "handwritten digits with one output neuron per class. For a single layer "
+                  "such as this, the result can be obtained directly from the weights (top "
+                  "row: red pixels increase the score and blue pixels decrease it), and the "
+                  "input image that maximises each neuron consists of the pixels with "
+                  "positive weight (bottom row). Some of these, such as '0' and '7', "
+                  "resemble the digit. Others are only fragments, and the locations where "
+                  "ink must be *absent* (the blue weights, such as the empty centre of the "
+                  "'0') are as important to each neuron as those where it should be "
+                  "present, as this is what distinguishes its class from the others. As "
+                  "discussed in the lecture slide on visualisation for understanding, a "
+                  "class may be recognised by a network from properties that co-occur with "
+                  "it, such as the texture of clouds or the sky behind a building, rather "
+                  "than from the object itself, which can cause confusion when the network "
+                  "is deployed.",
+                  png=png)
 
 
 def fig_texture_statistics(ctx: BuildContext) -> Figure:
@@ -271,23 +273,24 @@ def fig_texture_statistics(ctx: BuildContext) -> Figure:
             axes[r, j].set_xticks([]); axes[r, j].set_yticks([])
     png = save_mpl(fig, ctx, "texture_statistics")
     return Figure("texture_statistics",
-                  "What 'style' means to a network. The **Gram matrix** of a layer is "
-                  "the inner product of every pair of its feature maps, summed over "
-                  "all positions: entry (i, j) is large when features i and j tend to "
-                  "fire together, anywhere in the image. Summing over positions throws "
-                  "away *where* things are and keeps only *which features co-occur* — "
-                  f"which is what a texture is. For this network the Gram matrix of a "
-                  f"colour image is {3 * len(FN.BANK)} × {3 * len(FN.BANK)} — one row "
-                  "and column per feature map — however large the image. The proof "
-                  "that it captures the texture is the bottom row: starting "
-                  "from noise and adjusting the pixels until the Gram matrices match "
-                  "(at three depths), the stripes, bricks and feathers come back, with "
-                  "the right orientations and colours but a completely different "
-                  "layout. This runs for real on the lesson's fixed Gabor network, whose "
-                  "features are good enough for texture. Full style transfer also needs "
-                  "a content term from a *trained* network's deep layers, which this "
-                  "network does not have — the next figure shows how the two are "
-                  "combined.", png=png)
+                  "The representation of style in a network. The **Gram matrix** of a layer "
+                  "is the inner product of every pair of its feature maps, summed over all "
+                  "positions: entry (i, j) is large when features i and j tend to be active "
+                  "together anywhere in the image. As the sum is taken over positions, "
+                  "information about *where* features occur is discarded and only "
+                  "information about *which features co-occur* is retained, which "
+                  "corresponds to texture. For this network the Gram matrix of a colour "
+                  f"image is {3 * len(FN.BANK)} × {3 * len(FN.BANK)}, with one row and "
+                  "column per feature map, regardless of the image size. The bottom row "
+                  "shows that texture is captured by the Gram matrix: when the pixels of a "
+                  "noise image are adjusted until the Gram matrices match (at three depths), "
+                  "the stripes, bricks and feathers are recovered, with the correct "
+                  "orientations and colours but a completely different layout. This is run "
+                  "on the fixed Gabor network of this lesson, whose features are sufficient "
+                  "for texture. Full style transfer also requires a content term from the "
+                  "deep layers of a *trained* network, which this network does not have; "
+                  "the combination of the two is shown in the next figure.",
+                  png=png)
 
 
 def fig_style_transfer_loop(ctx: BuildContext) -> Figure:
@@ -328,19 +331,20 @@ def fig_style_transfer_loop(ctx: BuildContext) -> Figure:
     ax.set_xlim(-0.5, 14.6); ax.set_ylim(-1.0, 4.8); ax.axis("off")
     png = save_mpl(fig, ctx, "style_transfer_loop")
     return Figure("style_transfer_loop",
-                  "Training style transfer. The content image is passed through a "
-                  "pre-trained network and a deep feature map stored (conv4 in the "
-                  "original work): deep layers keep the content — the objects and their "
-                  "arrangement — but not fine detail. The style image is passed through "
-                  "and the Gram matrices of all its convolution layers stored, capturing "
-                  "texture at small scales in early layers and larger scales in deep "
-                  "ones. A random-noise image is then passed through, and its features "
-                  "and Gram matrices compared with those stored, in a content loss and "
-                  "a style loss. Gradient descent adjusts the noise image's pixels to "
-                  "minimise both together, and it converges to an image with the "
-                  "content of one and the style of the other. The weights α and β set "
-                  "the balance. As with reconstruction, it is the image that is "
-                  "optimised, not the network.", png=png)
+                  "Style transfer. The content image is passed through a pre-trained network "
+                  "and a deep feature map is stored (conv4 in the original work); the "
+                  "content, that is, the objects and their arrangement, is retained in the "
+                  "deep layers but fine detail is not. The style image is passed through the "
+                  "network and the Gram matrices of all its convolution layers are stored, "
+                  "capturing texture at small scales in the early layers and at larger "
+                  "scales in the deep layers. A random-noise image is then passed through "
+                  "the network, and its features and Gram matrices are compared with the "
+                  "stored values in a content loss and a style loss. The pixels of the noise "
+                  "image are adjusted by gradient descent to minimise both losses together, "
+                  "and the image converges to one with the content of one image and the "
+                  "style of the other. The balance is set by the weights α and β. As in "
+                  "reconstruction, the image is optimised rather than the network.",
+                  png=png)
 
 
 def fig_deep_dream(ctx: BuildContext) -> Figure:
@@ -362,17 +366,19 @@ def fig_deep_dream(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "deep_dream")
     return Figure("deep_dream",
                   "**Deep dream** is activation maximisation started from a photograph "
-                  "instead of noise. The photograph makes the network respond to the "
-                  "features it already contains, and gradient ascent on those "
-                  "responses amplifies them, pushing the image towards whatever the "
-                  "layer sees in it. Run here on the lesson's fixed network, whose only "
-                  "features are oriented edges, it can only amplify edges: the pyramids' "
-                  "outlines are reinforced and haloed, more coarsely from the deeper, "
-                  "more pooled layer. With a trained network, maximising many deep "
-                  "layers at once amplifies learned object parts instead, which is "
-                  "where the hallucinatory images come from — horizon lines become "
-                  "towers and pagodas, leaves become birds and insects — revealing what "
-                  "the network associates with those image features.", png=png)
+                  "rather than noise. The network responds to the features already present "
+                  "in the photograph, and these responses are amplified by gradient ascent, "
+                  "so that the image is modified towards whatever the layer detects in it. "
+                  "When run on the fixed network of this lesson, whose only features are "
+                  "oriented edges, only edges can be amplified: the outlines of the pyramids "
+                  "are reinforced and surrounded by halos, more coarsely for the deeper, more "
+                  "pooled layer. With a trained network, when many deep layers are "
+                  "maximised together, learned parts of objects are amplified instead, which "
+                  "produces the characteristic hallucinatory images: horizon lines become "
+                  "towers and pagodas, and leaves become birds and insects. These results "
+                  "reveal the associations learned by the network between image features "
+                  "and concepts.",
+                  png=png)
 
 
 def fig_adversarial_fgsm(ctx: BuildContext) -> Figure:
@@ -425,23 +431,24 @@ def fig_adversarial_fgsm(ctx: BuildContext) -> Figure:
                  f"{acc_fgsm[k10]:.0%} with the attack", fontsize=10)
     png = save_mpl(fig, ctx, "adversarial_fgsm")
     return Figure("adversarial_fgsm",
-                  "An **adversarial attack** on a real trained classifier. The **fast "
-                  "gradient sign method** computes the gradient of the loss with "
-                  "respect to the *input pixels* — the direction in which each pixel "
-                  "should move to make the network more wrong — and adds a small step "
-                  "ε in the sign of it: x' = x + ε·sign(∇ₓL). Left: a digit the "
-                  f"classifier gets right with {p0[i, y[i]]:.0%} confidence becomes, "
-                  f"after a change of at most {e:.2f} per pixel, a '{pa.argmax()}' "
-                  f"with {pa.max():.0%} confidence — wrong, and more sure of itself than "
-                  "many correct answers. Right: the crucial comparison. Random noise of "
-                  "exactly the same size barely affects accuracy, while the same "
-                  "budget aimed by the gradient destroys it. Adversarial examples are "
-                  "not noise — they are carefully chosen. Each output depends on many "
-                  "inputs through many multiplications, so many tiny, coordinated "
-                  "changes add up to a large change at the output. Deep networks are "
-                  "affected just as this simple classifier is, attacks crafted against "
-                  "one network often transfer to others, and building robust networks "
-                  "is an active research area.", png=png)
+                  "An **adversarial attack** on a trained classifier. In the **fast gradient "
+                  "sign method**, the gradient of the loss with respect to the *input "
+                  "pixels* is calculated, which gives the direction in which each pixel "
+                  "should move to increase the error of the network, and a small step ε in "
+                  "the sign of this gradient is added: x' = x + ε·sign(∇ₓL). Left: a digit "
+                  f"that is correctly classified with {p0[i, y[i]]:.0%} confidence becomes, "
+                  f"after a change of at most {e:.2f} per pixel, a '{pa.argmax()}' with "
+                  f"{pa.max():.0%} confidence, which is incorrect and more confident than "
+                  "many correct predictions. Right: random noise of exactly the same size has "
+                  "little effect on accuracy, whereas the same perturbation budget directed "
+                  "by the gradient reduces the accuracy greatly. Adversarial examples are "
+                  "therefore not random noise, but are carefully chosen. Each output depends "
+                  "on many inputs through many multiplications, so many small, coordinated "
+                  "changes accumulate to a large change at the output. Deep networks are "
+                  "affected in the same way as this simple classifier, attacks designed "
+                  "against one network often transfer to others, and the development of "
+                  "robust networks is an active research area.",
+                  png=png)
 
 
 def fig_patch_attack(ctx: BuildContext) -> Figure:
@@ -474,19 +481,19 @@ def fig_patch_attack(ctx: BuildContext) -> Figure:
                  fontsize=10.5)
     png = save_mpl(fig, ctx, "patch_attack")
     return Figure("patch_attack",
-                  "It is tempting to dismiss adversarial examples because the attack "
-                  "adds noise across the whole image, which nobody can do to a real "
-                  "scene. But the perturbation does not need to cover the image. Here "
-                  "the attack may change only one 3 × 3 patch — 9 of the 64 pixels — "
-                  "to any values at all, like a sticker, and the position and values "
-                  "are found by gradient ascent on the loss. That is enough to fool "
-                  f"the trained classifier on {rate:.0%} of the digits tried, with a "
-                  f"median confidence in the wrong answer of {med_conf:.0%}. This is "
-                  "the digital analogue of the physical "
-                  "attack on the slide, where black and white tape placed at chosen "
-                  "points on a stop sign made a network read it as a speed-limit sign "
-                  "across a wide range of distances and viewpoints — with obvious "
-                  "implications for safety-critical systems such as self-driving cars.",
+                  "As the attack in the previous figure adds noise across the whole image, "
+                  "which cannot be done to a real scene, adversarial examples may appear to "
+                  "be of little practical relevance. However, the perturbation does not need "
+                  "to cover the whole image. Here only one 3 × 3 patch, 9 of the 64 pixels, "
+                  "may be changed by the attack, to any values, in the manner of a sticker, "
+                  "and the position and values are found by gradient ascent on the loss. "
+                  f"This is sufficient to fool the trained classifier on {rate:.0%} of the "
+                  f"digits tested, with a median confidence in the incorrect answer of "
+                  f"{med_conf:.0%}. This is the digital equivalent of the physical attack in "
+                  "the lecture slides, in which black and white tape placed at chosen points "
+                  "on a stop sign caused a network to classify it as a speed-limit sign over "
+                  "a wide range of distances and viewpoints, with clear implications for "
+                  "safety-critical systems such as self-driving cars.",
                   png=png)
 
 
@@ -522,21 +529,20 @@ def fig_pose_generalisation(ctx: BuildContext) -> Figure:
         axk.set_xticks([]); axk.set_yticks([])
     png = save_mpl(fig, ctx, "pose_generalisation")
     return Figure("pose_generalisation",
-                  "Lack of generalisation, measured. Nobody is attacking this "
-                  "classifier; its test digits are simply rotated, a change of pose a "
-                  "person would barely notice. Because the training digits are all "
-                  "upright, accuracy falls steeply with the angle and reaches chance by "
-                  "about 75°; the partial recovery near 180° is only because some "
-                  "digits, such as 0, 1 and 8, look much the same upside down. The "
-                  "same failure has "
-                  "been shown for deep ImageNet networks, which recognise a school bus, "
-                  "a scooter or a fire truck in the poses common in their training "
-                  "data and misclassify them when the pose changes. A network can "
-                  "generalise well within its training distribution and still behave "
-                  "unexpectedly outside it — a pedestrian lying in the road, seen from "
-                  "an angle absent from the training data, is exactly the kind of "
-                  "error that makes deployment in safety-critical applications "
-                  "dangerous.", png=png)
+                  "Lack of generalisation, measured. No attack is applied to this "
+                  "classifier; its test digits are rotated, a change of pose that would "
+                  "hardly be noticed by a human observer. As all of the training digits are "
+                  "upright, the accuracy decreases rapidly with angle and reaches the chance "
+                  "level at approximately 75°; the partial recovery near 180° occurs only "
+                  "because some digits, such as 0, 1 and 8, appear similar when upside down. "
+                  "The same failure has been shown for deep ImageNet networks, in which a "
+                  "school bus, a scooter or a fire truck is recognised in the poses common "
+                  "in the training data and misclassified when the pose changes. A network "
+                  "may generalise well within its training distribution and still behave "
+                  "unexpectedly outside it; for example, a pedestrian lying in the road, "
+                  "seen from an angle absent from the training data, could cause the kind of "
+                  "error that makes deployment in safety-critical applications dangerous.",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

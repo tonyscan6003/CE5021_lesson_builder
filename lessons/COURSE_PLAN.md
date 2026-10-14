@@ -535,3 +535,25 @@ would need vendoring locally first if the LMS blocks external scripts.
 - Prefer genuine data (sklearn digits, credited photos) over invented numbers;
   where a number is illustrative (2.1's top-k probabilities, 2.4's detection
   feature map), say so in the caption.
+
+## 11. Prose style
+
+All student-facing text (lesson markdown, figure captions, self-check
+explanations written here) follows the register of the lecturer's own video
+scripts in `reference/legacy_md/lesson_*_script.md`, written in the **passive
+voice**. Sections 1 and 2 were revised to this style after an initial draft
+read as machine-written.
+
+- Passive, descriptive statements: "is shown in the figure", "is determined
+  by", "it can be seen that", "it should be noted that".
+- No second person and no imperatives addressed to the reader ("Notice",
+  "Trace", "Look at", "Try", "Drag"); describe what the figure or control
+  shows instead ("can be varied with the slider").
+- No rhetorical framing or reveals: avoid "It is worth being precise",
+  "arguably", "which is the point", "the trick", "for free", "buys",
+  "overclaim", "decisive", and short punchy sentences or "not X — Y"
+  constructions. Use em dashes sparingly; commas or brackets are preferred.
+- Learning outcomes open with "On completion of this lesson the student
+  should be able to:".
+- Worked examples are reproduced verbatim from the autoquiz bank and are not
+  restyled.

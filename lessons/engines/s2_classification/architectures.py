@@ -19,12 +19,14 @@ lesson_2_2_script.
 """
 from __future__ import annotations
 
+import re
+
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 from .._common import BuildContext, Figure, C, SERIES, save_mpl, plotly_html, sync_matrix
-from .._volumes import OBLIQUE, chan_len, spatial_side, volume, kernel_cube
+from .._volumes import OBLIQUE, chan_len, spatial_side, volume, kernel_cube, network_diagram
 from .. import _arch as A
 
 FIGURES = ["alexnet_diagram", "alexnet_cost", "vgg_stacking", "model_zoo",
@@ -55,51 +57,52 @@ def _fmt(n):
 
 def fig_alexnet_diagram(ctx: BuildContext) -> Figure:
     net = A.alexnet()
-    maps = [l for l in net.layers if l.kind in ("input", "conv", "pool")]
-    vecs = [l for l in net.layers if l.kind == "fc"]
-    fig, ax = plt.subplots(figsize=(14, 5.0))
-    x, ymid = 0.0, 2.1
-    for l in maps:
-        c, h, w = l.out
-        face = {"input": C["light"], "conv": C["blue"], "pool": C["orange"]}[l.kind]
-        # this network spans 227 px down to 6 px, beyond the range _volumes'
-        # spatial_side() is tuned for, so scale against the input size here
-        side = 0.6 + 1.9 * np.sqrt(h / 227)
-        right = volume(ax, x, ymid, chan_len(c), side, face, lw=1.0, alpha=0.8)
-        ax.text(x + (chan_len(c) + OBLIQUE[0] * side) / 2, ymid - side / 2 - 0.12,
-                f"{h}×{w}×{c}", ha="center", va="top", fontsize=8.2, color=C["red"],
-                family="monospace")
-        nm = l.name.replace(" ", "\n", 1) if l.kind != "input" else "input"
-        ax.text(x + chan_len(c) / 2, ymid + side / 2 + OBLIQUE[1] * side + 0.1, nm,
-                ha="center", va="bottom", fontsize=7.8)
-        x = right + 0.32
-    for l in vecs:
-        n = l.out[0]
-        hh = 0.5 + 2.2 * np.log10(n) / np.log10(4096)
-        ax.add_patch(plt.Rectangle((x, ymid - hh / 2), 0.2, hh, fc=C["purple"],
-                                   ec=C["ink"], lw=1.0, alpha=0.6))
-        ax.text(x + 0.1, ymid - hh / 2 - 0.12, str(n), ha="center", va="top",
-                fontsize=8.2, color=C["red"], family="monospace")
-        ax.text(x + 0.1, ymid + hh / 2 + 0.1, l.name.split()[0], ha="center",
-                va="bottom", fontsize=7.8)
-        x += 0.62
-    ax.set_xlim(-0.2, x); ax.set_ylim(0.35, 4.75); ax.axis("off")
-    ax.set_title("AlexNet (single-GPU form): 5 convolution, 3 pooling and 3 dense "
-                 "layers. Volumes drawn with the channel axis horizontal.", fontsize=10.5)
+    ksize = lambda l: int(re.search(r"(\d+)×", l.name).group(1))
+
+    def op_label(l):
+        if l.kind == "pool":
+            return "max pool\n3×3, s=2"
+        stride = " s=4" if "/4" in l.name else ""
+        return f"conv {ksize(l)}×{ksize(l)}{stride}\n{l.out[0]} kernels"
+
+    maps = [dict(h=l.out[1], c=l.out[0], kind=l.kind,
+                 k=ksize(l) if l.kind != "input" else None,
+                 op=op_label(l) if l.kind != "input" else None)
+            for l in net.layers if l.kind in ("input", "conv", "pool")]
+    vec_ops = {"flatten": "flatten", "fc6": "dense", "fc7": "dense",
+               "fc8 + softmax": "dense\n+ softmax"}
+    vecs = [dict(n=l.out[0], op=vec_ops[l.name]) for l in net.layers
+            if l.kind in ("flatten", "fc")]
+    fig, ax = plt.subplots(figsize=(14, 4.6))
+    # this network spans 227 px down to 6 px, beyond the range spatial_side()
+    # is tuned for, so the end caps are scaled against the input size here
+    right, low = network_diagram(
+        ax, maps, vecs, ymid=0.0, side_fn=lambda h: 0.42 + 1.25 * np.sqrt(h / 227),
+        chan_scale=0.72, gap=0.78, vec_gap=0.62, vertical=True, fontsize=10,
+        vec_height=lambda n: 0.25 + 1.3 * np.sqrt(n / 9216))
+    ax.set_xlim(-0.15, right + 0.2); ax.set_ylim(low - 0.1, 1.4)
+    ax.set_aspect("equal"); ax.axis("off")
+    ax.set_title("AlexNet (single-GPU form): 5 convolution, 3 pooling and 3 dense layers, "
+                 "with the channel axis horizontal", fontsize=11)
     png = save_mpl(fig, ctx, "alexnet_diagram")
     return Figure("alexnet_diagram",
-                  "AlexNet, the first network to win the ImageNet challenge, drawn in "
-                  "the volume notation of Lesson 1.3: the horizontal length of each box "
-                  "is its channel count and the end cap its spatial size. Structurally "
-                  "it is LeNet-5 scaled up — 5 convolution, 3 pooling and 3 dense layers "
-                  "ending in a 1000-way softmax — and the scale is the difference. The "
-                  "first layer uses large 11 × 11 kernels at stride 4 on the 227 × 227 "
-                  "input, and 96 of them. Going deeper, the channel count rises to 384 "
-                  "while pooling shrinks the spatial size, the usual trade that keeps "
-                  "each layer's cost in balance, and the kernels get smaller. Every "
-                  "shape here is computed with Lesson 1.1's output-size formula. (The "
-                  "paper says the input is 224 × 224, but an 11 × 11 kernel at stride 4 "
-                  "only produces the paper's 55 × 55 from 227 — try it.)", png=png)
+                  "AlexNet, the first network to win the ImageNet challenge, drawn in the "
+                  "volume notation of Lesson 1.3, in which the horizontal length of each box "
+                  "represents the number of channels and the end cap the spatial size. Each "
+                  "operation is shown in the gap between its input and output volumes: the "
+                  "dashed cube inside a volume is one kernel or pooling window, and the "
+                  "dotted lines connect it to the single output value that it produces. The "
+                  "structure is that of LeNet-5 on a larger scale, with 5 convolution, 3 "
+                  "pooling and 3 dense layers ending in a 1000-way softmax. Large 11 × 11 "
+                  "kernels are used in the first layer, at stride 4 on the 227 × 227 input, "
+                  "and there are 96 of them. Deeper in the network, the number of channels "
+                  "increases to 384 while the spatial size is reduced by pooling, which "
+                  "balances the cost of each layer, and the kernels become smaller. Every "
+                  "shape is calculated with the output-size formula of Lesson 1.1. (An input "
+                  "size of 224 × 224 is given in the paper, but the 55 × 55 output of the "
+                  "first layer is only obtained from an 11 × 11 kernel at stride 4 with an "
+                  "input of 227 × 227.)",
+                  png=png)
 
 
 def fig_alexnet_cost(ctx: BuildContext) -> Figure:
@@ -128,65 +131,55 @@ def fig_alexnet_cost(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "alexnet_cost")
     g = A.alexnet(grouped=True)
     return Figure("alexnet_cost",
-                  "Where AlexNet's memory and computation go, layer by layer — note the "
-                  "log scales. The memory requirement is the parameter count: for a "
-                  "convolution layer the sum of its kernels' weights, for a dense layer "
-                  "inputs × neurons. The convolution layers hold tens to hundreds of "
-                  "thousands each, the dense layers tens of millions, so the dense "
-                  f"layers hold {params[is_fc].sum() / params.sum():.0%} of the total. "
-                  "Computation is the other way round: sliding kernels across the image "
-                  "multiplies each weight many times, so the convolution layers do "
-                  f"{macs[~is_fc].sum() / macs.sum():.0%} of the work. This matters in "
-                  "practice: dense layers are limited by memory bandwidth and do not use "
-                  "a GPU's full speed, while convolution does. These figures are for the "
-                  f"single-GPU form drawn above. The original two-GPU AlexNet split "
-                  "conv2, conv4 and conv5 into halves, which reduces it to "
-                  f"{g.params:,} parameters and {g.macs / 1e9:.2f} G multiply-"
-                  "accumulates — the figures usually quoted.", png=png)
+                  "The memory and computation of AlexNet, layer by layer (log scales are "
+                  "used). The memory requirement is given by the number of parameters: for a "
+                  "convolution layer, the sum of the weights of its kernels, and for a dense "
+                  "layer, inputs × neurons. The convolution layers contain tens to hundreds "
+                  "of thousands of parameters each and the dense layers tens of millions, so "
+                  f"{params[is_fc].sum() / params.sum():.0%} of the parameters are in the "
+                  "dense layers. For computation the reverse is the case: as the kernels are "
+                  "moved across the image, each weight is used in many multiplications, and "
+                  f"{macs[~is_fc].sum() / macs.sum():.0%} of the computation is performed "
+                  "in the convolution layers. This is significant in practice, as dense "
+                  "layers are limited by memory bandwidth and do not use the full speed of a "
+                  "GPU, whereas convolution layers do. These values are for the single-GPU "
+                  "form shown above. In the original two-GPU AlexNet, conv2, conv4 and conv5 "
+                  f"were split into halves, which reduces the network to {g.params:,} "
+                  f"parameters and {g.macs / 1e9:.2f} G multiply-accumulates, the values "
+                  "usually quoted.",
+                  png=png)
 
 
 def fig_vgg_stacking(ctx: BuildContext) -> Figure:
     net = A.vgg16()
-    fig = plt.figure(figsize=(13.5, 5.2))
-    gs = fig.add_gridspec(2, 2, height_ratios=[0.62, 1], width_ratios=[1.35, 1],
-                          hspace=0.28, wspace=0.18)
+    fig = plt.figure(figsize=(13.5, 6.9))
+    gs = fig.add_gridspec(2, 2, height_ratios=[0.8, 1], width_ratios=[1.35, 1],
+                          hspace=0.08, wspace=0.18)
 
-    # (a) VGG-16 as blocks, shapes and parameters computed
+    # (a) VGG-16 in the volume notation, one volume per block output: the
+    # block's stacked 3 × 3 convolutions are one labelled operation, the
+    # pooling the next. Shapes and parameters computed by _arch.
     ax = fig.add_subplot(gs[0, :])
     st = net.stage_totals()
-    blocks = [f"block{i}" for i in range(1, 6)] + ["fc"]
-    shapes = {}
-    for l in net.layers:
-        if l.kind == "pool":
-            shapes[l.stage] = l.out
-    x = 0.0
-    for b in blocks:
-        convs = [l for l in net.layers if l.stage == b and l.kind == "conv"]
-        p = st[b][0]
-        if b == "fc":
-            w = 2.2
-            ax.add_patch(plt.Rectangle((x, 0), w, 1, fc=C["purple"], alpha=0.5,
-                                       ec=C["ink"], lw=1.1))
-            ax.text(x + w / 2, 0.5, "3 dense\n4096·4096·1000", ha="center", va="center",
-                    fontsize=8.5)
-        else:
-            w = 0.62 * len(convs) + 0.55
-            for i, l in enumerate(convs):
-                ax.add_patch(plt.Rectangle((x + i * 0.62, 0), 0.56, 1, fc=C["blue"],
-                                           alpha=0.55, ec=C["ink"], lw=1.0))
-                ax.text(x + i * 0.62 + 0.28, 0.5, f"3×3\n{l.out[0]}", ha="center",
-                        va="center", fontsize=7.3)
-            px = x + len(convs) * 0.62
-            ax.add_patch(plt.Rectangle((px, 0.15), 0.42, 0.7, fc=C["orange"],
-                                       alpha=0.6, ec=C["ink"], lw=1.0))
-            ax.text(px + 0.21, 0.5, "pool", ha="center", va="center", fontsize=7,
-                    rotation=90)
-            c, h, ww = shapes[b]
-            ax.text(x + w / 2, -0.13, f"→ {h}×{ww}×{c}", ha="center", va="top",
-                    fontsize=8, color=C["red"], family="monospace")
-        ax.text(x + w / 2, 1.12, f"{b}: {_fmt(p)} params", ha="center", fontsize=8.3)
-        x += w + 0.25
-    ax.set_xlim(-0.1, x); ax.set_ylim(-0.5, 1.45); ax.axis("off")
+    maps = [dict(h=224, c=3, kind="input", k=None, op=None)]
+    for b in range(1, 6):
+        convs = [l for l in net.layers if l.stage == f"block{b}" and l.kind == "conv"]
+        pool_ = [l for l in net.layers if l.stage == f"block{b}" and l.kind == "pool"][0]
+        c, h = convs[-1].out[0], convs[-1].out[1]
+        maps.append(dict(h=h, c=c, kind="conv", k=3,
+                         op=f"{len(convs)} × conv 3×3\n{c} kernels\n"
+                            f"{_fmt(st[f'block{b}'][0])} params"))
+        maps.append(dict(h=pool_.out[1], c=pool_.out[0], kind="pool", k=2,
+                         op="max pool\n2×2, s=2"))
+    fcs = [l for l in net.layers if l.kind in ("flatten", "fc")]
+    vec_ops = ["flatten"] + ["dense"] * (len(fcs) - 2) + ["dense\n+ softmax"]
+    vecs = [dict(n=l.out[0], op=o) for l, o in zip(fcs, vec_ops)]
+    right, low = network_diagram(
+        ax, maps, vecs, ymid=0.0, side_fn=lambda h: 0.42 + 1.25 * np.sqrt(h / 224),
+        chan_scale=0.55, gap=0.98, vec_gap=0.98, vertical=True, fontsize=9.5,
+        vec_height=lambda n: 0.25 + 1.3 * np.sqrt(n / 25088))
+    ax.set_xlim(-0.15, right + 0.2); ax.set_ylim(low - 0.1, 1.4)
+    ax.set_aspect("equal"); ax.axis("off")
     fc_p = st["fc"][0]
     ax.set_title(f"(a) VGG-16: 13 convolutions, all 3 × 3, in five blocks — "
                  f"{net.params:,} parameters, of which the dense layers hold "
@@ -227,19 +220,21 @@ def fig_vgg_stacking(ctx: BuildContext) -> Figure:
     ax.set_title("(c) … for fewer parameters and operations", fontsize=10.5, loc="left")
     png = save_mpl(fig, ctx, "vgg_stacking")
     return Figure("vgg_stacking",
-                  "(a) VGG-16 has the same overall plan as AlexNet — convolution, "
-                  "pooling, then dense layers — but every convolution is 3 × 3 and "
-                  "they are stacked in blocks, giving 13 convolution layers instead of "
-                  "5, with the channel count reaching 512. (b) The reason for the "
-                  "stacking: back-to-back 3 × 3 convolutions see as large a region of "
-                  "the input as one larger kernel — two give a receptive field of 5, "
-                  "three give 7, by Lesson 1.4's formula. (c) But they need fewer "
-                  "weights and fewer multiplications to do it: 27 per channel pair for "
-                  "three 3 × 3 layers against 49 for one 7 × 7, and there is an "
-                  "activation between each, so the stack is also more expressive. "
-                  "VGG keeps AlexNet's large dense layers, though, and they still hold "
-                  "most of its parameters — the problem the rest of this lesson "
-                  "addresses.", png=png)
+                  "(a) VGG-16 has the same overall structure as AlexNet, with convolution, "
+                  "pooling and then dense layers, but every convolution is 3 × 3 and the "
+                  "convolutions are stacked in blocks, giving 13 convolution layers instead "
+                  "of 5, with up to 512 channels. It is drawn in the same volume notation, "
+                  "with one volume for the output of each block of stacked convolutions "
+                  "and one for each pooling layer. (b) The reason for stacking: consecutive "
+                  "3 × 3 convolutions view as large a region of the input as one larger "
+                  "kernel, with a receptive field of 5 for two layers and 7 for three, by "
+                  "the formula of Lesson 1.4. (c) Fewer weights and fewer multiplications are "
+                  "required: 27 per channel pair for three 3 × 3 layers compared with 49 for "
+                  "one 7 × 7 layer, and as there is an activation between each layer, the "
+                  "stack is also more expressive. The large dense layers of AlexNet are "
+                  "retained in VGG, however, and they still contain most of its parameters; "
+                  "this problem is addressed in the remainder of this lesson.",
+                  png=png)
 
 
 def fig_model_zoo(ctx: BuildContext) -> Figure:
@@ -247,21 +242,27 @@ def fig_model_zoo(ctx: BuildContext) -> Figure:
     for name, fn, acc in ZOO:
         net = fn()
         rows.append((name, acc, net.macs / 1e9, net.params / 1e6))
-    # GoogLeNet and ResNet-18 land almost on top of each other, so labels sit
-    # beside their bubbles rather than on them
-    offset = {"GoogLeNet": (-14, 0, "right"), "ResNet-18": (14, 0, "left"),
-              "MobileNetV2": (0, 14, "center"), "DenseNet-121": (-14, 6, "right")}
-    fig, ax = plt.subplots(figsize=(11, 5.4))
+    # Every label sits just outside its own bubble, in a direction chosen so
+    # neighbours (GoogLeNet / ResNet-18, DenseNet / ResNet-50) do not collide.
+    # The offset is the bubble's radius in points plus a margin.
+    side = {"AlexNet": "right", "VGG-16": "below", "ResNet-152": "above",
+            "ResNet-50": "above", "DenseNet-121": "left", "GoogLeNet": "left",
+            "ResNet-18": "right", "MobileNetV2": "above"}
+    place = {"right": (1, 0, "left", "center"), "left": (-1, 0, "right", "center"),
+             "above": (0, 1, "center", "bottom"), "below": (0, -1, "center", "top")}
+    fig, ax = plt.subplots(figsize=(11, 5.6))
     for i, (name, acc, g, p) in enumerate(rows):
-        ax.scatter(g, acc, s=p * 22 + 30, color=SERIES[i % len(SERIES)], alpha=0.55,
+        s = p * 22 + 30
+        ax.scatter(g, acc, s=s, color=SERIES[i % len(SERIES)], alpha=0.55,
                    edgecolor=C["ink"], lw=0.8)
-        dx, dy, ha = offset.get(name, (0, -2, "center"))
-        ax.annotate(f"{name}\n{p:.1f}M", (g, acc), xytext=(dx, dy),
-                    textcoords="offset points", ha=ha, va="center", fontsize=8)
+        ux, uy, ha, va = place[side[name]]
+        r = np.sqrt(s / np.pi) + 4
+        ax.annotate(f"{name}\n{p:.1f}M", (g, acc), xytext=(ux * r, uy * r),
+                    textcoords="offset points", ha=ha, va=va, fontsize=10)
     ax.set_xscale("log")
     ax.set_xlabel("operations per image (G multiply-accumulates, log scale)")
     ax.set_ylabel("ImageNet top-1 accuracy (%)")
-    ax.set_xlim(0.15, 40); ax.set_ylim(52, 82)
+    ax.set_xlim(0.15, 40); ax.set_ylim(50, 83)
     ax.set_title("Accuracy against computation; bubble area ∝ parameters", fontsize=10.5)
     ax.grid(alpha=0.25, which="both")
     png = save_mpl(fig, ctx, "model_zoo")
@@ -278,19 +279,20 @@ def fig_model_zoo(ctx: BuildContext) -> Figure:
     fig2.update_yaxes(title_text="ImageNet top-1 accuracy (%)", range=[52, 82])
     fig2.update_layout(title="Hover a network for its numbers")
     return Figure("model_zoo",
-                  "The model zoo: ImageNet top-1 accuracy against the computation "
-                  "needed per image, with bubble area proportional to the parameter "
-                  "count. AlexNet sits bottom left — cheap to run and not very accurate, "
-                  "but with a very large number of parameters. VGG-16 is more accurate "
-                  "but costs far more computation and has the largest parameter count of "
-                  "all, which makes it unsuitable for mobile devices and slow to train, "
-                  "since its dense layers are limited by memory bandwidth. Those "
-                  "concerns drove the search for architectures without large dense "
-                  "layers: GoogLeNet, ResNet, DenseNet and MobileNetV2 all reach VGG's "
-                  "accuracy or better with a fraction of its parameters. Parameters and "
-                  "operations are computed from each architecture (and match torchvision's "
-                  "published counts); the accuracies are torchvision's published "
-                  "single-crop results.", png=png, html=plotly_html(fig2, height=480),
+                  "The model zoo: ImageNet top-1 accuracy against the computation required "
+                  "per image, with bubble area proportional to the number of parameters. "
+                  "AlexNet is located at the bottom left, as it requires little computation "
+                  "and is not very accurate, but it has a very large number of parameters. "
+                  "VGG-16 is more accurate but requires far more computation and has the "
+                  "largest number of parameters, which makes it unsuitable for mobile devices "
+                  "and slow to train, as its dense layers are limited by memory bandwidth. "
+                  "These concerns led to the development of architectures without large "
+                  "dense layers: GoogLeNet, ResNet, DenseNet and MobileNetV2 all reach or "
+                  "exceed the accuracy of VGG with a fraction of its parameters. The numbers "
+                  "of parameters and operations are calculated from each architecture (and "
+                  "match the counts published for torchvision); the accuracies are the "
+                  "single-crop results published for torchvision.",
+                  png=png, html=plotly_html(fig2, height=480),
                   kind="plotly")
 
 
@@ -337,18 +339,19 @@ def fig_network_in_network(ctx: BuildContext) -> Figure:
         ax.axis("off"); ax.set_title(title, fontsize=10)
     png = save_mpl(fig, ctx, "network_in_network")
     return Figure("network_in_network",
-                  "The network-in-network idea (Lin, 2013). (a) An ordinary convolution "
-                  "is a linear filter followed by an activation, so the features it can "
-                  "represent at each position are limited — which is what drives "
-                  "networks like AlexNet and VGG to need large dense layers at the "
-                  "output to separate the classes. (b) Network in network replaces the "
-                  "filter with a small multilayer perceptron, still slid across the "
-                  "input exactly like a convolution. That adds parameters locally and "
-                  "makes each feature more discriminative, so the large dense output "
-                  "layers can be replaced by global average pooling. Applying the same "
-                  "small dense network at every position is exactly what a stack of "
-                  "1 × 1 convolutions does, which is how Inception implements the idea "
-                  "efficiently.", png=png)
+                  "The network-in-network concept (Lin, 2013). (a) An ordinary convolution "
+                  "is a linear filter followed by an activation, so the features that can be "
+                  "represented at each position are limited, and for this reason large dense "
+                  "layers are required at the output of networks such as AlexNet and VGG to "
+                  "separate the classes. (b) In network in network, the filter is replaced by "
+                  "a small multilayer perceptron, which is still applied across the input in "
+                  "the same way as a convolution. Parameters are added locally and each "
+                  "feature becomes more discriminative, so the large dense output layers can "
+                  "be replaced by global average pooling. The application of the same small "
+                  "dense network at every position is equivalent to a stack of 1 × 1 "
+                  "convolutions, and this is how the concept is implemented efficiently in "
+                  "Inception.",
+                  png=png)
 
 
 def fig_global_avg_pool(ctx: BuildContext) -> Figure:
@@ -381,19 +384,21 @@ def fig_global_avg_pool(ctx: BuildContext) -> Figure:
                  fontsize=10)
     png = save_mpl(fig, ctx, "global_avg_pool")
     return Figure("global_avg_pool",
-                  "Global average pooling, also proposed in the network-in-network "
-                  "paper, as an alternative to dense layers acting as the classifier. "
-                  "It reduces a feature map of any spatial size to a single number — "
-                  "its mean — so C feature maps become a vector of length C, whatever "
-                  "the input image size. A dense layer with softmax then turns that "
-                  "vector into class probabilities. The saving is dramatic: on VGG-16's "
-                  "final 7 × 7 × 512 feature map, flattening into its three dense layers "
-                  f"needs {head_dense:,} parameters, while global average pooling into a "
-                  f"single 1000-way layer needs {gap_head:,}. Dense layers are also prone "
-                  "to overfitting and need regularisation such as dropout. The catch: "
-                  "GAP only works if the convolution layers are capable of producing "
-                  "sufficiently abstract features, which in practice means a deeper "
-                  "network or richer layers, as in network in network.", png=png)
+                  "Global average pooling, also proposed in the network-in-network paper, as "
+                  "an alternative to dense layers in the classifier. A feature map of any "
+                  "spatial size is reduced to a single value, its mean, so C feature maps "
+                  "become a vector of length C regardless of the input image size. This "
+                  "vector is converted into class probabilities by a dense layer with "
+                  "softmax. The saving is large: for the final 7 × 7 × 512 feature map of "
+                  "VGG-16, flattening into its three dense layers requires "
+                  f"{head_dense:,} parameters, whereas global average pooling into a single "
+                  f"1000-way layer requires {gap_head:,}. Dense layers are also prone to "
+                  "overfitting, and regularisation such as dropout is required. However, "
+                  "global average pooling is only effective if sufficiently abstract "
+                  "features can be produced by the convolution layers, which in practice "
+                  "requires a deeper network or more powerful layers, as in network in "
+                  "network.",
+                  png=png)
 
 
 def _inception_diagram(ax, reduce):
@@ -417,14 +422,17 @@ def _inception_diagram(ax, reduce):
         y = 1.0
         ax.annotate("", xy=(bx + 0.85, 0.98), xytext=(min(max(bx + 0.85, 1.4), 6.6), 0.57),
                     arrowprops=dict(arrowstyle="->", color=C["grey"], lw=1))
-        for label, key in br:
+        for j, (label, key) in enumerate(br):
             l = by[key]
+            if j:       # the bottleneck (or pool) feeds the next stage of the branch
+                ax.annotate("", xy=(bx + 0.85, y - 0.01), xytext=(bx + 0.85, y - 0.25),
+                            arrowprops=dict(arrowstyle="->", color=C["grey"], lw=1))
             col = (C["orange"] if "pool" in label else C["sky"] if "1×1" in label
                    else C["blue"])
             ax.add_patch(plt.Rectangle((bx, y), 1.7, 0.7, fc=col, alpha=0.6,
                                        ec=C["ink"], lw=1.0))
-            ax.text(bx + 0.85, y + 0.42, label, ha="center", fontsize=8.2)
-            ax.text(bx + 0.85, y + 0.14, f"→ {l.out[0]} ch", ha="center", fontsize=7.6,
+            ax.text(bx + 0.85, y + 0.42, label, ha="center", fontsize=9)
+            ax.text(bx + 0.85, y + 0.13, f"→ {l.out[0]} ch", ha="center", fontsize=8.5,
                     color=C["red"])
             y += 0.95
         ax.annotate("", xy=(bx + 0.85, 3.05), xytext=(bx + 0.85, y - 0.25),
@@ -449,20 +457,21 @@ def fig_inception_module(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "inception_module")
     (nn, on), (nr, orr) = res[False], res[True]
     return Figure("inception_module",
-                  "The Inception module, computed for GoogLeNet's first module on a "
-                  "28 × 28 × 192 input. It departs from the simple sequential stack of "
-                  "AlexNet and VGG: 1 × 1, 3 × 3 and 5 × 5 convolutions and a pooling "
-                  "path run in parallel, finding correlations across channels and over "
-                  "progressively wider regions, and their outputs are concatenated. "
-                  "Each module is a 'network within a network'. (a) Built naively, the "
-                  f"module costs {nn.macs / 1e6:.0f} M multiply-accumulates, and because "
-                  "the pooling path passes all 192 input channels straight through, the "
-                  f"output grows to {on[0]} channels — so stacking such modules would "
-                  "make every one more expensive than the last. (b) GoogLeNet inserts "
-                  "1 × 1 bottleneck convolutions before the 3 × 3 and 5 × 5 paths and "
-                  f"after the pool. That cuts the cost to {nr.macs / 1e6:.0f} M, "
-                  f"{nn.macs / nr.macs:.1f} times cheaper, and holds the output to "
-                  f"{orr[0]} channels — exactly the bottleneck idea of Lesson 1.3.",
+                  "The Inception module, calculated for the first module of GoogLeNet on a "
+                  "28 × 28 × 192 input. It departs from the sequential structure of AlexNet "
+                  "and VGG: 1 × 1, 3 × 3 and 5 × 5 convolutions and a pooling path are "
+                  "applied in parallel, so that correlations across channels and over "
+                  "progressively wider regions are found, and their outputs are "
+                  "concatenated. Each module is a 'network within a network'. (a) In the "
+                  f"naive form the module requires {nn.macs / 1e6:.0f} M multiply-"
+                  "accumulates, and as all 192 input channels are passed through by the "
+                  f"pooling path, the output increases to {on[0]} channels, so each module "
+                  "in a stack would be more expensive than the previous one. (b) In "
+                  "GoogLeNet, 1 × 1 bottleneck convolutions are inserted before the 3 × 3 "
+                  "and 5 × 5 paths and after the pooling. The cost is reduced to "
+                  f"{nr.macs / 1e6:.0f} M, {nn.macs / nr.macs:.1f} times less, and the "
+                  f"output is limited to {orr[0]} channels, using the bottleneck concept of "
+                  "Lesson 1.3.",
                   png=png)
 
 
@@ -525,20 +534,22 @@ def fig_googlenet(ctx: BuildContext) -> Figure:
                  f"{alex.params / 1e6:.0f} M", fontsize=10, loc="left")
     png = save_mpl(fig, ctx, "googlenet")
     return Figure("googlenet",
-                  "GoogLeNet, the Inception network that won the 2014 challenge. "
-                  "(a) At 22 layers it was the deepest CNN published at the time, and it "
-                  "is wide as well as deep, the width coming from the parallel paths in "
-                  "each module. A global average pooling layer feeds the final dense "
-                  "layer, with dropout during training. The two **auxiliary classifiers** "
-                  "are extra outputs attached part-way up; during training their losses "
-                  "are added to the main loss with a weight of 0.3, so the network is "
-                  "trained as a superposition of networks of different depths and the "
-                  "early layers receive a strong gradient. They are removed for "
-                  "inference. (b) Where the cost sits, computed per stage. In total "
-                  f"GoogLeNet has about {net.params / 1e6:.0f} million parameters, against "
-                  f"AlexNet's {alex.params / 1e6:.0f} million, and still performed "
-                  "better. (The paper itself quotes 12 times fewer; computing it from the "
-                  "published layer table gives about nine.)", png=png)
+                  "GoogLeNet, the Inception network that won the 2014 challenge. (a) With 22 "
+                  "layers it was the deepest CNN published at the time, and it is wide as "
+                  "well as deep, with the width provided by the parallel paths in each "
+                  "module. A global average pooling layer is connected to the final dense "
+                  "layer, with dropout applied during training. The two **auxiliary "
+                  "classifiers** are additional outputs attached part of the way through the "
+                  "network; during training their losses are added to the main loss with a "
+                  "weight of 0.3, so the network is trained as a superposition of networks "
+                  "of different depths and a strong gradient is received by the early "
+                  "layers. The auxiliary classifiers are removed for inference. (b) The "
+                  "distribution of cost, calculated per stage. In total GoogLeNet has "
+                  f"approximately {net.params / 1e6:.0f} million parameters, compared with "
+                  f"{alex.params / 1e6:.0f} million for AlexNet, and performed better. (A "
+                  "factor of 12 is quoted in the paper; when calculated from the published "
+                  "layer table, the factor is approximately nine.)",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

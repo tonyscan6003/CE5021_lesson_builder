@@ -151,58 +151,81 @@ def fig_transfer_pipeline(ctx: BuildContext) -> Figure:
                  pad=16)
     png = save_mpl(fig, ctx, "transfer_pipeline")
     return Figure("transfer_pipeline",
-                  "Transfer learning relies on a network splitting into a **feature "
-                  "extractor** — the convolution layers — and a **classifier**. "
-                  "(a) Trained on a large dataset such as ImageNet, the extractor has "
-                  "learned many generic image features: lines, edges and blobs in the "
-                  "early layers, more specific and complex features deeper in. (b) For "
-                  "a new task, the extractor is copied and only a new classifier is "
-                  "attached. In the simplest case the extractor is used as a fixed "
-                  "feature extractor and only the classifier is trained; usually the "
-                  "extractor is also **fine-tuned**, training both together. The "
-                  "numbers are MobileNetV2's, computed from its architecture: freezing "
-                  f"the extractor leaves {new_head:,} parameters to train for a "
-                  "5-class problem, which is why so little data and computation is "
-                  "needed.", png=png)
+                  "Transfer learning is based on the division of a network into a **feature "
+                  "extractor**, the convolution layers, and a **classifier**. (a) When "
+                  "trained on a large dataset such as ImageNet, many generic image features "
+                  "are learned by the extractor: lines, edges and blobs in the early layers, "
+                  "and more specific and complex features in the deeper layers. (b) For a "
+                  "new task the extractor is copied and a new classifier is attached. In the "
+                  "simplest case the extractor is used as a fixed feature extractor and only "
+                  "the classifier is trained; usually the extractor is also **fine-tuned**, "
+                  "with both trained together. The values are those of MobileNetV2, "
+                  "calculated from its architecture: when the extractor is frozen, "
+                  f"{new_head:,} parameters remain to be trained for a 5-class problem, "
+                  "which is why so little data and computation are required.",
+                  png=png)
 
 
 def fig_transfer_detection(ctx: BuildContext) -> Figure:
     img = load_image("cat", max_side=300)
     rng = np.random.default_rng(1)
     h, w = img.shape[:2]
-    fig = plt.figure(figsize=(13, 4.0))
-    gs = fig.add_gridspec(1, 4, width_ratios=[1.1, 1.3, 0.25, 1.4], wspace=0.15)
-    ax = fig.add_subplot(gs[0])
-    ax.imshow(img); ax.set_xticks([]); ax.set_yticks([])
-    ax.set_title("input", fontsize=10)
+    fig, ax = plt.subplots(figsize=(13, 4.3))
+    YM = 2.35
+
+    def arrow(x0, y0, x1, y1):
+        ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
+                    arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.5))
+
+    # input image
+    iw = 3.3
+    ih = iw * h / w
+    ax.imshow(img, extent=(0, iw, YM - ih / 2, YM + ih / 2))
+    ax.text(iw / 2, YM + ih / 2 + 0.12, "input", ha="center", va="bottom", fontsize=10)
+    arrow(iw + 0.1, YM, iw + 0.75, YM)
+
+    # the pre-trained feature extractor: convolution layers, spatial size shrinking
+    x0, x1 = iw + 0.8, iw + 3.9
+    ax.add_patch(plt.Polygon([(x0, YM - 1.35), (x1, YM - 0.7), (x1, YM + 0.7),
+                              (x0, YM + 1.35)], fc=C["sky"], alpha=0.6, ec=C["ink"], lw=1.2))
+    ax.text((x0 + x1) / 2, YM, "pre-trained\nfeature extractor\n(convolution layers,\n"
+            "usually fine-tuned)", ha="center", va="center", fontsize=9.5)
+    arrow(x1 + 0.1, YM, x1 + 0.75, YM)
 
     # a coarse 'activation' map: a blob over the cat's location, for illustration
-    ax = fig.add_subplot(gs[1])
+    fx, fs = x1 + 0.8, 2.5
     gy, gx = np.mgrid[0:7, 0:7]
     act = np.exp(-((gx - 3.2) ** 2 + (gy - 3.4) ** 2) / 4.0) + 0.12 * rng.random((7, 7))
-    ax.imshow(act, cmap="magma"); ax.set_xticks([]); ax.set_yticks([])
-    ax.set_title("pre-trained extractor: final 7 × 7 feature map\n(illustrative) — "
-                 "where it fires encodes where the cat is", fontsize=9.5)
+    ax.imshow(act, cmap="magma", extent=(fx, fx + fs, YM - fs / 2, YM + fs / 2))
+    ax.text(fx + fs / 2, YM + fs / 2 + 0.12, "final 7 × 7 feature map (illustrative):\n"
+            "where it fires encodes where the cat is", ha="center", va="bottom",
+            fontsize=9.5)
 
-    ax = fig.add_subplot(gs[3])
-    _box(ax, 0.0, 1.5, 2.6, 0.8, "class head\n→ 'cat', p = 0.97", C["purple"])
-    _box(ax, 0.0, 0.2, 2.6, 0.8, "box head\n→ (x, y, w, h)", C["green"])
-    ax.set_xlim(-0.4, 2.9); ax.set_ylim(0, 2.6); ax.axis("off")
-    ax.set_title("two new heads, trained on the\ntarget task", fontsize=10)
+    # two new heads, both fed by the same feature map
+    hx, hw, hh = fx + fs + 1.3, 3.0, 0.9
+    _box(ax, hx, YM + 0.45, hw, hh, "class head\n→ 'cat', p = 0.97", C["purple"], fs=9.5)
+    _box(ax, hx, YM - 0.45 - hh, hw, hh, "box head\n→ (x, y, w, h)", C["green"], fs=9.5)
+    arrow(fx + fs + 0.1, YM + 0.1, hx - 0.05, YM + 0.45 + hh / 2)
+    arrow(fx + fs + 0.1, YM - 0.1, hx - 0.05, YM - 0.45 - hh / 2)
+    ax.text(hx + hw / 2, YM + 0.45 + hh + 0.12, "two new heads, trained on the target task",
+            ha="center", va="bottom", fontsize=9.5)
+    ax.set_xlim(-0.1, hx + hw + 0.1); ax.set_ylim(YM - 1.75, YM + 2.0)
+    ax.set_aspect("equal"); ax.axis("off")
     png = save_mpl(fig, ctx, "transfer_detection")
     return Figure("transfer_detection",
-                  "Transfer learning can change the task as well as the data. Here a "
-                  "feature extractor pre-trained for classification is reused for "
-                  "object detection. When an image passes through it, certain feature "
-                  "maps in the last layers activate — not uniformly, but in a pattern "
-                  "that carries spatial information about where the object is. That "
-                  "is enough to train two heads: a class predictor, and a bounding-box "
-                  "predictor that outputs the object's coordinates. (The feature map "
-                  "shown is illustrative, not a network's output.) The extractor is "
-                  "usually fine-tuned and the whole network trained end to end. "
-                  "Detection data must say where every object is, so it is expensive "
-                  "to label and scarce — which usually makes transfer learning "
-                  "necessary to train a detector at all. Section 3 builds on this.",
+                  "In transfer learning the task can be changed as well as the data. Here a "
+                  "feature extractor pre-trained for classification is reused for object "
+                  "detection. When the input image is passed through the extractor, certain feature "
+                  "maps in the last layers are activated, not uniformly but in a pattern "
+                  "that contains spatial information about the location of the object. This "
+                  "is sufficient for two heads to be trained: a class predictor, and a "
+                  "bounding-box predictor that outputs the coordinates of the object. (The "
+                  "feature map shown is illustrative, not the output of a network.) The "
+                  "extractor is usually fine-tuned and the whole network trained end to end. "
+                  "The location of every object must be recorded in detection data, so the "
+                  "data is expensive to label and scarce, and transfer learning is therefore "
+                  "usually necessary for a detector to be trained. This is developed further "
+                  "in Section 3.",
                   png=png)
 
 
@@ -210,7 +233,6 @@ CONV_LR = 0.005   # same for every method; low enough that convergence is visibl
 
 
 def fig_pretrain_convergence(ctx: BuildContext) -> Figure:
-    use_source("sklearn_digits")
     task = "related"
     hist = {m: [run(task, m, None, s, lr=CONV_LR) for s in SEEDS] for m, _, _ in MODES}
     mean = {m: np.array([h["test_acc"] for h in hist[m]]).mean(0) for m in hist}
@@ -235,25 +257,26 @@ def fig_pretrain_convergence(ctx: BuildContext) -> Figure:
                  fontsize=10.5)
     png = save_mpl(fig, ctx, "pretrain_convergence")
     return Figure("pretrain_convergence",
-                  "Pre-training's main benefit is speed, measured here. A small network "
-                  "is pre-trained to recognise handwritten digits, then trained to tell "
-                  "odd from even digits on a separate set of images, using all the "
-                  "available target data — either from random weights or starting "
-                  "from the pre-trained feature extractor. All runs use the same "
-                  f"learning rate ({CONV_LR}); there are {len(SEEDS)} of each, the line "
-                  "is the mean and the band the range. After one epoch the pre-trained "
-                  f"network is {100 * (mean['finetune'][0] - mean['scratch'][0]):.0f} "
-                  "points ahead. But the network trained from scratch catches up"
-                  + (f" by epoch {meet}" if meet else "") + ", and their final accuracy "
-                  "is the same. This is exactly the finding of He and colleagues: with "
-                  "enough target data, pre-training converges faster but does not "
-                  "reach a better final accuracy. The frozen extractor ends lowest, "
-                  "because freezing stops the features being adapted to the new task.",
+                  "The main benefit of pre-training is speed, as measured here. A small "
+                  "network is pre-trained to recognise handwritten digits, and is then "
+                  "trained to distinguish odd from even digits on a separate set of images, "
+                  "using all of the available target data, either from random weights or "
+                  "from the pre-trained feature extractor. The same learning rate "
+                  f"({CONV_LR}) is used for all runs; there are {len(SEEDS)} runs of each, "
+                  "with the line showing the mean and the band the range. After one epoch "
+                  "the pre-trained network is "
+                  f"{100 * (mean['finetune'][0] - mean['scratch'][0]):.0f} points ahead. "
+                  "However, the network trained from scratch catches up"
+                  + (f" by epoch {meet}" if meet else "") + ", and the final accuracy is "
+                  "the same. This agrees with the finding of He and colleagues: with "
+                  "sufficient target data, pre-training results in faster convergence but "
+                  "not in a better final accuracy. The lowest final accuracy is obtained "
+                  "with the frozen extractor, as the features cannot be adapted to the new "
+                  "task.",
                   png=png)
 
 
 def fig_data_size_sweep(ctx: BuildContext) -> Figure:
-    use_source("sklearn_digits")
     fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.5), sharey=True)
     panels = [("related", "(a) closely related task: digit identity → odd or even"),
               ("new", "(b) new classes: digits 0–4 → digits 5–9")]
@@ -273,24 +296,27 @@ def fig_data_size_sweep(ctx: BuildContext) -> Figure:
     rel, new = sweep("related"), sweep("new")
     png = save_mpl(fig, ctx, "data_size_sweep")
     return Figure("data_size_sweep",
-                  "Whether transfer learning helps depends on the target data and on "
-                  f"how related the tasks are, measured over {len(SEEDS)} random "
-                  "subsets at each size. (a) **A closely related task.** The source "
-                  "network learned digit identity; the target is whether a digit is "
-                  "odd or even, on images the source never saw. With only 6 labelled "
-                  f"examples the pre-trained network reaches {rel['finetune'][0].mean():.0%} "
-                  f"against {rel['scratch'][0].mean():.0%} from scratch, and even a "
-                  "**frozen** extractor does as well as fine-tuning — the most "
-                  "favourable case on the slides. As data grows, scratch catches up "
-                  "and with all of it slightly overtakes. (b) **New classes.** The "
-                  "source learned digits 0–4; the target is 5–9. Now pre-training gives "
-                  "no advantage at any size — with the fewest examples, fine-tuning is "
-                  "even slightly worse than starting from scratch — and the frozen "
-                  "extractor is clearly worst: the features are only partly the right "
-                  "ones. "
-                  "This is the point of Raghu et al. — transfer helps less than is "
-                  "often assumed when the domains or tasks differ — and of the slide's "
-                  "advice that less similar domains need fine-tuning.", png=png)
+                  "The benefit of transfer learning depends on the amount of target data and "
+                  f"on how closely the tasks are related, measured over {len(SEEDS)} random "
+                  "subsets at each size. (a) **A closely related task.** Digit identity was "
+                  "learned by the source network; the target task is to decide whether a "
+                  "digit is odd or even, on images not seen by the source network. With only "
+                  "6 labelled examples, the pre-trained network reaches "
+                  f"{rel['finetune'][0].mean():.0%} compared with "
+                  f"{rel['scratch'][0].mean():.0%} from scratch, and a **frozen** extractor "
+                  "performs as well as fine-tuning, which is the most favourable case "
+                  "described in the lecture slides. As the amount of data increases, the "
+                  "network trained from scratch catches up, and with all of the data it "
+                  "performs slightly better. (b) **New classes.** Digits 0–4 were learned by "
+                  "the source network, and the target is digits 5–9. In this case "
+                  "pre-training gives no advantage at any size; with the fewest examples, "
+                  "fine-tuning is slightly worse than training from scratch, and the frozen "
+                  "extractor performs worst, as the features are only partly suitable. This "
+                  "agrees with the finding of Raghu et al. that transfer learning is less "
+                  "beneficial than is often assumed when the domains or tasks differ, and "
+                  "with the recommendation that fine-tuning is required for less similar "
+                  "domains.",
+                  png=png)
 
 
 def fig_decision_grid(ctx: BuildContext) -> Figure:
@@ -325,21 +351,22 @@ def fig_decision_grid(ctx: BuildContext) -> Figure:
     ax.set_xlim(-0.6, 10.3); ax.set_ylim(0.0, 5.15); ax.axis("off")
     png = save_mpl(fig, ctx, "decision_grid")
     return Figure("decision_grid",
-                  "When to use transfer learning, summarising the lesson's "
-                  "recommendations against the similarity of source and target and "
-                  "the size of the target dataset. The most favourable case is a "
-                  "similar domain with little target data: transfer learning will be "
-                  "much better than training from scratch, and if the classes are "
-                  "similar it can work well without fine-tuning at all. With a large "
-                  "target dataset the final accuracy is the same either way, but "
-                  "transfer learning saves training time. With a dissimilar domain, "
-                  "such as medical images, fine-tuning is necessary, a small target "
-                  "set risks overfitting, and with a medium-sized dataset training "
-                  "from scratch performs as well — so it is worth asking whether a "
-                  "much lighter model, trained from scratch, would do. Limited "
-                  "computation is a separate reason to prefer transfer learning in "
-                  "any cell. The italic notes point to where this lesson's experiments "
-                  "show each behaviour.", png=png)
+                  "The recommendations of this lesson on the use of transfer learning, "
+                  "arranged by the similarity of the source and target and by the size of "
+                  "the target dataset. The most favourable case is a similar domain with "
+                  "little target data: transfer learning performs much better than training "
+                  "from scratch, and if the classes are similar, good results can be "
+                  "obtained without fine-tuning. With a large target dataset the final "
+                  "accuracy is the same in both cases, but training time is saved with "
+                  "transfer learning. With a dissimilar domain, such as medical images, "
+                  "fine-tuning is necessary, there is a risk of overfitting with a small "
+                  "target dataset, and with a medium-sized dataset equivalent performance is "
+                  "obtained by training from scratch; in this case a much lighter model "
+                  "trained from scratch should be considered. Limited computational "
+                  "resources are a separate reason to use transfer learning in any case. "
+                  "The italic notes indicate where each behaviour is shown in the "
+                  "experiments of this lesson.",
+                  png=png)
 
 
 def fig_pretrained_models(ctx: BuildContext) -> Figure:
@@ -367,22 +394,19 @@ def fig_pretrained_models(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "pretrained_models")
     vgg = rows[-1]
     return Figure("pretrained_models",
-                  "Frameworks provide standard image recognition models with ImageNet "
-                  "weights ready to use: Keras has an applications module containing "
-                  "ResNet50, VGG16, DenseNet and MobileNetV2 among others. Setting "
-                  "**include_top=False** removes the fully connected classification "
-                  "part, leaving only the feature extractor, to which a new classifier "
-                  "is attached; the extractor's layers can then be frozen or fine-tuned "
-                  "together with it. The input_shape argument fixes the size of the "
-                  "model's tensors. Note how much of each model the top is: most of "
-                  "VGG-16's parameters are in its classifier, so without the top it "
-                  f"shrinks from {vgg[1]:,} to {vgg[2]:,}, whereas the backbones that "
-                  "end in global average pooling barely change. The counts are "
-                  "trainable parameters, computed from each architecture. If you check "
-                  "them with Keras's model.summary(), VGG-16 matches exactly but the "
-                  "others come out somewhat larger: Keras also counts batch norm's "
-                  "running mean and variance (Lesson 2.3) as non-trainable parameters, "
-                  "and its ResNet50 gives each convolution a bias.", png=png)
+                  "Standard image recognition models with ImageNet weights are provided by "
+                  "the frameworks: the torchvision.models module contains ResNet-50, VGG-16, "
+                  "DenseNet and MobileNetV2, among others. Each model consists of a feature "
+                  "extractor and a classifier; when the final classification layer is "
+                  "replaced, a new classifier is attached to the feature extractor, and the "
+                  "layers of the extractor can then be frozen or fine-tuned together with "
+                  "the new classifier. Most of the parameters of VGG-16 are in its "
+                  f"classifier, so without the classifier it is reduced from {vgg[1]:,} to "
+                  f"{vgg[2]:,} parameters, whereas the networks that end in global average "
+                  "pooling are changed very little. The counts are trainable parameters, "
+                  "calculated from each architecture, and are the same as those obtained "
+                  "from the torchvision models by summing p.numel() over model.parameters().",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

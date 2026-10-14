@@ -142,12 +142,13 @@ def fig_classification_task(ctx: BuildContext) -> Figure:
         s.set_edgecolor(C["red"]); s.set_linewidth(2)
     png = save_mpl(fig, ctx, "classification_task")
     return Figure("classification_task",
-                  "Image classification assigns one label to a whole image according "
-                  "to what is in it. To avoid ambiguity the images need a single "
-                  "subject that dominates the frame, as in the first four here. The "
-                  "last image has no such subject — a workbench covered in dozens of "
-                  "objects — and no single label describes it; that is a job for "
-                  "object detection, the subject of Section 3.", png=png)
+                  "In image classification, one label is assigned to a whole image according "
+                  "to its content. To avoid ambiguity, the images should have a single "
+                  "subject that dominates the frame, as in the first four images. The last "
+                  "image, a workbench covered in many objects, has no such subject and "
+                  "cannot be described by a single label; this is a task for object "
+                  "detection, which is described in Section 3.",
+                  png=png)
 
 
 def fig_recognition_challenges(ctx: BuildContext) -> Figure:
@@ -199,15 +200,16 @@ def fig_recognition_challenges(ctx: BuildContext) -> Figure:
     axes[1, 3].set_title("… that share little\nat the pixel level", fontsize=10)
     png = save_mpl(fig, ctx, "recognition_challenges")
     return Figure("recognition_challenges",
-                  "Why classification is hard. The same dog under synthetic changes of "
-                  "viewpoint, illumination and scale, partly occluded, and placed "
-                  "against a cluttered background: to a person it is obviously the "
+                  "Difficulties in classification. The same dog is shown under synthetic "
+                  "changes of viewpoint, illumination and scale, partly occluded, and "
+                  "against a cluttered background. To a human observer it is clearly the "
                   "same animal throughout, but the pixel values have changed almost "
-                  "completely. The bottom right adds intra-class variation — two cats "
-                  "that share a label and very little else. Real images also contain "
-                  "deformable objects whose shape changes with pose. Deep networks cope "
-                  "because they learn, from many labelled examples, features that are "
-                  "robust to all of these at once.", png=png)
+                  "completely. Intra-class variation is shown at the bottom right, with two "
+                  "cats that share a label but little else. Real images also contain "
+                  "deformable objects, whose shape changes with pose. Deep networks are able "
+                  "to address these difficulties because features that are robust to all of "
+                  "them are learned from many labelled examples.",
+                  png=png)
 
 
 def fig_ilsvrc_progress(ctx: BuildContext) -> Figure:
@@ -236,15 +238,16 @@ def fig_ilsvrc_progress(ctx: BuildContext) -> Figure:
                  "error by year (grey = not a neural network)", fontsize=10.5)
     png = save_mpl(fig, ctx, "ilsvrc_progress")
     return Figure("ilsvrc_progress",
-                  "The ImageNet challenge was compiled to drive progress in image "
-                  "classification, and in 2012 AlexNet — the first deep convolutional "
-                  "network to enter — beat the best classical approach by about ten "
-                  "percentage points. That result started the deep learning "
-                  "revolution. The error then roughly halved every two years until "
-                  "2015, when ResNet passed the human estimate and depth jumped from "
-                  "22 layers to 152; after that the gains level off. These are the "
-                  "published challenge results. The next three lessons cover AlexNet, "
-                  "VGG, GoogLeNet and ResNet.", png=png)
+                  "The ImageNet challenge was compiled to promote progress in image "
+                  "classification. In 2012 AlexNet, the first deep convolutional network to "
+                  "be entered, outperformed the best classical approach by approximately ten "
+                  "percentage points, and this result marked the start of the deep learning "
+                  "era. The error was then approximately halved every two years until 2015, "
+                  "when the human estimate was surpassed by ResNet and the depth increased "
+                  "from 22 layers to 152; after this the improvements level off. The "
+                  "published challenge results are shown. AlexNet, VGG, GoogLeNet and ResNet "
+                  "are described in the next three lessons.",
+                  png=png)
 
 
 def fig_binary_metrics(ctx: BuildContext) -> Figure:
@@ -290,15 +293,16 @@ def fig_binary_metrics(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "binary_metrics")
     return Figure("binary_metrics",
                   "A confusion matrix for a binary pedestrian classifier and the three "
-                  "metrics computed from it. There are four outcomes: a pedestrian "
-                  "correctly found is a **true positive**; a pedestrian reported where "
-                  "there is none is a **false positive**; a pedestrian missed entirely "
-                  "is a **false negative**; and background correctly left alone is a "
-                  "**true negative**. Accuracy is the fraction of all predictions that "
-                  "are correct. Precision asks how trustworthy a positive prediction is "
-                  "— high precision means few false positives. Recall asks how many of "
-                  "the real positives were found — high recall means few missed "
-                  "detections.", png=png)
+                  "metrics calculated from it. There are four outcomes: a pedestrian that is "
+                  "correctly detected is a **true positive**; a pedestrian reported where "
+                  "there is none is a **false positive**; a pedestrian that is missed is a "
+                  "**false negative**; and background that is correctly identified is a "
+                  "**true negative**. Accuracy is the fraction of all predictions that are "
+                  "correct. Precision is a measure of how reliable a positive prediction is, "
+                  "and a high precision indicates few false positives. Recall is the "
+                  "proportion of the actual positives that are found, and a high recall "
+                  "indicates few missed detections.",
+                  png=png)
 
 
 def fig_multiclass_metrics(ctx: BuildContext) -> Figure:
@@ -349,19 +353,21 @@ def fig_multiclass_metrics(ctx: BuildContext) -> Figure:
             cell.set_text_props(weight="bold")
     png = save_mpl(fig, ctx, "multiclass_metrics")
     return Figure("multiclass_metrics",
-                  "In the multi-class case each metric is computed one class at a time, "
-                  "treating that class as positive and every other class as negative. "
-                  "Actual labels run down the rows and predictions across the columns. "
-                  "For a given class the true positive is the diagonal cell; the false "
-                  "positives are the rest of its **column** (predicted as this class "
-                  "but actually something else); the false negatives are the rest of "
-                  "its **row** (actually this class but predicted as something else); "
-                  "and everything else is a true negative. The per-class values are "
-                  "then combined: the **macro** average weights every class equally, so "
-                  "a poorly served class drags it down, while the **weighted** average "
-                  "weights each class by how many examples it has. The two agree only "
-                  "when the classes are balanced. These counts match the online "
-                  "exercise, so the table doubles as its answer key.", png=png)
+                  "In the multi-class case each metric is calculated one class at a time, "
+                  "with that class treated as positive and every other class as negative. "
+                  "The actual labels are given by the rows and the predictions by the "
+                  "columns. For a given class, the true positive is the diagonal cell; the "
+                  "false positives are the remaining cells of its **column** (predicted as "
+                  "this class but actually another class); the false negatives are the "
+                  "remaining cells of its **row** (actually this class but predicted as "
+                  "another class); and all other cells are true negatives. The per-class "
+                  "values are then combined: in the **macro** average every class is "
+                  "weighted equally, so the average is reduced by a poorly performing class, "
+                  "while in the **weighted** average each class is weighted by its number of "
+                  "examples. The two averages are equal only when the classes are balanced. "
+                  "These counts match the online exercise, so the table also serves as its "
+                  "answer key.",
+                  png=png)
 
 
 def fig_top1_top5(ctx: BuildContext) -> Figure:
@@ -391,21 +397,20 @@ def fig_top1_top5(ctx: BuildContext) -> Figure:
         ax.set_xlabel("output probability")
     png = save_mpl(fig, ctx, "top1_top5")
     return Figure("top1_top5",
-                  "Top-1 and top-5 accuracy, the two metrics used for ImageNet. A deep "
-                  "classifier outputs a probability for every class. For **top-1** the "
-                  "single highest probability must match the ground truth: classifier A "
-                  "passes, but classifier B ranks tiger above lion and fails. For "
-                  "**top-5** it is enough for the true label to appear anywhere among the "
-                  "five highest, and the order among them does not matter — so both "
-                  "classifiers pass. With 1000 classes, many of them very similar, top-1 "
-                  "is a stringent test, which is why top-5 was introduced; any "
-                  "classifier scores at least as well on top-5 as on top-1. (The "
-                  "probabilities here are an illustrative example, not a network's "
-                  "output.)", png=png)
+                  "Top-1 and top-5 accuracy, the two metrics used for ImageNet. A probability "
+                  "is output by a deep classifier for every class. For **top-1** accuracy, "
+                  "the highest probability must correspond to the ground truth: classifier A "
+                  "passes, but classifier B ranks tiger above lion and fails. For **top-5** "
+                  "accuracy, the true label need only appear among the five highest "
+                  "probabilities, in any order, so both classifiers pass. With 1000 classes, "
+                  "many of which are very similar, top-1 is a stringent test, and for this "
+                  "reason top-5 was introduced; the top-5 accuracy of a classifier is always "
+                  "at least as high as its top-1 accuracy. (The probabilities shown are an "
+                  "illustrative example, not the output of a network.)",
+                  png=png)
 
 
 def fig_imbalance_and_shift(ctx: BuildContext) -> Figure:
-    use_source("sklearn_digits")
     counts, recall = imbalance_experiment()
     levels, acc = shift_experiment()
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
@@ -433,18 +438,19 @@ def fig_imbalance_and_shift(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "imbalance_and_shift")
     return Figure("imbalance_and_shift",
                   "Two failure modes, both **measured** on a classifier trained on "
-                  "handwritten digits. (a) **Imbalance and confusion.** The training set "
-                  "is thinned so that each digit has fewer examples than the last; the "
-                  "classes the classifier saw least are the ones it recognises worst, "
-                  "because it had less opportunity to learn what distinguishes them. "
-                  "This is how bias enters a trained network: whatever is "
-                  "under-represented in the training data is served worst. "
-                  "(b) **Robustness to domain shift.** A classifier is only as good as "
-                  "the match between its training and test conditions. Testing the same "
-                  "classifier on images with reduced contrast and added noise — a stand-"
-                  "in for a network trained on daytime scenes and deployed at night — "
-                  "steadily degrades its accuracy, even though the digits themselves "
-                  "are unchanged.", png=png)
+                  "handwritten digits. (a) **Imbalance and confusion.** The training set is "
+                  "reduced so that each digit has fewer examples than the previous one; the "
+                  "classes with the fewest training examples are recognised least well, as "
+                  "there was less opportunity for the features that distinguish them to be "
+                  "learned. This is how bias is introduced into a trained network: the "
+                  "performance is poorest for whatever is under-represented in the training "
+                  "data. (b) **Robustness to domain shift.** The performance of a classifier "
+                  "depends on the match between its training and test conditions. When the "
+                  "same classifier is tested on images with reduced contrast and added "
+                  "noise, representing a network trained on daytime scenes and deployed at "
+                  "night, its accuracy is steadily reduced, although the digits themselves "
+                  "are unchanged.",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

@@ -170,17 +170,17 @@ def fig_supervised_pipeline(ctx: BuildContext) -> Figure:
         ax.set_title(title, fontsize=10.5, loc="left")
     png = save_mpl(fig, ctx, "supervised_pipeline")
     return Figure("supervised_pipeline",
-                  "Supervised learning is the formalisation of learning from examples, "
-                  "and the presence of **labelled training data** is its defining "
-                  "feature. (a) In classical computer vision the engineer had to "
-                  "design a feature extractor that turned images into a more abstract "
-                  "representation the classifier could learn from; only the "
-                  "classifier's parameters were optimised. (b) In deep learning the "
-                  "feature extraction is learned too, **end to end**: the convolution "
-                  "layers and the dense classifier are optimised simultaneously "
-                  "against the same loss. This is the key difference from earlier "
-                  "machine learning, and the cost of it is data and computation — "
-                  "deep models have a great many parameters to fit.", png=png)
+                  "Supervised learning is the formalisation of learning from examples, and "
+                  "its defining feature is the use of **labelled training data**. (a) In "
+                  "classical computer vision, a feature extractor had to be designed by the "
+                  "engineer to convert images into a more abstract representation from which "
+                  "the classifier could learn; only the parameters of the classifier were "
+                  "optimised. (b) In deep learning the feature extraction is also learned, "
+                  "**end to end**: the convolution layers and the dense classifier are "
+                  "optimised together with the same loss. This is the key difference from "
+                  "earlier machine learning, and it requires large amounts of data and "
+                  "computation, as deep models have a very large number of parameters.",
+                  png=png)
 
 
 def fig_datasets_table(ctx: BuildContext) -> Figure:
@@ -199,14 +199,15 @@ def fig_datasets_table(ctx: BuildContext) -> Figure:
             cell.set_text_props(weight="bold")
     png = save_mpl(fig, ctx, "datasets_table")
     return Figure("datasets_table",
-                  "Labelled datasets are an integral part of supervised learning, and "
-                  "the computer vision field has many public ones. The small early "
-                  "sets — MNIST, CIFAR-10 and CIFAR-100 — are still very useful for "
-                  "prototyping. The large sets, ImageNet and MS COCO, are what made "
-                  "training state-of-the-art deep networks possible in the first "
-                  "place. There are also specialised sets for particular tasks, such "
-                  "as Cityscapes for driving-scene segmentation and CelebA for facial "
-                  "attributes; later sections of the module return to these.", png=png)
+                  "Labelled datasets are an integral part of supervised learning, and many "
+                  "public datasets are available for computer vision. The small early "
+                  "datasets, MNIST, CIFAR-10 and CIFAR-100, are still very useful for "
+                  "prototyping. The large datasets, ImageNet and MS COCO, enabled "
+                  "state-of-the-art deep networks to be trained. There are also specialised "
+                  "datasets for particular tasks, such as Cityscapes for driving-scene "
+                  "segmentation and CelebA for facial attributes, which are described in "
+                  "later sections of the module.",
+                  png=png)
 
 
 def fig_cross_entropy(ctx: BuildContext) -> Figure:
@@ -253,20 +254,20 @@ def fig_cross_entropy(ctx: BuildContext) -> Figure:
     ax.set_ylim(0, 4)
     png = save_mpl(fig, ctx, "cross_entropy")
     return Figure("cross_entropy",
-                  "The loss function measures the model's current error and is what "
-                  "the optimiser minimises; using the wrong one for the task can stop "
-                  "a network converging at all. (a) **Binary cross-entropy** has two "
-                  "terms, of which only one is active per example. When the truth is "
-                  "y = 1 the loss is −log ŷ, which falls towards zero as ŷ approaches "
-                  "1; when y = 0 the −log(1 − ŷ) term is active instead. (b) "
-                  "**Categorical cross-entropy** extends this to many classes. With a "
-                  "one-hot ground truth every term but one is multiplied by zero, so "
-                  "the loss depends only on the probability given to the correct "
-                  "class. (c) The logarithm is what makes it work as a training "
-                  "signal: it is near zero for a confident correct answer and grows "
-                  "without bound as the probability given to the true class "
-                  "approaches zero, so a confidently wrong prediction produces a very "
-                  "large gradient.", png=png)
+                  "The loss function is a measure of the current error of the model, and is "
+                  "minimised by the optimiser; if an incorrect loss function is used for the "
+                  "task, the network may fail to converge. (a) **Binary cross-entropy** has "
+                  "two terms, of which only one is active for each example. When the ground "
+                  "truth is y = 1 the loss is −log ŷ, which decreases towards zero as ŷ "
+                  "approaches 1; when y = 0 the −log(1 − ŷ) term is active instead. (b) "
+                  "**Categorical cross-entropy** extends this to many classes. With a one-hot "
+                  "ground truth, all terms except one are multiplied by zero, so the loss "
+                  "depends only on the probability assigned to the correct class. (c) The "
+                  "logarithm provides a suitable training signal: it is close to zero for a "
+                  "confident correct prediction and increases without limit as the "
+                  "probability assigned to the true class approaches zero, so a confident "
+                  "incorrect prediction produces a very large gradient.",
+                  png=png)
 
 
 def fig_gradient_descent(ctx: BuildContext) -> Figure:
@@ -330,17 +331,18 @@ def fig_gradient_descent(ctx: BuildContext) -> Figure:
     fig2.update_xaxes(range=[-2.6, 2.6], title_text="θ₀")
     fig2.update_yaxes(range=[-1.3, 1.3], title_text="θ₁")
     return Figure("gradient_descent",
-                  "Gradient descent minimises the loss J(θ) by repeatedly stepping "
-                  "in the direction of steepest descent, "
+                  "In gradient descent, the loss J(θ) is minimised by repeated steps in the "
+                  "direction of steepest descent, "
                   r"$\theta \leftarrow \theta - \eta\,\partial J/\partial\theta$. The "
-                  "**learning rate** η sets the step size, and it matters a great "
-                  "deal. Too low and the algorithm needs a great many updates to "
-                  "reach the minimum. Too high and it overshoots, oscillating across "
-                  "the valley or diverging outright — note the log scale on the loss "
-                  "curves underneath. The aim is the largest rate that still "
-                  "converges. All four runs here start from the same point on the "
-                  "same surface and differ only in η; drag the slider in the "
-                  "interactive version to find where the behaviour changes.",
+                  "step size is set by the **learning rate** η, which has a large effect on "
+                  "the result. If the rate is too low, a very large number of updates is "
+                  "required to reach the minimum. If it is too high, the minimum is "
+                  "overshot, and the parameters oscillate across the valley or diverge (a "
+                  "log scale is used for the loss curves below). The aim is to use the "
+                  "largest rate at which convergence still occurs. All four runs start from "
+                  "the same point on the same surface and differ only in η; in the "
+                  "interactive version, the rate at which the behaviour changes can be found "
+                  "with the slider.",
                   png=png, html=plotly_html(fig2, height=470), kind="plotly")
 
 
@@ -387,57 +389,109 @@ def fig_backprop_chain(ctx: BuildContext) -> Figure:
     ax.set_xlim(-0.3, 12.3); ax.set_ylim(-1.45, 2.05); ax.axis("off")
     png = save_mpl(fig, ctx, "backprop_chain")
     return Figure("backprop_chain",
-                  "Gradient descent needs the partial derivative of the loss with "
-                  "respect to every parameter. **Backpropagation**, published in 1989, "
-                  "computes them efficiently using the chain rule. Training data is "
-                  "passed forward through the network (blue) to give a prediction, "
-                  "which is compared with the true label by the loss function. The "
-                  "backward pass (red) then works from the loss back towards the "
-                  "input, and at each step the gradient arriving from the right is "
-                  "multiplied by the local derivative. The point is that every "
-                  "parameter's gradient is obtained in a single backward sweep rather "
-                  "than by perturbing parameters one at a time — which is what makes "
-                  "training a network with millions of parameters feasible at all. "
-                  "Every number here is computed for this tiny network, so the "
-                  "arithmetic can be checked by hand.", png=png)
+                  "In gradient descent, the partial derivative of the loss with respect to "
+                  "every parameter is required. In **backpropagation**, published in 1989, "
+                  "these derivatives are calculated efficiently using the chain rule. "
+                  "Training data is passed forward through the network (blue) to give a "
+                  "prediction, which is compared with the true label in the loss function. "
+                  "In the backward pass (red), the calculation proceeds from the loss back "
+                  "towards the input, and at each step the gradient arriving from the right "
+                  "is multiplied by the local derivative. The gradient of every parameter is "
+                  "obtained in a single backward pass, rather than by perturbing the "
+                  "parameters one at a time, and this allows networks with millions of "
+                  "parameters to be trained. Every value is calculated for this small "
+                  "network, so the arithmetic can be checked by hand.",
+                  png=png)
+
+
+def regression_data(seed=5, n=512):
+    """A noisy straight-line dataset, its least-squares optimum and its loss."""
+    rng = np.random.default_rng(seed)
+    x = rng.normal(0.0, 1.45, n)
+    y = 1.0 * x - 0.4 + rng.normal(0.0, 0.5, n)          # noisy: the minimum loss is > 0
+    X = np.stack([x, np.ones(n)], 1)
+    opt = np.linalg.lstsq(X, y, rcond=None)[0]
+    return X, y, opt, lambda th: 0.5 * np.mean((X @ th - y) ** 2)
+
+
+def regression_runs(batch_sizes, steps=40, lr=0.15, seed=5):
+    """Fit y = w·x + b by gradient descent on a real 512-example dataset.
+
+    Each update uses the gradient of a randomly drawn batch of the given size
+    (the whole set for batch descent, one example for stochastic). Returns the
+    data, the least-squares optimum and, per batch size, the parameter path and
+    the loss on the FULL training set after every update — the quantity a
+    training curve shows.
+    """
+    X, y, opt, loss = regression_data(seed)
+    n = len(y)
+    out = {}
+    for bs in batch_sizes:
+        r = np.random.default_rng(seed + bs)
+        th = opt + np.array([-2.2, 1.1])                   # same start for every run
+        path, L = [th.copy()], [loss(th)]
+        for _ in range(steps):
+            idx = r.choice(n, bs, replace=False) if bs < n else np.arange(n)
+            g = X[idx].T @ (X[idx] @ th - y[idx]) / bs
+            th = th - lr * g
+            path.append(th.copy()); L.append(loss(th))
+        out[bs] = (np.array(path), np.array(L))
+    return X, y, opt, loss, out
 
 
 def fig_batch_size_noise(ctx: BuildContext) -> Figure:
-    gx, gy = np.meshgrid(np.linspace(-2.6, 2.6, 260), np.linspace(-1.4, 1.4, 140))
-    Z = bowl(np.stack([gx, gy], -1))
-    cases = [("batch: all examples", 0.0, C["blue"]),
-             ("mini-batch: a subset", 0.45, C["orange"]),
-             ("stochastic: one example", 1.5, C["red"])]
+    cases = [("batch: all 512 examples", 512, C["blue"]),
+             ("mini-batch: 32 examples", 32, C["orange"]),
+             ("stochastic: one example", 1, C["red"])]
+    X, y, opt, loss, runs = regression_runs([bs for _, bs, _ in cases])
+    Lmin = loss(opt)
+    # The claim the caption makes: batch and mini-batch both settle at the
+    # minimum; stochastic is still visibly noisy.
+    end = {bs: runs[bs][1][-10:] for _, bs, _ in cases}
+    assert end[512].max() < Lmin * 1.01 and end[32].mean() < Lmin * 1.05, end
+    assert end[1].std() > 3 * end[32].std(), end
+
+    gw, gb = np.meshgrid(np.linspace(-2.6, 2.6, 240), np.linspace(-1.4, 1.4, 140))
+    Z = np.array([[loss(opt + np.array([u, v])) for u, v in zip(ru, rv)]
+                  for ru, rv in zip(gw, gb)])
     fig, axes = plt.subplots(1, 4, figsize=(14, 3.7),
                              gridspec_kw=dict(width_ratios=[1, 1, 1, 1.15]))
-    for ax, (name, noise, col) in zip(axes, cases):
-        path = descend(bowl_grad, (-2.2, 1.1), 0.08, steps=60, noise=noise, seed=5)
-        ax.contour(gx, gy, Z, levels=14, colors=C["light"], linewidths=0.8)
-        ax.contourf(gx, gy, Z, levels=14, cmap="Blues", alpha=0.3)
+    for ax, (name, bs, col) in zip(axes, cases):
+        path = runs[bs][0] - opt
+        ax.contour(gw, gb, Z, levels=14, colors=C["light"], linewidths=0.8)
+        ax.contourf(gw, gb, Z, levels=14, cmap="Blues", alpha=0.3)
         ax.plot(path[:, 0], path[:, 1], "-o", color=col, ms=2.6, lw=1.2)
         ax.scatter([0], [0], marker="*", s=150, color=C["green"], zorder=6)
         ax.set_xlim(-2.6, 2.6); ax.set_ylim(-1.4, 1.4)
         ax.set_xticks([]); ax.set_yticks([]); ax.set_title(name, fontsize=10)
     ax = axes[3]
-    for (name, noise, col) in cases:
-        path = descend(bowl_grad, (-2.2, 1.1), 0.08, steps=60, noise=noise, seed=5)
-        ax.plot(bowl(path), color=col, lw=1.8, label=name.split(":")[0])
-    ax.set_yscale("log"); ax.set_xlabel("iteration"); ax.set_ylabel("loss J(θ)")
+    for (name, bs, col) in cases:
+        ax.plot(runs[bs][1], color=col, lw=1.8, label=name.split(":")[0])
+    ax.axhline(Lmin, color=C["grey"], ls="--", lw=1)
+    ax.text(len(runs[1][1]) - 1, Lmin * 0.93, "minimum loss", ha="right", va="top",
+            fontsize=8.5, color=C["grey"])
+    ax.set_ylim(0, 0.9)
+    ax.set_xlabel("iteration (one update each)"); ax.set_ylabel("training-set loss J(θ)")
     ax.set_title("convergence", fontsize=10); ax.legend(fontsize=8.5)
     png = save_mpl(fig, ctx, "batch_size_noise")
     return Figure("batch_size_noise",
-                  "How much training data to use for each update. **Batch** gradient "
-                  "descent uses the entire training set, giving a smooth trajectory, "
-                  "but for a large dataset the memory required exceeds even the best "
-                  "GPUs. **Stochastic** gradient descent uses a single example, which "
-                  "converges noisily and updates the network far too often to be "
-                  "computationally efficient — though the noise has a genuine "
-                  "benefit, since it can knock the optimiser out of a local minimum. "
-                  "**Mini-batch** gradient descent is the compromise used in practice: "
-                  "16, 32 or 64 examples at a time keeps some of the helpful noise "
-                  "while suiting the GPU's parallelism. The three trajectories here "
-                  "are the same update rule on the same surface, differing only in "
-                  "how much noise the gradient estimate carries.", png=png)
+                  "The amount of training data used for each update. In **batch** gradient "
+                  "descent the entire training set is used, which gives a smooth trajectory, "
+                  "but for a large dataset the memory required exceeds that of even the best "
+                  "GPUs. In **stochastic** gradient descent a single example is used, and "
+                  "convergence is noisy, with the network updated too often to be "
+                  "computationally efficient; however, the noise can be beneficial, as it "
+                  "may allow the optimiser to escape from a local minimum. **Mini-batch** "
+                  "gradient descent is the compromise used in practice: with 16, 32 or 64 "
+                  "examples at a time, some of the beneficial noise is retained and the "
+                  "parallelism of the GPU is used effectively. The three trajectories are "
+                  "produced by the same update rule and learning rate, fitting a straight "
+                  "line to the same 512 examples, and differ only in the number of examples "
+                  "used for each gradient. The loss on the right is measured on the whole "
+                  "training set after each update: batch and mini-batch descent both settle "
+                  "at the minimum loss (dashed), which is above zero because the data is "
+                  "noisy, while the stochastic run continues to fluctuate around it.",
+                  png=png)
 
 
 def fig_momentum_path(ctx: BuildContext) -> Figure:
@@ -479,24 +533,23 @@ def fig_momentum_path(ctx: BuildContext) -> Figure:
     ax.legend(fontsize=9)
     png = save_mpl(fig, ctx, "momentum_path")
     return Figure("momentum_path",
-                  "Plain stochastic gradient descent struggles with flat regions and "
-                  "local minima. The simplest improvement is **momentum**, which "
-                  "reinterprets the update as a velocity: "
+                  "Plain stochastic gradient descent performs poorly in flat regions and in "
+                  "the presence of local minima. The simplest improvement is **momentum**, "
+                  "in which the update is interpreted as a velocity: "
                   r"$v \leftarrow \gamma v + \eta\,\partial J/\partial\theta$, then "
-                  r"$\theta \leftarrow \theta - v$. Including previous gradients "
-                  "damps the effect of noise and preserves the general trend, so the "
-                  "optimiser builds speed through regions of large gradient and "
-                  "carries that speed across flat regions and through shallow local "
-                  "minima. Both runs here use the same learning rate and the same "
-                  "starting point and differ only in γ, and the difference is "
-                  "decisive: plain descent halts at the first minimum it meets and "
-                  "stays there, while momentum carries straight through it to the "
-                  "true minimum, at a loss of 0 rather than 0.287. Note the "
-                  "trade-off, visible in (b): γ = 0.9 overshoots and oscillates before "
-                  "settling. A γ close to 1 gives larger updates but can cause "
-                  "convergence problems, which is why it is sometimes increased over "
-                  "the course of training. A great many deep networks are trained "
-                  "with SGD plus momentum.", png=png)
+                  r"$\theta \leftarrow \theta - v$. When previous gradients are included, "
+                  "the effect of noise is reduced and the general trend is preserved, so "
+                  "speed is built up in regions of large gradient and carried across flat "
+                  "regions and through shallow local minima. Both runs use the same learning "
+                  "rate and starting point and differ only in γ. Plain descent stops at the "
+                  "first minimum it reaches, while with momentum the optimiser passes "
+                  "through it to the true minimum, at a loss of 0 rather than 0.287. A "
+                  "trade-off can be seen in (b): with γ = 0.9 the minimum is overshot and "
+                  "the parameters oscillate before settling. A value of γ close to 1 gives "
+                  "larger updates but can cause convergence problems, and for this reason γ "
+                  "is sometimes increased during training. A large number of deep networks "
+                  "are trained with SGD and momentum.",
+                  png=png)
 
 
 def fig_lr_schedules(ctx: BuildContext) -> Figure:
@@ -513,31 +566,56 @@ def fig_lr_schedules(ctx: BuildContext) -> Figure:
     ax.set_title("(a) three common schedules", fontsize=10.5)
     ax.legend(fontsize=8.5)
 
+    # (b) mini-batch SGD on the regression data of figure 6. With noisy
+    # gradients a constant rate stalls at a noise floor proportional to η;
+    # decaying η lowers the floor. Excess loss J − J*, averaged over seeds.
+    X, y, opt, loss = regression_data()
+    Lmin, n, BS, EPOCHS, SEEDS = loss(opt), len(y), 16, 100, range(6)
+    scheds = [(lambda i: 0.10, C["red"], "constant η = 0.10"),
+              (lr_step, C["blue"], "step decay"),
+              (lambda i: lr_cosine(i, total=EPOCHS), C["green"], "cosine")]
+    curves = {}
+    for fn, col, name in scheds:
+        runs = []
+        for s in SEEDS:
+            r = np.random.default_rng(100 + s)
+            th, L = opt + np.array([-2.2, 1.1]), [loss(opt + np.array([-2.2, 1.1])) - Lmin]
+            for ep in range(EPOCHS):
+                for idx in r.permutation(n).reshape(-1, BS):
+                    th = th - fn(ep) * X[idx].T @ (X[idx] @ th - y[idx]) / BS
+                L.append(loss(th) - Lmin)
+            runs.append(L)
+        curves[name] = np.mean(runs, 0)
+    # The caption's claim: the constant rate plateaus, both schedules end lower.
+    tail = {k: v[-10:].mean() for k, v in curves.items()}
+    assert tail["step decay"] < tail["constant η = 0.10"] / 3, tail
+    assert tail["cosine"] < tail["constant η = 0.10"] / 3, tail
     ax = axes[1]
-    for fn, col, name in [(lambda i: 0.10, C["red"], "constant η = 0.10"),
-                          (lambda i: lr_step(i), C["blue"], "step decay"),
-                          (lambda i: lr_cosine(i, total=100), C["green"], "cosine")]:
-        t = np.array([-2.2, 1.0])
-        losses = []
-        for i in range(101):
-            t = t - fn(i) * bowl_grad(t)
-            losses.append(bowl(t))
-        ax.plot(losses, color=col, lw=2, label=name)
-    ax.set_yscale("log"); ax.set_xlabel("epoch"); ax.set_ylabel("loss J(θ)")
-    ax.set_title("(b) the same surface, the same start", fontsize=10.5)
+    for fn, col, name in scheds:
+        ax.plot(curves[name], color=col, lw=2, label=name)
+    ax.set_yscale("log"); ax.set_xlabel("epoch")
+    ax.set_ylabel("loss above the minimum, J(θ) − J*")
+    ax.set_title(f"(b) mini-batch SGD (batch {BS}), mean of {len(SEEDS)} runs",
+                 fontsize=10.5)
     ax.legend(fontsize=8.5)
     png = save_mpl(fig, ctx, "lr_schedules")
     return Figure("lr_schedules",
-                  "A fixed learning rate forces a compromise: large enough to make "
-                  "progress early, small enough to settle at the end. A **schedule** "
-                  "avoids the compromise by reducing η as training proceeds. (a) Step "
-                  "decay multiplies the rate by a constant factor every so many "
-                  "epochs; exponential decay does the same thing smoothly; cosine "
-                  "annealing follows a half-cosine from η₀ down to zero. (b) The "
-                  "effect on the same optimisation problem: a constant rate plateaus "
-                  "once the steps become too large to make further progress, while "
-                  "the decaying schedules keep reducing the loss. Both scheduled runs "
-                  "start at the same rate as the constant one.", png=png)
+                  "With a fixed learning rate a compromise is required: the rate must be "
+                  "large enough for progress to be made early in training, and small enough "
+                  "for the parameters to settle at the end. With a **schedule**, η is "
+                  "reduced as training proceeds and this compromise is avoided. (a) In step "
+                  "decay the rate is multiplied by a constant factor every given number of "
+                  "epochs; in exponential decay the same reduction is applied smoothly; and "
+                  "in cosine annealing the rate follows a half-cosine from η₀ to zero. (b) "
+                  "The effect on a real training problem: the straight-line fit of Figure 6, "
+                  "trained by mini-batch gradient descent with the same starting point and "
+                  "the same initial rate. As each mini-batch gives only an estimate of the "
+                  "gradient, the parameters continue to move around the minimum, and with a "
+                  "constant rate the loss reaches a plateau whose level is set by the size "
+                  "of the steps. With the decaying schedules the steps become smaller as "
+                  "training proceeds, and the loss continues to decrease to a much lower "
+                  "level. The loss is shown above its minimum value $J^*$ on a log scale.",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

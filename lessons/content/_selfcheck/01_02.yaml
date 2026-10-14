@@ -9,7 +9,7 @@
     - "To introduce non-linearity so the network can learn complex functions"
     - "To reduce the number of parameters in the layer"
   answer: 2
-  explain: "Without a non-linear activation, a stack of layers collapses into a single linear map however deep it is, and could only ever produce a linear decision boundary. Some activations happen to be bounded, but that is not the point of having one."
+  explain: "Without a non-linear activation, a stack of layers reduces to a single linear mapping regardless of depth, and only a linear decision boundary can be produced. Some activations are bounded, but this is not the reason an activation is used."
 - q: "What does it mean for a layer to be fully connected?"
   options:
     - "Every neuron receives every output of the previous layer"

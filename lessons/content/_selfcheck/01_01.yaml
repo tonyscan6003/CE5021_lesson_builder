@@ -10,7 +10,7 @@
     - "normalise the kernel so its values sum to 1"
     - "transpose the image"
   answer: 1
-  explain: "Convolution is defined with a reversed kernel, so the flip comes first. Padding is the second step and only matters once you slide the kernel to positions that fall outside the image."
+  explain: "Convolution is defined with a reversed kernel, so the flip comes first. Padding is the second step and only has an effect when the kernel is moved to positions that fall outside the image."
 - q: "A 7×7 input is convolved with a 3×3 kernel using 'same' padding and stride 1. What is the output size?"
   options:
     - "5×5"

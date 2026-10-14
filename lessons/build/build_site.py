@@ -100,8 +100,19 @@ def credit_line(key: str) -> str:
     return f'{title}, {html.escape(c["author"])}, {lic}'
 
 
+def caption_html(text: str) -> str:
+    """Inline markdown for captions: **bold** and *italic*. Math is left to KaTeX."""
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
+    return re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<em>\1</em>", text)
+
+
+def caption_plain(text: str) -> str:
+    """Caption text for alt attributes, with the markdown markers removed."""
+    return html.escape(re.sub(r"\*{1,2}(.+?)\*{1,2}", r"\1", text))
+
+
 def figure_html(fig: Figure, number: int) -> str:
-    cap = f"<b>Figure {number}.</b> {fig.caption}"
+    cap = f"<b>Figure {number}.</b> {caption_html(fig.caption)}"
     if fig.sources:
         for key in fig.sources:
             if key not in credits():
@@ -109,7 +120,7 @@ def figure_html(fig: Figure, number: int) -> str:
         cap += ' <span class="credit">Image: ' + "; ".join(credit_line(k) for k in fig.sources) + ".</span>"
     if fig.kind == "widget":
         return (f'<figure class="lesson-fig" id="fig-{fig.id}">'
-                f'<img src="{fig.png}" alt="{html.escape(fig.caption)}">'
+                f'<img src="{fig.png}" alt="{caption_plain(fig.caption)}">'
                 f'<figcaption>{cap}</figcaption>{fig.html}</figure>')
     toggle = ""
     inter = ""
@@ -118,7 +129,7 @@ def figure_html(fig: Figure, number: int) -> str:
                   f'Interactive version</button>')
         inter = f'<div class="fig-interactive" hidden>{fig.html}</div>'
     return (f'<figure class="lesson-fig" id="fig-{fig.id}">'
-            f'<img src="{fig.png}" alt="{html.escape(fig.caption)}">{inter}'
+            f'<img src="{fig.png}" alt="{caption_plain(fig.caption)}">{inter}'
             f'<figcaption>{cap}{toggle}</figcaption></figure>')
 
 

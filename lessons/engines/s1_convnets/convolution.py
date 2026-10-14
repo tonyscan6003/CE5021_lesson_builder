@@ -142,13 +142,13 @@ def fig_conv2d_flip_slide(ctx: BuildContext) -> Figure:
         fig2.update_yaxes(autorange="reversed", showticklabels=False, row=1, col=c_)
         fig2.update_xaxes(showticklabels=False, row=1, col=c_)
     return Figure("conv2d_flip_slide",
-                  "2D convolution of a 4 × 4 image with a 3 × 3 kernel using one ring "
-                  "of zero padding, so the output is the same size as the input. "
-                  "(a) The kernel is flipped horizontally and vertically to give (b). "
-                  "(c) The flipped kernel is placed over each 3 × 3 window of the "
-                  "padded image, (d) multiplied element-wise and summed, giving one "
-                  "output pixel (e). Step through every position in the interactive "
-                  "version.", png=png, html=plotly_html(fig2, height=430), kind="plotly")
+                  "2D convolution of a 4 × 4 image with a 3 × 3 kernel using one ring of "
+                  "zero padding, so that the output is the same size as the input. (a) The "
+                  "kernel is flipped horizontally and vertically to give (b). (c) The flipped "
+                  "kernel is placed over each 3 × 3 window of the padded image, and (d) the "
+                  "values are multiplied element-wise and summed to give one output pixel "
+                  "(e). Every position can be stepped through in the interactive version.",
+                  png=png, html=plotly_html(fig2, height=430), kind="plotly")
 
 
 def fig_padding_modes(ctx: BuildContext) -> Figure:
@@ -207,12 +207,13 @@ def fig_padding_modes(ctx: BuildContext) -> Figure:
 </script>
 """
     return Figure("padding_modes",
-                  "The three common padding choices for a 4 × 4 image and a 3 × 3 "
-                  "kernel at unit stride. Valid padding uses only real pixels and "
-                  "shrinks the output; same padding adds ⌊k/2⌋ rings to keep the size; "
-                  "full padding adds k − 1 rings so the kernel just overlaps the image "
-                  "at the extremes, which is what the mathematical definition requires. "
-                  "Use the calculator to try other sizes.",
+                  "The three common padding choices for a 4 × 4 image and a 3 × 3 kernel at "
+                  "unit stride. With valid padding only real pixels are used and the output "
+                  "is smaller than the input; with same padding ⌊k/2⌋ rings are added so that "
+                  "the size is unchanged; with full padding k − 1 rings are added, so that "
+                  "the kernel just overlaps the image at the extremes, as required by the "
+                  "mathematical definition. Other sizes can be calculated with the "
+                  "calculator.",
                   png=png, html=widget, kind="widget")
 
 
@@ -305,18 +306,17 @@ def fig_stride_grid(ctx: BuildContext) -> Figure:
                           showgrid=False, zeroline=False,
                           scaleanchor=anchor, scaleratio=1, row=1, col=c_)
     return Figure("stride_grid",
-                  "Stride is how far the kernel moves between positions. The same "
+                  "Stride is the distance moved by the kernel between positions. The same "
                   "6 × 6 input is convolved with the 2 × 2 kernel "
-                  f"{KER_STRIDE.tolist()} at three strides, with no padding. Top row: "
-                  "each ring marks the top-left cell of one kernel position and the "
-                  "bold square is the kernel at the first position, so the positions "
-                  "thin out from 25 to 9 to 4. Bottom row: the resulting output, drawn "
-                  "at the same cell size so the shrinkage from 5 × 5 to 3 × 3 to "
-                  "2 × 2 is the real thing rather than a change of scale. A larger "
-                  "stride therefore gives both a smaller output and less computation, "
-                  "which is how convolutional networks downsample without a separate "
-                  "pooling layer. Drag the slider in the interactive version to watch "
-                  "the output shrink.",
+                  f"{KER_STRIDE.tolist()} at three strides, with no padding. In the top row, "
+                  "each ring marks the top-left cell of one kernel position and the bold "
+                  "square is the kernel at the first position, so the number of positions is "
+                  "reduced from 25 to 9 to 4. In the bottom row the resulting output is drawn "
+                  "at the same cell size, so the reduction from 5 × 5 to 3 × 3 to 2 × 2 is "
+                  "shown to scale. A larger stride therefore results in both a smaller output "
+                  "and less computation, and is used in convolutional networks to downsample "
+                  "without a separate pooling layer. In the interactive version the stride is "
+                  "set with the slider.",
                   png=png, html=plotly_html(fig2, height=470), kind="plotly")
 
 
@@ -334,13 +334,13 @@ def fig_pooling_ops(ctx: BuildContext) -> Figure:
     sync_matrix(axes[2], av, title="(b) average pooling", cmap="Greens", fmt="{:.2f}")
     png = save_mpl(fig, ctx, "pooling_ops")
     return Figure("pooling_ops",
-                  "Pooling sweeps a window over the input in the same stepwise way as "
-                  "convolution, but there is no kernel and nothing is multiplied: each "
-                  "window is replaced by the maximum (a) or the mean (b) of the values "
-                  "under it. A 2 × 2 window at stride 2 halves each spatial dimension. "
-                  "Because there is no kernel, a pooling layer has no learnable "
-                  "parameters at all — max pooling is also non-linear, which "
-                  "convolution is not.", png=png)
+                  "In pooling, a window is moved over the input in the same stepwise manner "
+                  "as in convolution, but there is no kernel and no multiplication: each "
+                  "window is replaced by the maximum (a) or the mean (b) of the values within "
+                  "it. With a 2 × 2 window and stride 2, each spatial dimension is halved. As "
+                  "there is no kernel, a pooling layer has no learnable parameters. Max "
+                  "pooling is also non-linear, whereas convolution is linear.",
+                  png=png)
 
 
 def fig_corr_vs_conv(ctx: BuildContext) -> Figure:
@@ -358,14 +358,15 @@ def fig_corr_vs_conv(ctx: BuildContext) -> Figure:
                     title="convolution (kernel flipped)", cmap="Purples")
     png = save_mpl(fig, ctx, "corr_vs_conv")
     return Figure("corr_vs_conv",
-                  "Cross-correlation slides the kernel as given; convolution first "
-                  "flips it along both axes. With an asymmetric kernel (top) the two "
-                  "results differ. With a symmetric kernel (bottom) the flip changes "
-                  "nothing and the results are identical. Correlation measures how "
-                  "similar the image is to the kernel, which is why deep learning "
-                  "frameworks label the operation \"convolution\" but almost always "
-                  "compute correlation: the kernel weights are learned, so whether "
-                  "they are stored flipped makes no difference.", png=png)
+                  "In cross-correlation the kernel is applied as given, whereas in "
+                  "convolution it is first flipped along both axes. With an asymmetric "
+                  "kernel (top) the two results differ. With a symmetric kernel (bottom) the "
+                  "flip has no effect and the results are identical. Correlation is a measure "
+                  "of the similarity between the image and the kernel. In deep learning "
+                  "frameworks the operation is labelled \"convolution\" but correlation is "
+                  "almost always computed; as the kernel weights are learned, it makes no "
+                  "difference whether they are stored flipped.",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

@@ -99,12 +99,13 @@ def fig_single_neuron(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "single_neuron")
     return Figure("single_neuron",
                   f"A single artificial neuron with inputs {x.tolist()} and weights "
-                  f"{w.tolist()}. Each input is multiplied by its own weight, the "
-                  f"products are summed, the bias b = {b:g} is added, and the "
-                  "activation function σ is applied to the result. With a linear "
-                  f"activation the output is just z = {z:.3f}; with a sigmoid it is "
-                  f"{sigmoid(z):.2f}. The weights and the bias are the neuron's "
-                  "learnable parameters — four of them here.", png=png)
+                  f"{w.tolist()}. Each input is multiplied by its own weight, the products "
+                  f"are summed, the bias b = {b:g} is added, and the activation function σ is "
+                  f"applied to the result. With a linear activation the output is "
+                  f"z = {z:.3f}, and with a sigmoid it is {sigmoid(z):.2f}. The weights and "
+                  "the bias are the learnable parameters of the neuron, of which there are "
+                  "four here.",
+                  png=png)
 
 
 def fig_activation_functions(ctx: BuildContext) -> Figure:
@@ -131,16 +132,17 @@ def fig_activation_functions(ctx: BuildContext) -> Figure:
     axes[0].set_ylim(-1.6, 3.2); axes[1].set_ylim(-0.1, 1.15)
     png = save_mpl(fig, ctx, "activation_functions")
     return Figure("activation_functions",
-                  "The activation function is what makes a network non-linear; without "
-                  "it a stack of layers would collapse into a single linear map. "
-                  "Sigmoid and tanh were used in early networks and are still used "
-                  "where a bounded output is wanted, but they are slow to compute and "
-                  "they saturate: for |z| beyond about 4 the derivative (right) is "
-                  "near zero, so almost no gradient flows back and learning stalls. "
-                  "ReLU and leaky ReLU are fast and do not saturate for positive z, "
-                  "which is why they are the default in deep networks. Leaky ReLU "
-                  "keeps a small gradient for negative z so a unit cannot go "
-                  "permanently silent.", png=png)
+                  "The network is made non-linear by the activation function; without it, a "
+                  "stack of layers would reduce to a single linear mapping. Sigmoid and tanh "
+                  "were used in early networks and are still used where a bounded output is "
+                  "required, but they are slow to compute and they saturate: for |z| greater "
+                  "than approximately 4 the derivative (right) is close to zero, so very "
+                  "little gradient flows back and learning is slowed. ReLU and leaky ReLU are "
+                  "fast to compute and do not saturate for positive z, and for this reason "
+                  "they are the default in deep networks. In leaky ReLU a small gradient is "
+                  "retained for negative z, so that a unit cannot become permanently "
+                  "inactive.",
+                  png=png)
 
 
 def fig_fc_network(ctx: BuildContext) -> Figure:
@@ -174,12 +176,13 @@ def fig_fc_network(ctx: BuildContext) -> Figure:
     ax.set_xlim(-1.0, 5.8); ax.set_ylim(-3.3, 2.6); ax.axis("off")
     png = save_mpl(fig, ctx, "fc_network")
     return Figure("fc_network",
-                  "A one-hidden-layer fully connected network. \"Fully connected\" "
-                  "means every neuron in a layer receives every output of the previous "
-                  "layer, so each layer contributes (inputs × neurons) weights plus one "
-                  "bias per neuron. The whole network is a mathematical function "
-                  "mapping the inputs to the outputs, and the parameters of that "
-                  "function are what training adjusts.", png=png)
+                  "A one-hidden-layer fully connected network. In a fully connected network, "
+                  "every neuron in a layer receives every output of the previous layer, so "
+                  "each layer contributes (inputs × neurons) weights plus one bias per "
+                  "neuron. The network is a mathematical function that maps the inputs to "
+                  "the outputs, and the parameters of this function are adjusted during "
+                  "training.",
+                  png=png)
 
 
 def fig_nn_classifiers(ctx: BuildContext) -> Figure:
@@ -211,15 +214,16 @@ def fig_nn_classifiers(ctx: BuildContext) -> Figure:
     axes[1].set_ylim(0, max(p) * 1.28)
     png = save_mpl(fig, ctx, "nn_classifiers")
     return Figure("nn_classifiers",
-                  "A neural network is a probabilistic classifier: it outputs the "
-                  "probability that the input belongs to a class rather than assigning "
-                  "a label directly. (a) For a binary task one output neuron with a "
-                  "sigmoid gives a value between 0 and 1. (b) For a multi-class task "
-                  "the last layer has one neuron per class and softmax turns their "
-                  "sums into probabilities that add to 1; the predicted class is the "
-                  "largest. Note that the last layer does not use an ordinary "
-                  "activation function — softmax acts across all the neurons at once, "
-                  "not on each independently.", png=png)
+                  "A neural network is a probabilistic classifier: the probability that the "
+                  "input belongs to a class is output, rather than a label being assigned "
+                  "directly. (a) For a binary task, one output neuron with a sigmoid gives a "
+                  "value between 0 and 1. (b) For a multi-class task, the last layer has one "
+                  "neuron per class, and their sums are converted by softmax into "
+                  "probabilities that sum to 1; the predicted class is the one with the "
+                  "largest probability. It should be noted that an ordinary activation "
+                  "function is not used in the last layer, as softmax acts across all of the "
+                  "neurons together rather than on each independently.",
+                  png=png)
 
 
 def fig_softmax_activation(ctx: BuildContext) -> Figure:
@@ -275,15 +279,15 @@ def fig_softmax_activation(ctx: BuildContext) -> Figure:
 </script>
 """
     return Figure("softmax_activation",
-                  "The softmax calculation worked through for the four logits on the "
-                  f"slide, z = {[int(v) for v in z]}. Exponentiating gives "
-                  f"{', '.join(f'{v:.1f}' for v in e)}, which sum to {e.sum():.1f}; "
-                  "dividing each by that sum gives "
-                  f"{', '.join(f'{v:.2f}' for v in p)}. The probabilities add to 1, "
-                  "which is the check worth doing every time. Note that equal logits "
-                  "give equal probabilities, and that the exponential exaggerates "
-                  "differences — a logit one unit higher is about 2.7 times more "
-                  "likely. Try your own values below.",
+                  "The softmax calculation for the four logits from the lecture slide, "
+                  f"z = {[int(v) for v in z]}. The exponentials are "
+                  f"{', '.join(f'{v:.1f}' for v in e)}, with a sum of {e.sum():.1f}, and when "
+                  "each is divided by the sum, the probabilities "
+                  f"{', '.join(f'{v:.2f}' for v in p)} are obtained. The probabilities sum to "
+                  "1, which provides a check on the calculation. Equal logits give equal "
+                  "probabilities, and differences are exaggerated by the exponential: a logit "
+                  "one unit higher results in a probability approximately 2.7 times greater. "
+                  "Other values can be entered below.",
                   png=png, html=widget, kind="widget")
 
 
@@ -357,15 +361,16 @@ def fig_fc_param_count(ctx: BuildContext) -> Figure:
 </script>
 """
     return Figure("fc_param_count",
-                  "Fully connected layers are usually where a network's parameters "
-                  "are. A feature map of size n × m × C must first be flattened into "
-                  "a vector of n·m·C values; connecting that to N neurons needs "
-                  "n·m·C·N weights plus one bias per neuron. (a) The flattening step. "
-                  "(b) The count grows linearly in the number of neurons and in the "
-                  f"number of channels — the marked point is {n} × {m} × {channels} "
-                  f"into {neurons} neurons, which is already {r['total']:,} parameters. "
-                  "Use the calculator to see how quickly this gets out of hand for a "
-                  "realistic image size.", png=png, html=widget, kind="widget")
+                  "Most of the parameters of a network are usually contained in the fully "
+                  "connected layers. A feature map of size n × m × C must first be flattened "
+                  "into a vector of n·m·C values, and n·m·C·N weights plus one bias per "
+                  "neuron are required to connect it to N neurons. (a) The flattening step. "
+                  "(b) The number of parameters increases linearly with the number of "
+                  f"neurons and the number of channels; the marked point is {n} × {m} × "
+                  f"{channels} connected to {neurons} neurons, which already requires "
+                  f"{r['total']:,} parameters. The calculator can be used to show how "
+                  "rapidly the number increases for a realistic image size.",
+                  png=png, html=widget, kind="widget")
 
 
 def build(ctx: BuildContext) -> list[Figure]:

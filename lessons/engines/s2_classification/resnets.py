@@ -28,6 +28,7 @@ import plotly.graph_objects as go
 
 from .._common import (BuildContext, Figure, C, SERIES, save_mpl, plotly_html,
                        slider_frames_layout, use_source, sync_matrix)
+from .._volumes import OBLIQUE, volume
 from .. import _arch as A
 from .. import _tinynet as T
 
@@ -109,7 +110,6 @@ def deep_activation_std(depth=50, width=64, scale=1.3, bn=False, seed=0):
 # ---------------------------------------------------------------------------
 
 def fig_degradation(ctx: BuildContext) -> Figure:
-    use_source("sklearn_digits")
     runs, _ = degradation_runs()
     cols = [C["blue"], C["red"], C["green"]]
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
@@ -132,19 +132,20 @@ def fig_degradation(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "degradation")
     plain, res = runs["40 layers, plain"][0], runs["40 layers, residual"][0]
     return Figure("degradation",
-                  "The degradation problem, measured. Three fully connected networks "
-                  "of the same width are trained identically on handwritten digits; "
-                  "only their depth and connectivity differ. The 40-layer plain "
-                  "network does worse than the 3-layer one — not on the test set, but "
-                  "on the **training** set, where its loss stays at the chance level "
-                  f"of ln 10 and its test accuracy at {plain['test_acc'][-1]:.0%}. "
-                  "That rules out overfitting as the explanation: the deeper network "
-                  "simply cannot be optimised. This is what the ResNet authors found "
-                  "when they extended VGG-19 with more layers. Add identity shortcuts "
-                  "around each layer and the same 40-layer network trains easily, "
-                  f"reaching {res['test_acc'][-1]:.1%} — better than the shallow "
-                  "network. The networks here are small and fully connected rather "
-                  "than convolutional, but the effect is the same one.", png=png)
+                  "The degradation problem, measured. Three fully connected networks of the "
+                  "same width are trained in the same way on handwritten digits, and differ "
+                  "only in depth and connectivity. The 40-layer plain network performs worse "
+                  "than the 3-layer network, not only on the test set but on the "
+                  "**training** set, where its loss remains at the chance level of ln 10 and "
+                  f"its test accuracy at {plain['test_acc'][-1]:.0%}. Overfitting is "
+                  "therefore not the explanation; the deeper network cannot be optimised. "
+                  "This was found by the ResNet authors when VGG-19 was extended with "
+                  "additional layers. When identity shortcuts are added around each layer, "
+                  "the same 40-layer network is trained easily and reaches "
+                  f"{res['test_acc'][-1]:.1%}, better than the shallow network. The "
+                  "networks used here are small and fully connected rather than "
+                  "convolutional, but the same effect is observed.",
+                  png=png)
 
 
 def fig_residual_block(ctx: BuildContext) -> Figure:
@@ -159,29 +160,53 @@ def fig_residual_block(ctx: BuildContext) -> Figure:
         ax.annotate("", xy=(x, y1), xytext=(x, y0),
                     arrowprops=dict(arrowstyle="->", color=C["grey"], lw=1.2))
 
+    TOP = 5.9
+
+    def block(ax, steps, post, cx, w, xs):
+        """Draw a residual block top to bottom: x, main path, +, post, out.
+
+        Returns the y of the addition and of the bottom of the output arrow.
+        """
+        y = TOP
+        ax.text(cx, y, "x", ha="center", va="center", fontsize=12)
+        y_branch = y - 0.25
+        arrow(ax, cx, y - 0.15, y - 0.5)
+        y -= 0.52
+        for txt, col in steps:
+            box(ax, y - 0.55, txt, col, w=w, x0=cx - w / 2)
+            y -= 0.55
+            arrow(ax, cx, y, y - 0.3)
+            y -= 0.32
+        yc = y - 0.2                                   # the addition
+        ax.scatter([cx], [yc], s=480, facecolors="white", edgecolors=C["ink"], lw=1.4,
+                   zorder=3)
+        ax.text(cx, yc, "+", ha="center", va="center", fontsize=15, zorder=4)
+        # identity shortcut: from the input, round the main path, into the +
+        ax.plot([cx, xs, xs, cx + 0.45], [y_branch, y_branch, yc, yc], color=C["red"], lw=2)
+        ax.annotate("", xy=(cx + 0.19, yc), xytext=(cx + 0.5, yc),
+                    arrowprops=dict(arrowstyle="->", color=C["red"], lw=2))
+        y = yc - 0.2
+        for txt, col in post:
+            arrow(ax, cx, y, y - 0.3)
+            y -= 0.32
+            box(ax, y - 0.55, txt, col, w=w, x0=cx - w / 2)
+            y -= 0.55
+        # the block's output, on to the next block
+        arrow(ax, cx, y, y - 0.42)
+        ax.text(cx, y - 0.55, "output", ha="center", va="top", fontsize=9, color=C["grey"])
+        return yc, y - 0.55
+
     # (a) the generic residual block
     ax = axes[0]
-    ax.text(1.0, 0.0, "x", ha="center", fontsize=12)
-    arrow(ax, 1.0, 0.18, 0.62)
-    box(ax, 0.65, "weight layer", C["blue"])
-    arrow(ax, 1.0, 1.22, 1.45)
-    box(ax, 1.48, "ReLU", C["sky"])
-    arrow(ax, 1.0, 2.05, 2.28)
-    box(ax, 2.31, "weight layer", C["blue"])
-    arrow(ax, 1.0, 2.88, 3.2)
-    ax.scatter([1.0], [3.42], s=520, facecolors="white", edgecolors=C["ink"], lw=1.4,
-               zorder=3)
-    ax.text(1.0, 3.42, "+", ha="center", va="center", fontsize=15, zorder=4)
-    arrow(ax, 1.0, 3.62, 3.95)
-    box(ax, 3.98, "ReLU", C["sky"])
-    ax.text(1.0, 4.85, "H(x) = F(x) + x", ha="center", fontsize=11, weight="bold")
-    ax.plot([1.0, 2.25, 2.25, 1.18], [0.10, 0.10, 3.42, 3.42], color=C["red"], lw=2)
-    ax.annotate("", xy=(1.17, 3.42), xytext=(1.6, 3.42),
-                arrowprops=dict(arrowstyle="->", color=C["red"], lw=2))
-    ax.text(2.35, 1.8, "identity\nshortcut\n(x)", fontsize=9, color=C["red"])
-    ax.text(-0.15, 1.8, "F(x)", fontsize=11, color=C["blue"], ha="center")
-    ax.set_xlim(-0.6, 3.1); ax.set_ylim(-0.35, 5.15); ax.axis("off")
-    ax.set_title("(a) residual learning", fontsize=10.5)
+    yc, _ = block(ax, [("weight layer", C["blue"]), ("ReLU", C["sky"]),
+                       ("weight layer", C["blue"])], [("ReLU", C["sky"])],
+                  cx=1.0, w=1.7, xs=2.25)
+    ax.text(0.72, yc + 0.08, "F(x) + x", ha="right", va="bottom", fontsize=10,
+            weight="bold")
+    ax.text(2.35, 3.6, "identity\nshortcut\n(x)", fontsize=9, color=C["red"])
+    ax.text(-0.15, 3.95, "F(x)", fontsize=11, color=C["blue"], ha="center")
+    ax.set_xlim(-0.6, 3.1); ax.set_ylim(-1.15, 6.2); ax.axis("off")
+    ax.set_title("(a) residual learning\nH(x) = F(x) + x", fontsize=10.5)
 
     # (b) basic and (c) bottleneck, with computed costs on a 56x56 map
     for ax, kind in [(axes[1], "basic"), (axes[2], "bottleneck")]:
@@ -201,41 +226,30 @@ def fig_residual_block(ctx: BuildContext) -> Figure:
             steps = [("1×1 conv, 64  (reduce)", C["sky"]), ("3×3 conv, 64", C["blue"]),
                      ("1×1 conv, 256 (expand)", C["sky"])]
             title = "(c) bottleneck block (ResNet-50/101/152)\n256 channels in and out"
-        y = 0.4
-        for txt, col in steps:
-            box(ax, y, txt, col, w=2.3)
-            arrow(ax, 1.3, y + 0.55, y + 0.85)
-            y += 0.88
-        ax.scatter([1.3], [y + 0.05], s=420, facecolors="white", edgecolors=C["ink"],
-                   lw=1.4, zorder=3)
-        ax.text(1.3, y + 0.05, "+", ha="center", va="center", fontsize=14, zorder=4)
-        # the input, feeding both the main path and the shortcut
-        ax.text(1.3, -0.12, "x", ha="center", va="center", fontsize=12)
-        arrow(ax, 1.3, 0.02, 0.38)
-        ax.plot([1.3, 2.75, 2.75, 1.75], [0.15, 0.15, y + 0.05, y + 0.05],
-                color=C["red"], lw=2)
-        ax.annotate("", xy=(1.47, y + 0.05), xytext=(1.8, y + 0.05),
-                    arrowprops=dict(arrowstyle="->", color=C["red"], lw=2))
-        ax.text(1.3, 4.55, f"{n.params:,} parameters\n{n.macs / 1e6:.0f} M multiply-"
-                           f"accumulates on 56 × 56", ha="center", fontsize=9,
+        _, bottom = block(ax, steps, [("ReLU", C["sky"])], cx=1.3, w=2.3, xs=2.75)
+        ax.text(1.3, bottom - 0.35,
+                f"{n.params:,} parameters\n{n.macs / 1e6:.0f} M multiply-"
+                f"accumulates on 56 × 56", ha="center", va="top", fontsize=9,
                 color=C["red"])
-        ax.set_xlim(-0.1, 3.2); ax.set_ylim(-0.35, 5.15); ax.axis("off")
+        ax.set_xlim(-0.1, 3.2); ax.set_ylim(-1.15, 6.2); ax.axis("off")
         ax.set_title(title, fontsize=10.5)
     png = save_mpl(fig, ctx, "residual_block")
     return Figure("residual_block",
-                  "(a) The residual block: a main path of weight layers and activations, "
-                  "plus a shortcut that adds the input x to the main path's output "
-                  "before the final activation. Without the shortcut, a block would "
-                  "have to learn some desired mapping H(x) directly. With it, the main "
-                  "path only has to learn the **residual** F(x) = H(x) − x, and H(x) is "
-                  "recovered as F(x) + x. Residual mappings turn out to be much easier "
-                  "to train — in particular, if a block should do nothing, it only has "
-                  "to drive F(x) to zero. (b) ResNet-18 and -34 use two 3 × 3 "
-                  "convolutions per block. (c) The deeper ResNets use a bottleneck: a "
-                  "1 × 1 convolution reduces 256 channels to 64, the 3 × 3 works on "
-                  "64, and another 1 × 1 restores 256. Note that the bottleneck block "
-                  "handles four times as many channels as the basic block for a "
-                  "similar cost — the reason it is used in the deeper networks.",
+                  "(a) The residual block, drawn with the input x at the top: a main path of "
+                  "weight layers and activations, and a shortcut by which the input x is "
+                  "added to the output of the main path before the final activation, whose "
+                  "output is passed to the next block. Without the shortcut, a desired mapping H(x) "
+                  "would have to be learned directly by the block. With the shortcut, only "
+                  "the **residual** F(x) = H(x) − x must be learned by the main path, and "
+                  "H(x) is recovered as F(x) + x. Residual mappings have been found to be "
+                  "much easier to train; in particular, if a block should have no effect, "
+                  "F(x) need only be driven to zero. (b) Two 3 × 3 convolutions per block "
+                  "are used in ResNet-18 and -34. (c) A bottleneck is used in the deeper "
+                  "ResNets: the number of channels is reduced from 256 to 64 by a 1 × 1 "
+                  "convolution, the 3 × 3 convolution operates on 64 channels, and 256 "
+                  "channels are restored by a further 1 × 1 convolution. Four times as many "
+                  "channels are handled by the bottleneck block as by the basic block for a "
+                  "similar cost, which is why it is used in the deeper networks.",
                   png=png)
 
 
@@ -292,23 +306,24 @@ def fig_unravelled_paths(ctx: BuildContext) -> Figure:
                  fontsize=10)
     png = save_mpl(fig, ctx, "unravelled_paths")
     return Figure("unravelled_paths",
-                  "Veit and colleagues' explanation of why residual networks train. "
-                  "(a) Each block offers two routes — through its layers or round them "
-                  "by the shortcut — so n blocks unravel into 2ⁿ paths of different "
-                  "lengths, and a ResNet behaves like an **ensemble** of networks. That "
-                  "is why a block can be removed from a trained ResNet with little "
-                  "effect. (b) For the 40-layer residual network trained above, with "
-                  f"{n} residual blocks, most paths are of medium length. (c) But each "
-                  "time a path goes *through* a block, its gradient is multiplied by "
-                  f"that block's gain, which measures {rho:.3f} on average in this "
-                  "network; the shortcut passes the gradient unchanged. Weighting each "
-                  "path length by that measured gain shows the gradient is carried "
-                  "almost entirely by **short** paths, which is what lets deep residual "
-                  "networks train. (Panel (c) treats the blocks' gains as independent, "
-                  "which is the approximation Veit's analysis makes.) The exact reason "
-                  "shortcuts help is still debated — the original ResNet authors "
-                  "thought vanishing gradients an unlikely cause — but their "
-                  "effectiveness is not in doubt.", png=png)
+                  "The explanation of Veit and colleagues for the training of residual "
+                  "networks. (a) Each block offers two routes, through its layers or around "
+                  "them by the shortcut, so n blocks can be unravelled into 2ⁿ paths of "
+                  "different lengths, and a ResNet behaves as an **ensemble** of networks. "
+                  "For this reason a block can be removed from a trained ResNet with little "
+                  f"effect. (b) For the 40-layer residual network trained above, with {n} "
+                  "residual blocks, most paths are of medium length. (c) However, each time "
+                  "a path passes *through* a block, its gradient is multiplied by the gain of "
+                  f"that block, which is {rho:.3f} on average in this network, while the "
+                  "gradient is passed unchanged by the shortcut. When each path length is "
+                  "weighted by this measured gain, it can be seen that the gradient is "
+                  "carried almost entirely by **short** paths, which allows deep residual "
+                  "networks to be trained. (In panel (c) the gains of the blocks are treated "
+                  "as independent, which is the approximation made in the analysis of Veit.) "
+                  "The exact reason for the effectiveness of shortcuts is still debated, and "
+                  "vanishing gradients were considered an unlikely cause by the original "
+                  "ResNet authors, but their effectiveness is well established.",
+                  png=png)
 
 
 def fig_resnet_family(ctx: BuildContext) -> Figure:
@@ -356,17 +371,18 @@ def fig_resnet_family(ctx: BuildContext) -> Figure:
     ax.set_title("even ResNet-152 is smaller and cheaper than VGG-16", fontsize=10)
     png = save_mpl(fig, ctx, "resnet_family")
     return Figure("resnet_family",
-                  "The ResNet family. Every member has the same plan — an initial "
-                  "7 × 7 convolution and max pooling, then four stages of identical "
-                  "residual blocks on 56, 28, 14 and 7 pixel feature maps, then global "
-                  "average pooling and a single dense layer — and they differ only in "
-                  "how many blocks each stage repeats and which kind of block. The "
-                  "regular, repeating structure is what makes a 152-layer network "
-                  "practical to specify. The parameter counts are computed from this "
-                  "table and match torchvision's published figures exactly. Because "
-                  "ResNet ends with global average pooling instead of large dense "
-                  "layers, even ResNet-152, more than ten times as deep as VGG-16, has "
-                  "fewer than half its parameters and needs less computation.", png=png)
+                  "The ResNet family. Every member has the same structure: an initial 7 × 7 "
+                  "convolution and max pooling, four stages of identical residual blocks on "
+                  "56, 28, 14 and 7 pixel feature maps, then global average pooling and a "
+                  "single dense layer. The members differ only in the number of blocks in "
+                  "each stage and the type of block. With this regular, repeating structure, "
+                  "a 152-layer network can be specified in a practical way. The parameter "
+                  "counts are calculated from this table and match the figures published for "
+                  "torchvision exactly. As ResNet ends with global average pooling instead "
+                  "of large dense layers, even ResNet-152, which is more than ten times as "
+                  "deep as VGG-16, has fewer than half as many parameters and requires less "
+                  "computation.",
+                  png=png)
 
 
 def fig_batch_norm(ctx: BuildContext) -> Figure:
@@ -401,21 +417,22 @@ def fig_batch_norm(ctx: BuildContext) -> Figure:
                  f"{s1[-1]:.2f} by the last layer", fontsize=10)
     png = save_mpl(fig, ctx, "batch_norm")
     return Figure("batch_norm",
-                  "Batch normalisation, which ResNet inserts after each convolution. "
-                  "(a) For each channel, the mean and variance are computed over the "
+                  "Batch normalisation, which is inserted after each convolution in ResNet. "
+                  "(a) For each channel, the mean and variance are calculated over the "
                   "mini-batch and used to normalise the values to zero mean and unit "
-                  "variance; two learned parameters, γ and β, then scale and shift the "
-                  "result, so the layer can undo the normalisation if that is what "
-                  "training needs. Only γ and β are learned, so batch norm adds very few "
-                  "parameters. (b) Why it helps. Without it, a small mis-scaling of the "
-                  "weights compounds through the layers: here weights 30% larger than "
-                  "they should be make the activations grow geometrically, by a factor "
-                  "of more than 100,000 over 50 layers. With batch norm the scale is "
-                  "reset at every layer and stays put. This is the effect that later "
-                  "work points to — batch norm stops the internal states of deep "
-                  "networks exploding — rather than the 'internal covariate shift' of "
-                  "the original paper. It is what allows larger learning rates and "
-                  "faster convergence.", png=png)
+                  "variance; the result is then scaled and shifted by two learned "
+                  "parameters, γ and β, so that the normalisation can be reversed if this is "
+                  "required during training. Only γ and β are learned, so very few "
+                  "parameters are added. (b) The benefit of batch normalisation. Without it, "
+                  "a small error in the scale of the weights accumulates through the layers: "
+                  "here, with weights 30% larger than required, the activations increase "
+                  "geometrically, by a factor of more than 100,000 over 50 layers. With "
+                  "batch normalisation the scale is reset at every layer and remains "
+                  "constant. This is the effect identified in later work, in which batch "
+                  "normalisation prevents the internal states of deep networks from "
+                  "exploding, rather than the 'internal covariate shift' of the original "
+                  "paper, and it allows larger learning rates and faster convergence.",
+                  png=png)
 
 
 def fig_batch_norm_running(ctx: BuildContext) -> Figure:
@@ -439,15 +456,81 @@ def fig_batch_norm_running(ctx: BuildContext) -> Figure:
         ax.set_title(f"running {name}: what inference will use", fontsize=10.5)
     png = save_mpl(fig, ctx, "batch_norm_running")
     return Figure("batch_norm_running",
-                  "Training and inference use batch norm differently. During training, "
-                  "each mini-batch is normalised with its own statistics, which are "
-                  "noisy (grey). At the same time a running mean and variance are kept, "
-                  "updated after every step as μ ← d·μ + (1 − d)·μ_B, here with a decay "
-                  f"d = {d}; they settle on the statistics of the whole training "
-                  "population (blue). At inference there may be only one image, so "
-                  "there is no batch to take statistics from — the stored running mean "
+                  "Batch normalisation is applied differently in training and at inference. "
+                  "During training, each mini-batch is normalised with its own statistics, "
+                  "which are noisy (grey). At the same time a running mean and variance are "
+                  "maintained, updated after every step as μ ← d·μ + (1 − d)·μ_B, here with "
+                  f"a decay d = {d}; these converge to the statistics of the whole training "
+                  "population (blue). At inference there may be only one image, so there is "
+                  "no batch from which statistics can be calculated; the stored running mean "
                   "and variance are used instead, and the layer becomes a fixed affine "
-                  "transform.", png=png)
+                  "transform.",
+                  png=png)
+
+
+def _se_diagram(ax, z, s, out_means, vmax):
+    """Panel (a) of the SE figure: the block in the volume notation.
+
+    Channels run along x, so each of the C slices of the input volume lines up
+    with one cell of the squeezed vector and one cell of the weight vector, and
+    the multiplication is visibly channel by channel.
+    """
+    from matplotlib import cm
+    c = len(z)
+    dl, side, ymid = 0.24, 1.7, 0.0
+    vir = lambda v: cm.viridis(min(v / vmax, 1.0))
+
+    def sliced(x0, values, ymid, side, label):
+        for i, v in enumerate(values):
+            volume(ax, x0 + i * dl, ymid, dl, side, vir(v), lw=0.8, alpha=0.95)
+        ax.text(x0 + c * dl / 2 + OBLIQUE[0] * side / 2, ymid - side / 2 - 0.15, label,
+                ha="center", va="top", fontsize=9.5)
+        return x0 + c * dl + OBLIQUE[0] * side
+
+    def cells(x0, values, colour, label, fmt=None):
+        for i, v in enumerate(values):
+            volume(ax, x0 + i * dl, ymid, dl, 0.32, colour(v), lw=0.8, alpha=0.95)
+            if fmt:
+                ax.text(x0 + (i + 0.5) * dl, ymid - 0.24, fmt(v), ha="center",
+                        va="top", fontsize=8, rotation=90, color=C["red"])
+        ax.text(x0 + c * dl / 2, ymid - (0.85 if fmt else 0.3), label, ha="center",
+                va="top", fontsize=9.5)
+        return x0 + c * dl + OBLIQUE[0] * 0.32
+
+    def step(x0, x1, text):
+        ax.annotate("", xy=(x1, ymid), xytext=(x0, ymid),
+                    arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.4))
+        ax.text((x0 + x1) / 2, ymid + 0.12, text, ha="center", va="bottom", fontsize=9.5)
+
+    xu = 0.0
+    ru = sliced(xu, z, ymid, side, f"input U: H × W × {c}")
+    xz = ru + 2.5
+    step(ru + 0.1, xz - 0.1, "squeeze:\nglobal avg pool")
+    rz = cells(xz, z, vir, f"1 × 1 × {c}")
+    xs = rz + 2.9
+    step(rz + 0.1, xs - 0.1, "excite: FC → ReLU\n→ FC → sigmoid")
+    rs = cells(xs, s, lambda v: cm.Reds(0.15 + 0.8 * v), f"weights s, 1 × 1 × {c}",
+               fmt=lambda v: f"{v:.2f}")
+    xm = rs + 0.75                                    # the channel-wise multiply
+    ax.scatter([xm], [ymid], s=520, facecolors="white", edgecolors=C["ink"], lw=1.4,
+               zorder=5)
+    ax.text(xm, ymid, "×", ha="center", va="center", fontsize=15, zorder=6)
+    ax.annotate("", xy=(xm - 0.2, ymid), xytext=(rs + 0.05, ymid),
+                arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.4))
+    # U also feeds the multiply, round underneath
+    yb = ymid - side / 2 - 0.75
+    ax.plot([xu + c * dl / 2, xu + c * dl / 2, xm, xm], [ymid - side / 2 - 0.55, yb, yb,
+            ymid - 0.55], color=C["red"], lw=1.8)
+    ax.annotate("", xy=(xm, ymid - 0.2), xytext=(xm, ymid - 0.6),
+                arrowprops=dict(arrowstyle="->", color=C["red"], lw=1.8))
+    ax.text((xu + xm) / 2, yb - 0.08, "the input U, channel by channel", ha="center",
+            va="top", fontsize=9, color=C["red"])
+    xo = xm + 1.1
+    ax.annotate("", xy=(xo - 0.08, ymid), xytext=(xm + 0.2, ymid),
+                arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.4))
+    ro = sliced(xo, out_means, ymid, side, "output: each channel × its weight")
+    ax.set_xlim(-0.2, ro + 0.9); ax.set_ylim(yb - 0.55, ymid + side / 2 + 0.75)
+    ax.set_aspect("equal"); ax.axis("off")
 
 
 def fig_squeeze_excite(ctx: BuildContext) -> Figure:
@@ -461,23 +544,32 @@ def fig_squeeze_excite(ctx: BuildContext) -> Figure:
     se = A.resnet(50, se_ratio=16)
     base = A.resnet(50)
 
-    fig = plt.figure(figsize=(13.5, 4.6))
-    gs = fig.add_gridspec(2, c + 3, height_ratios=[1, 1], wspace=0.15, hspace=0.45)
+    fig = plt.figure(figsize=(13.5, 7.6))
+    gs = fig.add_gridspec(3, c + 3, height_ratios=[1.5, 1, 1], wspace=0.15, hspace=0.5)
     vmax = max(maps.max(), out.max())
+    ax = fig.add_subplot(gs[0, :])
+    _se_diagram(ax, z, s, out.mean((1, 2)), z.max())
+    ax.set_title("(a) the squeeze-and-excite block: one weight per channel, multiplied "
+                 "back onto that channel", fontsize=10.5, loc="left")
     for i in range(c):
-        ax = fig.add_subplot(gs[0, i])
+        ax = fig.add_subplot(gs[1, i])
+        if i == 0:
+            ax.set_title("ch 1", fontsize=8)
+            ax.text(-0.12, 1.42, "(b) the block applied to an 8-channel feature map",
+                    transform=ax.transAxes, fontsize=10.5, ha="left", va="bottom")
         ax.imshow(maps[i], cmap="viridis", vmin=0, vmax=vmax); ax.axis("off")
-        ax.set_title(f"ch {i + 1}", fontsize=8)
+        if i:
+            ax.set_title(f"ch {i + 1}", fontsize=8)
         if i == 0:
             ax.text(-0.12, 0.5, "input", transform=ax.transAxes, ha="right",
                     va="center", fontsize=9)
-        ax = fig.add_subplot(gs[1, i])
+        ax = fig.add_subplot(gs[2, i])
         ax.imshow(out[i], cmap="viridis", vmin=0, vmax=vmax); ax.axis("off")
         ax.set_title(f"× {s[i]:.2f}", fontsize=8, color=C["red"])
         if i == 0:
             ax.text(-0.12, 0.5, "rescaled", transform=ax.transAxes, ha="right",
                     va="center", fontsize=9)
-    ax = fig.add_subplot(gs[:, c + 1:])
+    ax = fig.add_subplot(gs[1:, c + 1:])
     ax.barh(np.arange(c), s, color=C["red"], alpha=0.7)
     ax.set_yticks(np.arange(c)); ax.set_yticklabels([f"ch {i + 1}" for i in range(c)],
                                                     fontsize=8)
@@ -488,21 +580,24 @@ def fig_squeeze_excite(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "squeeze_excite")
     extra = se.params - base.params
     return Figure("squeeze_excite",
-                  "The squeeze-and-excite block, run on an 8-channel feature map. "
-                  "**Squeeze**: global average pooling reduces each channel to one "
-                  "number. **Excite**: two small dense layers, the second with a "
-                  "sigmoid, turn those numbers into a weight between 0 and 1 for each "
-                  "channel, and every channel of the input is multiplied by its weight. "
-                  "The block therefore models the **dependencies between channels**, "
-                  "emphasising some and suppressing others according to the content of "
-                  "the whole feature map. (The weights here are random, to show the "
-                  "mechanism; in a trained network they are learned.) It is "
-                  "lightweight and can be inserted into a ResNet block, between the "
-                  "last convolution and the shortcut addition, or into Inception. "
-                  f"Added to every block of ResNet-50 with a reduction ratio of 16, it "
-                  f"costs {extra / 1e6:.2f} M extra parameters ({extra / base.params:.0%}) "
-                  "and almost no extra computation, and the paper reports roughly a "
-                  "tenth less ImageNet error in return.", png=png)
+                  "(a) The squeeze-and-excite block, drawn in the volume notation, and (b) the "
+                  "block applied to an 8-channel feature map. In the "
+                  "**squeeze** step, each channel is reduced to one value by global average "
+                  "pooling. In the **excite** step, these values are converted by two small "
+                  "dense layers, the second with a sigmoid, into a weight between 0 and 1 "
+                  "for each channel, and every channel of the input is multiplied by its "
+                  "weight; as the channels are drawn along the horizontal axis in (a), each "
+                  "slice of the input lines up with its weight. The **dependencies between channels** are therefore modelled, "
+                  "with some channels emphasised and others suppressed according to the "
+                  "content of the whole feature map. (Random weights are used here to show "
+                  "the mechanism; in a trained network the weights are learned.) The block "
+                  "is lightweight and can be inserted into a ResNet block, between the last "
+                  "convolution and the shortcut addition, or into Inception. When it is "
+                  "added to every block of ResNet-50 with a reduction ratio of 16, "
+                  f"{extra / 1e6:.2f} M additional parameters ({extra / base.params:.0%}) "
+                  "and almost no additional computation are required, and a reduction of "
+                  "approximately one tenth in ImageNet error is reported in the paper.",
+                  png=png)
 
 
 def fig_densenet(ctx: BuildContext) -> Figure:
@@ -552,21 +647,22 @@ def fig_densenet(ctx: BuildContext) -> Figure:
                  "accuracy", fontsize=10)
     png = save_mpl(fig, ctx, "densenet")
     return Figure("densenet",
-                  "DenseNet extends the ResNet idea with far more connectivity. "
-                  "(a) Inside a dense block every composite function — batch norm, "
-                  "ReLU and convolution — receives the outputs of **all** earlier "
-                  "layers, and its own output is **concatenated** onto them rather than "
-                  "added. Each layer contributes only k new feature maps (the growth "
-                  f"rate, typically {k}), so with k₀ input channels there are k₀ + l·k "
-                  "after l layers. Concatenation would grow the channel count without "
-                  "limit, so the network is split into dense blocks separated by "
-                  "transition layers of 1 × 1 convolution and average pooling. As in "
-                  "ResNet there are many short paths, so gradients flow easily. "
-                  "(b) The result is narrow but deep, and parameter-efficient: "
-                  f"DenseNet-121 has {net.params / 1e6:.1f} M parameters against "
-                  f"ResNet-50's {rn.params / 1e6:.1f} M, for similar ImageNet accuracy. "
-                  "Both parameter counts are computed (and match torchvision); the "
-                  "accuracies are torchvision's published results.", png=png)
+                  "In DenseNet the ResNet concept is extended with much greater "
+                  "connectivity. (a) Inside a dense block, the outputs of **all** earlier "
+                  "layers are received by every composite function (batch normalisation, "
+                  "ReLU and convolution), and its own output is **concatenated** with them "
+                  "rather than added. Only k new feature maps are contributed by each layer "
+                  f"(the growth rate, typically {k}), so with k₀ input channels there are "
+                  "k₀ + l·k channels after l layers. As concatenation would increase the "
+                  "number of channels without limit, the network is divided into dense "
+                  "blocks separated by transition layers of 1 × 1 convolution and average "
+                  "pooling. As in ResNet there are many short paths, and the gradient flows "
+                  "easily. (b) The resulting network is narrow but deep, and uses parameters "
+                  f"efficiently: DenseNet-121 has {net.params / 1e6:.1f} M parameters "
+                  f"compared with {rn.params / 1e6:.1f} M for ResNet-50, for similar "
+                  "ImageNet accuracy. Both parameter counts are calculated (and match "
+                  "torchvision); the accuracies are the results published for torchvision.",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

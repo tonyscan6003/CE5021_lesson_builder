@@ -102,14 +102,15 @@ def fig_multi_channel_conv(ctx: BuildContext) -> Figure:
                  f"= {total.tolist()}", fontsize=10)
     png = save_mpl(fig, ctx, "multi_channel_conv")
     return Figure("multi_channel_conv",
-                  "Convolution with a multi-channel input. The kernel must have the "
-                  "same number of channels as the input — here a 3 × 3 × 3 RGB input "
-                  "and a 2 × 2 × 3 kernel with valid padding and stride 1. Each "
-                  "channel of the input is convolved with the matching channel of the "
-                  "kernel, giving three 2 × 2 results, and those are summed "
-                  f"element-wise into a single 2 × 2 output feature map, "
-                  f"{total.tolist()}. One kernel always produces exactly one output "
-                  "feature map, however many input channels there are.", png=png)
+                  "Convolution with a multi-channel input. The kernel must have the same "
+                  "number of channels as the input; here a 3 × 3 × 3 RGB input is "
+                  "convolved with a 2 × 2 × 3 kernel, with valid padding and stride 1. Each "
+                  "channel of the input is convolved with the corresponding channel of the "
+                  "kernel, giving three 2 × 2 results, and these are summed element-wise to "
+                  f"give a single 2 × 2 output feature map, {total.tolist()}. One output "
+                  "feature map is produced by each kernel, regardless of the number of input "
+                  "channels.",
+                  png=png)
 
 
 def fig_multi_kernel_conv(ctx: BuildContext) -> Figure:
@@ -159,16 +160,17 @@ def fig_multi_kernel_conv(ctx: BuildContext) -> Figure:
     ax.axis("off")
     png = save_mpl(fig, ctx, "multi_kernel_conv")
     return Figure("multi_kernel_conv",
-                  f"A convolution layer uses several kernels in parallel. Every one of "
-                  f"the N = {N} kernels has the same number of channels as the input "
-                  f"(C = {c}) — which is why each kernel is drawn the same length as "
-                  "the input volume — and is convolved with the whole input in the way "
-                  "the previous figure shows, producing one 2D feature map each. Those "
-                  "feature maps are one channel deep, so they draw as thin slices; "
-                  "stacking them gives an output N channels long. This is the rule to "
-                  "remember: the kernel's channel count is set by the input, and the "
-                  "output's channel count is set by the number of kernels. The spatial "
-                  "size follows the same arithmetic as plain 2D convolution.", png=png)
+                  f"Several kernels are used in parallel in a convolution layer. Each of the "
+                  f"N = {N} kernels has the same number of channels as the input (C = {c}), "
+                  "which is why each kernel is drawn with the same length as the input "
+                  "volume, and each is convolved with the whole input as shown in the "
+                  "previous figure to produce one 2D feature map. Each feature map is one "
+                  "channel deep and is drawn as a thin slice; when the feature maps are "
+                  "stacked, an output N channels long is obtained. The number of kernel "
+                  "channels is therefore set by the input, and the number of output channels "
+                  "is set by the number of kernels. The spatial size is calculated in the "
+                  "same way as for 2D convolution.",
+                  png=png)
 
 
 def fig_conv_volumes(ctx: BuildContext) -> Figure:
@@ -198,19 +200,20 @@ def fig_conv_volumes(ctx: BuildContext) -> Figure:
     ax.set_xlim(-0.2, x_out + 0.4); ax.set_ylim(-0.35, 4.3); ax.axis("off")
     png = save_mpl(fig, ctx, "conv_volumes")
     return Figure("conv_volumes",
-                  "Real networks have hundreds of feature maps, so drawing each one is "
-                  "impractical. Architecture diagrams instead show a whole stack as a "
-                  "single volume. Note the orientation, which is the standard one: the "
-                  "horizontal axis is the channel axis, so a volume with more channels "
-                  "is a longer box, and the square end cap is the spatial size m × n. "
-                  "Going deeper into a network, volumes typically get longer and their "
-                  "end caps smaller. The convolution is marked by a dashed cube inside "
-                  "the input: it runs the full length of the volume, because a kernel "
-                  "must span every input channel, but covers only a k × k patch "
-                  "spatially. Nothing is lost by the compact notation — the input "
-                  "length tells you how many channels each kernel has and the output "
-                  "length tells you how many kernels there are, so the layer's shape "
-                  "and cost can be recovered from the diagram alone.", png=png)
+                  "As there are hundreds of feature maps in real networks, it is impractical "
+                  "to draw each one, and in architecture diagrams a stack of feature maps is "
+                  "shown as a single volume. In the standard orientation used here, the "
+                  "horizontal axis is the channel axis, so a volume with more channels is "
+                  "drawn as a longer box, and the square end cap represents the spatial size "
+                  "m × n. In a typical network the volumes become longer and their end caps "
+                  "smaller with depth. The convolution is indicated by a dashed cube inside "
+                  "the input volume, which extends over the full length of the volume, as a "
+                  "kernel must span every input channel, but covers only a k × k region "
+                  "spatially. No information is lost in this notation: the number of channels "
+                  "in each kernel is given by the length of the input volume, and the number "
+                  "of kernels by the length of the output volume, so the shape and cost of "
+                  "the layer can be determined from the diagram.",
+                  png=png)
 
 
 def fig_conv_cost(ctx: BuildContext) -> Figure:
@@ -250,15 +253,16 @@ def fig_conv_cost(ctx: BuildContext) -> Figure:
     ax.set_xticks(ks); ax.legend(fontsize=9)
     png = save_mpl(fig, ctx, "conv_cost")
     return Figure("conv_cost",
-                  "Counting the cost of one convolution layer. The parameters live in "
-                  "the kernels: N kernels of k × k × C, plus one bias per output "
-                  "feature map. For the multiplications, the number of kernel "
-                  "positions is just the spatial size of the output — a shortcut that "
-                  "avoids having to work back through the stride and padding. "
-                  "Multiplications are counted rather than additions because they cost "
-                  "more. Because the count goes as k², small kernels are strongly "
-                  "preferred: at C = 24 here, a 5 × 5 kernel costs nearly three times "
-                  "a 3 × 3 one.", png=png)
+                  "The cost of one convolution layer. The parameters are contained in the "
+                  "kernels: N kernels of size k × k × C, plus one bias per output feature "
+                  "map. For the multiplications, the number of kernel positions is equal to "
+                  "the spatial size of the output, so it is not necessary to work back "
+                  "through the stride and padding. Multiplications are counted rather than "
+                  "additions, as they are more expensive. As the number of multiplications "
+                  "increases with k², small kernels are preferred: for C = 24, a 5 × 5 "
+                  "kernel requires nearly three times as many multiplications as a 3 × 3 "
+                  "kernel.",
+                  png=png)
 
 
 def fig_one_by_one_conv(ctx: BuildContext) -> Figure:
@@ -285,16 +289,15 @@ def fig_one_by_one_conv(ctx: BuildContext) -> Figure:
         ax.set_title(title, fontsize=10)
     png = save_mpl(fig, ctx, "one_by_one_conv")
     return Figure("one_by_one_conv",
-                  "A 1 × 1 convolution is an ordinary convolution with the smallest "
-                  "possible kernel. It still spans the full depth of the input, which "
-                  "the dashed cube shows clearly: the kernel runs the whole length of "
-                  "the input volume but is only one pixel across, so it computes a "
-                  "weighted sum across channels at each pixel independently. Two "
-                  "properties make it useful: it needs no padding and leaves the "
-                  "spatial size unchanged — the end caps are the same in the input and "
-                  "the output — and it has the smallest parameter count of any kernel. "
-                  "What it changes is the number of channels, which is the length of "
-                  "the box, and that is exactly what a bottleneck layer needs.",
+                  "A 1 × 1 convolution is an ordinary convolution with the smallest possible "
+                  "kernel. As shown by the dashed cube, the kernel still spans the full depth "
+                  "of the input: it extends over the whole length of the input volume but is "
+                  "only one pixel across, so a weighted sum across channels is calculated "
+                  "independently at each pixel. No padding is required and the spatial size "
+                  "is unchanged, as shown by the end caps, which are the same for the input "
+                  "and the output, and the number of parameters is the smallest of any "
+                  "kernel. The number of channels, represented by the length of the box, "
+                  "can be changed, and this is the property required in a bottleneck layer.",
                   png=png)
 
 
@@ -366,17 +369,17 @@ def fig_bottleneck_conv(ctx: BuildContext) -> Figure:
                        xaxis_title="bottleneck channels P",
                        yaxis_title="multiplications (millions)")
     return Figure("bottleneck_conv",
-                  f"The worked bottleneck example from the slides. A "
-                  f"{b['m']} × {b['n']} × {b['C']} input convolved with {b['N']} "
-                  f"kernels of {b['k']} × {b['k']} at 'same' padding costs "
-                  f"{r['plain']:,} multiplications (a). Inserting a 1 × 1 convolution "
-                  f"that cuts the channels from {b['C']} to {b['P']} first (b) costs "
-                  f"{r['reduce']:,} for the 1 × 1 stage plus {r['expand']:,} for the "
-                  f"{b['k']} × {b['k']} stage, {r['total']:,} in total — a saving of "
-                  f"{100 * r['saved'] / r['plain']:.0f}%. The expensive "
-                  f"{b['k']} × {b['k']} kernels now see far fewer channels. The "
-                  "interactive version sweeps the bottleneck width so you can see "
-                  "where the saving disappears.",
+                  f"The bottleneck example from the lecture slides. When a "
+                  f"{b['m']} × {b['n']} × {b['C']} input is convolved with {b['N']} kernels "
+                  f"of size {b['k']} × {b['k']} with 'same' padding, {r['plain']:,} "
+                  f"multiplications are required (a). When a 1 × 1 convolution is first used "
+                  f"to reduce the number of channels from {b['C']} to {b['P']} (b), "
+                  f"{r['reduce']:,} multiplications are required for the 1 × 1 stage and "
+                  f"{r['expand']:,} for the {b['k']} × {b['k']} stage, {r['total']:,} in "
+                  f"total, a saving of {100 * r['saved'] / r['plain']:.0f}%. The more "
+                  f"expensive {b['k']} × {b['k']} kernels are applied to far fewer channels. "
+                  "In the interactive version the bottleneck width is varied, and the point "
+                  "at which the saving is lost can be seen.",
                   png=png, html=plotly_html(fig2, height=420), kind="plotly")
 
 

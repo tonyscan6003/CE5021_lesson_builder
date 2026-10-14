@@ -19,6 +19,7 @@ import plotly.graph_objects as go
 
 from .._common import (BuildContext, Figure, C, SERIES, save_mpl, plotly_html,
                        slider_frames_layout, sync_matrix)
+from .._volumes import network_diagram
 
 FIGURES = ["fc_on_images", "conv_as_nn", "cnn_structure", "learned_features",
            "receptive_field", "translation_invariance", "lenet5"]
@@ -81,7 +82,7 @@ def lenet_table():
         total += p
         shape = f"{h}×{w}×{c}" if kind not in ("flat", "dense") else f"{c}"
         rows.append(dict(name=name, kind=kind, shape=shape, params=p,
-                         h=h, w=w, c=c))
+                         h=h, w=w, c=c, k=k))
     return rows, total
 
 
@@ -139,16 +140,16 @@ def fig_fc_on_images(ctx: BuildContext) -> Figure:
     ax.grid(alpha=0.25, which="both")
     png = save_mpl(fig, ctx, "fc_on_images")
     return Figure("fc_on_images",
-                  "The naive way to process an image with a neural network is to "
-                  "flatten it into a vector and feed it to a fully connected layer. "
-                  "(a) For a 4 × 4 image and two neurons that is 34 parameters, which "
-                  "is fine. (b) But the count grows with the *square* of the image "
-                  "side. A 256 × 256 greyscale image is a vector of 65,536 values, and "
-                  "connecting it to even a modest 100-neuron layer needs 6,553,700 "
-                  "parameters — for one layer, before any learning has happened. "
-                  "Worse, flattening throws away the spatial arrangement: two pixels "
-                  "that are neighbours in the image are nothing special to a dense "
-                  "layer. Both problems point at the same fix.", png=png)
+                  "In the naive approach, an image is flattened into a vector and applied to "
+                  "a fully connected layer. (a) For a 4 × 4 image and two neurons, 34 "
+                  "parameters are required. (b) The number of parameters, however, increases "
+                  "with the *square* of the image side. A 256 × 256 greyscale image becomes a "
+                  "vector of 65,536 values, and 6,553,700 parameters are required to connect "
+                  "it to a layer of 100 neurons, in one layer alone. In addition, the spatial "
+                  "arrangement of the pixels is lost when the image is flattened, and pixels "
+                  "that are neighbours in the image are not treated as related by a dense "
+                  "layer. Both problems are addressed by convolution.",
+                  png=png)
 
 
 def fig_conv_as_nn(ctx: BuildContext) -> Figure:
@@ -194,17 +195,18 @@ def fig_conv_as_nn(ctx: BuildContext) -> Figure:
     ax.set_xlim(-1.0, 4.4); ax.set_ylim(-1.9, 5.1); ax.axis("off")
     png = save_mpl(fig, ctx, "conv_as_nn")
     return Figure("conv_as_nn",
-                  "The same convolution drawn as a neural network. Each position of "
-                  "the kernel becomes one neuron: the multiply-and-sum the kernel "
-                  "performs there is exactly the weighted sum a neuron computes, and "
-                  "adding a bias and an activation function makes it a neuron in the "
-                  "full sense. The result looks like the dense networks of Lesson 1.2, "
-                  "with two crucial differences. It is **not fully connected** — each "
-                  "neuron sees only the 4 pixels under the kernel, which saves "
-                  "computation. And every neuron uses the **same** weights and the "
-                  "same bias, which saves memory. Those two properties, local "
-                  "connectivity and weight sharing, are what a convolution layer buys "
-                  "you over a dense one.", png=png)
+                  "The same convolution drawn as a neural network. Each position of the "
+                  "kernel corresponds to one neuron: the multiply-and-sum performed by the "
+                  "kernel at that position is the same as the weighted sum in a neuron, and "
+                  "when a bias and an activation function are added, the operation is "
+                  "mathematically the same as a neuron. The result is similar to the dense "
+                  "networks of Lesson 1.2, with two important differences. The network is "
+                  "**not fully connected**, as each neuron is connected only to the 4 pixels "
+                  "under the kernel, which saves computation. In addition, the **same** "
+                  "weights and bias are used by every neuron, which saves memory. These two "
+                  "properties, local connectivity and weight sharing, are the advantages of a "
+                  "convolution layer over a dense layer.",
+                  png=png)
 
 
 def fig_cnn_structure(ctx: BuildContext) -> Figure:
@@ -239,17 +241,17 @@ def fig_cnn_structure(ctx: BuildContext) -> Figure:
     ax.set_xlim(-0.2, x); ax.set_ylim(-0.55, 1.62); ax.axis("off")
     png = save_mpl(fig, ctx, "cnn_structure")
     return Figure("cnn_structure",
-                  "The basic structure of a CNN, drawn as a sequence of operations "
-                  "rather than feature maps. Convolution layers come first and are "
-                  "stacked to make the network deeper, which helps it learn complex "
-                  "features. The activation is drawn as its own layer: it is good "
-                  "practice to show it explicitly, because in modern CNNs a "
-                  "convolution layer sometimes appears without one. Pooling layers "
-                  "summarise features and halve the spatial size, and the number of "
-                  "kernels is typically increased as the spatial size falls. Finally "
-                  "the feature map is flattened to a vector and fed to a dense layer "
-                  "with one neuron per class, whose softmax activation gives the class "
-                  "probabilities.", png=png)
+                  "The basic structure of a CNN, drawn as a sequence of operations rather "
+                  "than feature maps. Convolution layers are used first, and are stacked to "
+                  "produce a deeper network, which helps the network to learn complex "
+                  "features. The activation is shown as a separate layer; it is good practice "
+                  "to show the activation explicitly, as in modern CNNs a convolution layer "
+                  "may appear without one. Features are summarised by the pooling layers and "
+                  "the spatial size is halved, and the number of kernels is typically "
+                  "increased as the spatial size is reduced. Finally, the feature map is "
+                  "flattened to a vector and applied to a dense layer with one neuron per "
+                  "class, and the class probabilities are given by the softmax activation.",
+                  png=png)
 
 
 def fig_learned_features(ctx: BuildContext) -> Figure:
@@ -297,18 +299,19 @@ def fig_learned_features(ctx: BuildContext) -> Figure:
                  "not the output of a trained network", fontsize=9.5, y=0.055)
     png = save_mpl(fig, ctx, "learned_features")
     return Figure("learned_features",
-                  "During training the kernel parameters are learned, so after "
-                  "training the convolution layers respond to whatever features turn "
-                  "out to be useful. It helps to think of a convolution layer as "
-                  "cross-correlating the image with those learned features: the "
-                  "response is large where the image looks like the kernel. Early "
-                  "layers consistently learn simple things — oriented edges, colour "
-                  "boundaries. Deeper layers respond to textures, then to object "
-                  "parts, then to whole objects. The classifier stage reads the "
-                  "pattern of responses in the final feature map and outputs a class "
-                  "probability. **These panels are synthetic patterns illustrating the "
-                  "progression, not kernels from a trained network** — Lesson 2.5 "
-                  "covers how real learned features are visualised.", png=png)
+                  "The kernel parameters are learned during training, so after training the "
+                  "convolution layers respond to the features that are useful for the task. "
+                  "A convolution layer can be considered to perform cross-correlation between "
+                  "the image and the learned features, so that the response is large where "
+                  "the image resembles the kernel. Simple features such as oriented edges and "
+                  "colour boundaries are learned in the early layers. Deeper layers respond "
+                  "to textures, then to parts of objects, and then to whole objects. The "
+                  "pattern of responses in the final feature map is interpreted by the "
+                  "classifier stage and a class probability is output. **These panels are "
+                  "synthetic patterns that illustrate the progression, not kernels from a "
+                  "trained network**; the visualisation of real learned features is "
+                  "described in Lesson 2.5.",
+                  png=png)
 
 
 def rf_layer_stack(layers, n_in=12, unit=None):
@@ -406,23 +409,22 @@ def fig_receptive_field(ctx: BuildContext) -> Figure:
     fig2.update_xaxes(visible=False, range=[-7.5, len(centres[0]) + 0.5])
     fig2.update_yaxes(visible=False, range=[-0.7, L + 0.7])
     return Figure("receptive_field",
-                  "The **receptive field** of a neuron is the size of the region of "
-                  "the input it can respond to. It matters for recognition: the "
-                  "receptive field has to be large enough to cover the object being "
-                  "detected. The layers are drawn as in the worked example's table — "
-                  "the input at the top, then layers 1 to 3, with layer 3 the deepest — "
-                  "and each row is drawn at its own length, so the layers really do "
-                  "shrink. Starting from one unit of the deepest layer ($r_3 = 1$), "
-                  r"work **upwards** with $r_{l-1} = s_l \cdot r_l + (k_l - s_l)$, "
-                  "following the connections to the cells that feed it. A 3-kernel "
-                  "convolution, a 2/2 pooling layer and another 3-kernel convolution, "
-                  "all with valid padding, give a receptive field of "
-                  f"$r_0 = {r_total}$ input positions, and the red cells in the input "
-                  "row agree with the recurrence. Note how the pooling layer's stride "
-                  "of 2 doubles the effect of everything below it. Deeper into a "
-                  "network the receptive field generally grows, which is the point: "
-                  "later layers need to see enough of the image to recognise whole "
-                  "objects.",
+                  "The **receptive field** of a neuron is the size of the region of the "
+                  "input to which it can respond. The receptive field is important for "
+                  "recognition, as it must be large enough to cover the object being "
+                  "detected. The layers are drawn in the same order as in the table of the "
+                  "worked example, with the input at the top followed by layers 1 to 3, "
+                  "where layer 3 is the deepest, and each row is drawn at its true length. "
+                  "Starting from one unit of the deepest layer ($r_3 = 1$), the receptive "
+                  r"field is calculated **upwards** with $r_{l-1} = s_l \cdot r_l + (k_l - s_l)$, "
+                  "following the connections to the cells that feed each unit. With a "
+                  "3-kernel convolution, a 2/2 pooling layer and a further 3-kernel "
+                  "convolution, all with valid padding, a receptive field of "
+                  f"$r_0 = {r_total}$ input positions is obtained, in agreement with the red "
+                  "cells in the input row. It can be seen that the effect of the layers "
+                  "after the pooling layer is doubled by its stride of 2. In general the "
+                  "receptive field increases with depth, so that later layers can view "
+                  "enough of the image to recognise whole objects.",
                   png=png, html=plotly_html(fig2, height=450), kind="plotly")
 
 
@@ -478,58 +480,45 @@ def fig_translation_invariance(ctx: BuildContext) -> Figure:
                  "but partial.", fontsize=9.5, y=1.13)
     png = save_mpl(fig, ctx, "translation_invariance")
     return Figure("translation_invariance",
-                  "**Translation invariance** is the ability of a network to give the "
-                  "same response wherever in the image an object appears. Convolution "
-                  "layers build it in automatically, because the same kernel is applied "
-                  "everywhere. Pooling contributes as well: here a 1D signal is max "
-                  "pooled with a window of 3, and in (b) the signal has been shifted "
-                  "one place to the right. The peak (red) moves, but it stays inside "
-                  "the same pooling window and is still the largest value in it, so "
-                  f"the pooled output is exactly the same, {[int(v) for v in p_base]}. "
-                  "Be precise about what this does and does not give you: the "
-                  "invariance is **partial**. Shift the peak by two places instead and "
-                  "it crosses into the next window, changing the output to "
-                  f"{[int(v) for v in far]}. Pooling buys tolerance to shifts smaller "
-                  "than the pooling window, not to arbitrary ones.", png=png)
+                  "**Translation invariance** is the ability of a network to give the same "
+                  "response regardless of where an object appears in the image. Translation "
+                  "invariance is built into convolution layers, as the same kernel is applied "
+                  "everywhere. Pooling also contributes: here a 1D signal is max pooled with "
+                  "a window of 3, and in (b) the signal has been shifted one place to the "
+                  "right. The peak (red) moves, but it remains inside the same pooling window "
+                  "and is still the largest value in that window, so the pooled output is "
+                  f"unchanged, {[int(v) for v in p_base]}. The invariance is, however, "
+                  "**partial**. When the peak is shifted by two places instead, it moves into "
+                  f"the next window and the output changes to {[int(v) for v in far]}. "
+                  "Pooling therefore provides tolerance to shifts smaller than the pooling "
+                  "window, but not to larger shifts.",
+                  png=png)
 
 
 def fig_lenet5(ctx: BuildContext) -> Figure:
     rows, total = lenet_table()
-    fig = plt.figure(figsize=(13, 7.2))
-    gs = fig.add_gridspec(2, 1, height_ratios=[0.78, 1], hspace=0.10)
+    fig = plt.figure(figsize=(13, 6.3))
+    gs = fig.add_gridspec(2, 1, height_ratios=[0.62, 1], hspace=0.04)
 
-    # (a) the architecture, feature maps drawn to scale
+    # (a) the architecture in the volume notation of Lesson 1.3: channels along
+    # x, spatial size on the square end cap, each operation in the gap between
+    # its input and output (shared helper, also used for AlexNet and VGG).
     ax = fig.add_subplot(gs[0])
-    # Fixed label rows so the names and shapes line up instead of tracking the
-    # height of each block.
-    Y_MID, Y_NAME, Y_SHAPE = 1.5, 2.78, 0.42
-    x = 0.0
-    for r in rows:
-        if r["kind"] in ("flat", "dense"):
-            h = min(r["c"] / 400 * 2.0, 2.0)
-            ax.add_patch(plt.Rectangle((x, Y_MID - h / 2), 0.22, h, fc=C["purple"],
-                                       ec=C["ink"], lw=1.1, alpha=0.6))
-            ax.text(x + 0.11, Y_SHAPE, r["shape"], ha="center", va="top",
-                    fontsize=8.5, color=C["red"], family="monospace")
-            ax.text(x + 0.11, Y_NAME, r["name"].replace(" + softmax", ""),
-                    ha="center", va="bottom", fontsize=8)
-            x += 0.78
-            continue
-        side = r["h"] / 32 * 1.7
-        depth = min(0.10 + 0.020 * r["c"], 0.50)
-        col = {"input": C["light"], "conv": C["blue"], "pool": C["orange"]}[r["kind"]]
-        nshow = min(r["c"], 6)
-        for d in range(nshow):
-            off = d * depth / max(nshow, 1)
-            ax.add_patch(plt.Rectangle((x + off, Y_MID - side / 2 + off * 0.55), side,
-                                       side, fc=col, ec=C["ink"], lw=0.7, alpha=0.75))
-        ax.text(x + side / 2, Y_SHAPE, r["shape"], ha="center", va="top",
-                fontsize=8.5, color=C["red"], family="monospace")
-        ax.text(x + side / 2, Y_NAME, r["name"], ha="center", va="bottom", fontsize=8)
-        x += side + 0.80
-    ax.set_xlim(-0.25, x); ax.set_ylim(0.22, 3.08); ax.axis("off")
+    ops = {"conv": lambda r: f"conv {r['k']}×{r['k']}\n{r['c']} kernels",
+           "pool": lambda r: f"avg pool\n{r['k']}×{r['k']}, s=2"}
+    maps = [dict(h=r["h"], c=r["c"], kind=r["kind"], k=r["k"],
+                 op=ops[r["kind"]](r) if r["kind"] in ops else None)
+            for r in rows if r["kind"] in ("input", "conv", "pool")]
+    vec_ops = iter(["flatten", "dense", "dense", "dense\n+ softmax"])
+    vecs = [dict(n=r["c"], op=next(vec_ops)) for r in rows if r["kind"] in ("flat", "dense")]
+    right, _ = network_diagram(ax, maps, vecs, ymid=1.55, gap=1.55, vec_gap=1.03,
+                               vec_height=lambda n: 0.30 + np.sqrt(n / 400),
+                               op_y=0.72, shape_y=0.32)
+    ax.set_xlim(-0.25, right + 0.15); ax.set_ylim(0.05, 2.85); ax.axis("off")
+    ax.set_aspect("equal")
     ax.set_title("(a) LeNet-5 (1998): handwritten digit recognition on 32 × 32 "
-                 "greyscale images", fontsize=10.5)
+                 "greyscale images — channels along x, spatial size on the end cap",
+                 fontsize=10.5)
 
     # (b) the layer table, every parameter count computed from the shapes
     ax = fig.add_subplot(gs[1])
@@ -553,19 +542,29 @@ def fig_lenet5(ctx: BuildContext) -> Figure:
     conv_p = sum(r["params"] for r in rows if r["kind"] == "conv")
     dense_p = sum(r["params"] for r in rows if r["kind"] == "dense")
     return Figure("lenet5",
-                  "LeNet-5, developed in 1998 for handwritten digit recognition, and "
-                  "small enough to check by hand. Two convolution layers, two pooling "
-                  "layers and three fully connected layers. Note how the rules from "
-                  "the previous lessons pin everything down: the first convolution has "
-                  "6 kernels so it produces 6 feature maps, and its kernels have 1 "
-                  "channel because the input is greyscale; the second has 16 kernels "
-                  "so its kernels must have 6 channels, matching the 6 maps before it. "
-                  "Pooling halves the spatial size and leaves the channel count alone. "
-                  "Every parameter count in the table is computed from the shapes "
-                  f"rather than quoted, and they total {total:,}. The split is worth "
-                  f"noting: the convolution layers hold only {conv_p:,} of them while "
-                  f"the three dense layers hold {dense_p:,} — the same lopsidedness "
-                  "Lesson 1.2 predicted, and a problem Section 2 returns to.", png=png)
+                  "LeNet-5, developed in 1998 for handwritten digit recognition, which is "
+                  "small enough to be checked by hand. There are two convolution layers, two "
+                  "pooling layers and three fully connected layers. (a) As in Lesson 1.3, "
+                  "the feature maps are drawn as volumes, with the channels along the "
+                  "horizontal axis and the spatial size on the square end cap. Each "
+                  "operation is shown between its input and output volumes: the dashed "
+                  "cube inside a volume is one kernel, or one pooling window, and the "
+                  "dotted lines connect it to the single output value that it produces. "
+                  "A kernel spans every channel of its input, whereas a pooling window is "
+                  "applied to each channel separately, so the number of channels is "
+                  "unchanged by pooling. The flattened vector and the dense layers are "
+                  "drawn as bars, with dotted lines representing the full connections. "
+                  "(b) The shapes are "
+                  "determined by the rules from the previous lessons: the first convolution "
+                  "has 6 kernels and so produces 6 feature maps, and its kernels have 1 "
+                  "channel as the input is greyscale; the second convolution has 16 kernels, "
+                  "each of which must have 6 channels to match the 6 feature maps before it. "
+                  "The spatial size is halved by pooling and the number of channels is "
+                  "unchanged. Every parameter count in the table is calculated from the "
+                  f"shapes, and the total is {total:,}. Only {conv_p:,} of these are in the "
+                  f"convolution layers, while {dense_p:,} are in the three dense layers, as "
+                  "predicted in Lesson 1.2; this problem is discussed further in Section 2.",
+                  png=png)
 
 
 def build(ctx: BuildContext) -> list[Figure]:

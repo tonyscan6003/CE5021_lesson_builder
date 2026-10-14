@@ -90,48 +90,87 @@ def inverted_dropout(x, rate, seed=0):
 # Figures
 # ---------------------------------------------------------------------------
 
+def _truth_bv(x):
+    return np.sin(1.6 * x + 0.5) + 0.3 * x
+
+
+def bias_variance(degrees, n=18, noise=0.4, seed=4):
+    """Exact bias-variance decomposition for polynomial least squares.
+
+    The classic setting: the input positions x are fixed and only the noise on
+    the targets changes from one training set to the next. The fit is then
+    linear in y, so with H the matrix mapping training targets to predictions,
+        mean fit  = H f(x)                  -> bias²    = mean (H f(x) − f)²
+        spread    = noise² · ||rows of H||² -> variance
+    and the expected training error is the training-set bias plus
+    noise²·(1 − p/n). Computed exactly — nothing is sampled, so there is no
+    Monte Carlo noise in the curves. Legendre basis for numerical stability;
+    errors are measured over the span of the data (no extrapolation).
+    """
+    from numpy.polynomial import legendre as Lg
+    x = np.sort(np.random.default_rng(seed).uniform(-3, 3, n))
+    xt = np.linspace(x.min(), x.max(), 300)
+    rows = []
+    for d in degrees:
+        A, At = Lg.legvander(x / 3, d), Lg.legvander(xt / 3, d)
+        P = np.linalg.pinv(A)
+        H, Htr = At @ P, A @ P
+        b2 = np.mean((H @ _truth_bv(x) - _truth_bv(xt)) ** 2)
+        var = noise ** 2 * np.mean(np.sum(H ** 2, 1))
+        tr = np.mean((Htr @ _truth_bv(x) - _truth_bv(x)) ** 2) + noise ** 2 * (1 - (d + 1) / n)
+        rows.append((b2, var, tr))
+    b2, var, tr = map(np.array, zip(*rows))
+    return x, b2, var, tr
+
+
 def fig_bias_variance(ctx: BuildContext) -> Figure:
-    # Stop at 12: with 22 training points, polyfit past about degree 12 is so
-    # ill-conditioned that the error is a numerical artefact rather than a
-    # measurement of variance, and quoting 1e8 would be misleading.
-    degrees = list(range(1, 13))
-    errs = [poly_fit_error(d) for d in degrees]
-    tr = np.array([a for a, _ in errs])
-    te = np.array([b for _, b in errs])
-    best = degrees[int(np.argmin(te))]
+    degrees = list(range(1, 10))
+    NOISE = 0.4
+    x, b2, var, tr = bias_variance(degrees, noise=NOISE)
+    tot = b2 + var
+    best = degrees[int(np.argmin(tot))]
+    # The claims the figure makes: bias falls, variance rises, the total has an
+    # interior minimum, and the training error falls throughout.
+    assert np.all(np.diff(b2) < 1e-3) and np.all(np.diff(var) > 0), (b2, var)
+    assert 1 < best < degrees[-1] and np.all(np.diff(tr) < 0), (best, tr)
 
     fig = plt.figure(figsize=(12, 6.4))
     gs = fig.add_gridspec(2, 3, height_ratios=[1.0, 1], hspace=0.30, wspace=0.22)
-
     ax = fig.add_subplot(gs[0, :])
-    ax.plot(degrees, te, color=C["red"], lw=2.4, marker="o", ms=4,
-            label="total error on unseen data")
-    ax.plot(degrees, tr, color=C["blue"], lw=2.0, marker="o", ms=4,
-            label="training error")
-    ax.axvline(best, color=C["green"], ls="--", lw=1.5)
-    ax.text(best + 0.2, te.max() * 0.05, f"optimum complexity\n(degree {best})",
-            fontsize=9, color=C["green"], va="center")
-    ax.text(1.5, te.max() * 0.30, "high bias\n(underfitting)", fontsize=9,
+    YMAX = 0.8
+    ax.plot(degrees, tot, color=C["red"], lw=2.6, marker="o", ms=4,
+            label="total error = bias² + variance")
+    ax.plot(degrees, b2, color=C["blue"], lw=2.0, marker="o", ms=4, label="bias²")
+    ax.plot(degrees, var, color=C["orange"], lw=2.0, marker="o", ms=4, label="variance")
+    ax.plot(degrees, tr, color=C["grey"], lw=1.6, ls="--", label="training error")
+    for d, v in zip(degrees, tot):
+        if v > YMAX:                       # off the scale: say so rather than clip silently
+            ax.annotate(f"{v:.1f} (off scale)", xy=(d, YMAX), xytext=(d, YMAX * 0.80),
+                        fontsize=8.5, color=C["red"], ha="center",
+                        arrowprops=dict(arrowstyle="->", color=C["red"], lw=1))
+    ax.axvline(best, color=C["green"], ls=":", lw=1.5)
+    ax.text(best + 0.1, YMAX * 0.62, f"optimum complexity\n(degree {best})",
+            fontsize=9, color=C["green"])
+    ax.text(1.1, YMAX * 0.93, "high bias\n(underfitting)", fontsize=9, color=C["grey"],
+            va="top")
+    ax.text(degrees[-1] - 1.9, YMAX * 0.62, "high variance\n(overfitting)", fontsize=9,
             color=C["grey"])
-    ax.text(degrees[-1] - 2.2, te.max() * 0.30, "high variance\n(overfitting)",
-            fontsize=9, color=C["grey"])
-    ax.set_yscale("log")
+    ax.set_ylim(0, YMAX); ax.set_xticks(degrees)
     ax.set_xlabel("model complexity (polynomial degree)")
     ax.set_ylabel("mean squared error")
-    ax.set_title("Error against model complexity, averaged over 60 resampled "
-                 "training sets", fontsize=10.5)
-    ax.legend(fontsize=9)
-    ax.set_xticks(degrees)
+    ax.set_title(f"Bias and variance of least-squares polynomial fits to {len(x)} noisy "
+                 "points", fontsize=10.5)
+    ax.legend(fontsize=9, loc="upper center", ncol=2)
 
-    x, y = sample(22, seed=7)
-    xt = np.linspace(-3, 3, 300)
+    y = _truth_bv(x) + np.random.default_rng(11).normal(0, NOISE, len(x))
+    xt = np.linspace(x.min(), x.max(), 300)
     for col, (deg, name) in enumerate([(1, "underfitting: degree 1"),
                                        (best, f"good fit: degree {best}"),
                                        (degrees[-1],
                                         f"overfitting: degree {degrees[-1]}")]):
         ax = fig.add_subplot(gs[1, col])
         ax.scatter(x, y, s=22, color=C["grey"], zorder=3, label="training data")
-        ax.plot(xt, _truth(xt), color=C["light"], lw=3, zorder=1, label="true function")
+        ax.plot(xt, _truth_bv(xt), color=C["light"], lw=3, zorder=1, label="true function")
         ax.plot(xt, np.polyval(np.polyfit(x, y, deg), xt), color=SERIES[col], lw=2,
                 zorder=4, label="fit")
         ax.set_ylim(-3.2, 3.2); ax.set_title(name, fontsize=10)
@@ -140,21 +179,24 @@ def fig_bias_variance(ctx: BuildContext) -> Figure:
             ax.legend(fontsize=7.5, loc="upper left")
     png = save_mpl(fig, ctx, "bias_variance")
     return Figure("bias_variance",
-                  "**Bias** is the error inherent in the model's complexity; "
-                  "**variance** is how much the result changes with different "
-                  "training data. The two are linked: less complex models tend to "
-                  "have high bias and low variance, more complex models the reverse. "
-                  "The total error is therefore a U-shaped curve, high at both ends, "
-                  f"with a minimum at some optimal complexity — degree {best} here "
-                  "(note the log scale). A "
-                  "low-complexity model produces a decision boundary too simple to "
-                  "fit the data, which is **underfitting**. A high-complexity model "
-                  "fits the training points closely, including the noise, giving a "
-                  "very complicated boundary that changes a great deal if the "
-                  "training data changes: **overfitting**. Note that the training "
-                  "error keeps falling with complexity throughout, which is exactly "
-                  "why it cannot be used to choose a model. Every point here is a "
-                  "real least-squares fit averaged over 60 resampled datasets.",
+                  "**Bias** is the error inherent in the complexity of the model, and "
+                  "**variance** is the amount by which the result changes when different "
+                  "training data is used. Here a polynomial is fitted by least squares to "
+                  f"{len(x)} noisy samples of a known function (bottom), and both "
+                  "quantities are calculated exactly over all possible draws of the noise: "
+                  "**bias²** is the squared difference between the average fit and the true "
+                  "function, and **variance** is the spread of the individual fits about the "
+                  "average fit. As the complexity increases, the bias decreases and the "
+                  "variance increases, so the total error, their sum, follows a U-shaped "
+                  f"curve with a minimum at an optimal complexity, degree {best} here. A "
+                  "low-complexity model is too simple to fit the data, which is known as "
+                  "**underfitting**. A high-complexity model fits the training points "
+                  "closely, including the noise, and the fit changes significantly when the "
+                  "training data changes, which is known as **overfitting**. It should be "
+                  "noted that the training error (dashed) decreases throughout as the "
+                  "complexity increases, and for this reason it cannot be used to select a "
+                  "model. The same decomposition applies to a neural network, in which the "
+                  "complexity is set by the number of layers and parameters.",
                   png=png)
 
 
@@ -183,21 +225,21 @@ def fig_train_val_curves(ctx: BuildContext) -> Figure:
             ax.set_ylabel("error"); ax.legend(fontsize=8.5)
     png = save_mpl(fig, ctx, "train_val_curves")
     return Figure("train_val_curves",
-                  "Underfitting and overfitting can be detected during training by "
-                  "watching the error on the training and validation sets. "
-                  "(a) **Underfitting**: both errors stay high. This is what high bias "
-                  "looks like — the model cannot fit the data, and no amount of "
-                  "further training will help. (b) **Overfitting**: the two diverge. "
-                  "The training error keeps falling while the validation error bottoms "
-                  "out and then rises, because the model is fitting the training set "
-                  "ever more closely and losing its ability to predict new data. This "
-                  "is why validation data must be used during training: relying on the "
-                  "training error alone is actively misleading. It is also where "
-                  "**early stopping** comes from — stop at the minimum of the "
-                  "validation curve. (c) **A good fit**: both errors fall together to "
-                  "a low value. Underfitting is addressed by increasing model "
-                  "complexity; overfitting by more data, less complexity, or "
-                  "regularisation.", png=png)
+                  "Underfitting and overfitting can be detected during training from the "
+                  "error on the training and validation sets. (a) **Underfitting**: both "
+                  "errors remain high. This is the result of high bias; the data cannot be "
+                  "fitted by the model, and further training does not help. "
+                  "(b) **Overfitting**: the two errors diverge. The training error continues "
+                  "to decrease, while the validation error reaches a minimum and then "
+                  "increases, as the training set is fitted more and more closely and the "
+                  "ability to predict new data is lost. For this reason validation data must "
+                  "be used during training, as the training error alone is misleading. This "
+                  "is also the basis of **early stopping**, in which training is stopped at "
+                  "the minimum of the validation curve. (c) **A good fit**: both errors "
+                  "decrease together to a low value. Underfitting is addressed by an "
+                  "increase in model complexity, and overfitting by more data, reduced "
+                  "complexity or regularisation.",
+                  png=png)
 
 
 def fig_curse_of_dimensionality(ctx: BuildContext) -> Figure:
@@ -245,19 +287,20 @@ def fig_curse_of_dimensionality(ctx: BuildContext) -> Figure:
     ax.set_title("sparsity grows, data required explodes", fontsize=10)
     png = save_mpl(fig, ctx, "curse_of_dimensionality")
     return Figure("curse_of_dimensionality",
-                  "Applying an image to a classifier means treating each pixel as a "
-                  "dimension, so even a small 256 × 256 image has 65,536 of them. "
-                  "Adding dimensions helps discriminate between classes — in 1D here "
-                  "the two classes overlap, in 2D they separate — but with the same "
-                  "number of data points the distances between them grow. That is "
-                  "**sparsity**, and it only increases with more dimensions. Sparse "
-                  "training data leads to overfitting, and offsetting it requires the "
-                  "amount of data to grow *exponentially* with each dimension just to "
-                  "maintain generalisation. That exponential requirement is the curse "
-                  "of dimensionality. Neural networks do take raw images as input, so "
-                  "it applies to them; but because convolution layers operate locally "
-                  "and learn to extract features before the final layers classify, "
-                  "they are less susceptible to it than classical methods.", png=png)
+                  "When an image is applied to a classifier, each pixel is treated as a "
+                  "dimension, so even a small 256 × 256 image has 65,536 dimensions. The "
+                  "addition of dimensions helps to discriminate between classes (here the two "
+                  "classes overlap in 1D and are separated in 2D), but with the same number "
+                  "of data points, the distances between the points increase. This is known "
+                  "as **sparsity**, and it increases further with more dimensions. Sparse "
+                  "training data leads to overfitting, and to compensate, the amount of data "
+                  "must increase *exponentially* with each dimension in order to maintain "
+                  "generalisation. This exponential requirement is known as the curse of "
+                  "dimensionality. Raw images are applied to neural networks, so the curse of "
+                  "dimensionality applies; however, as the convolution layers operate locally "
+                  "and features are extracted before classification in the final layers, "
+                  "neural networks are less susceptible to it than classical methods.",
+                  png=png)
 
 
 def fig_l1_l2_regularisation(ctx: BuildContext) -> Figure:
@@ -343,18 +386,19 @@ def fig_l1_l2_regularisation(ctx: BuildContext) -> Figure:
     ax.legend(fontsize=8.5)
     png = save_mpl(fig, ctx, "l1_l2_regularisation")
     return Figure("l1_l2_regularisation",
-                  "L1 and L2 regularisation penalise large parameter values in the "
-                  "loss function, forcing the model towards more equally sized "
-                  "parameters and better generalisation. The **L1** term penalises "
-                  "the absolute values of the weights and the **L2** term the squares. "
-                  "(a) The difference in behaviour comes from the shape of the "
-                  "constraint region: L1's diamond has corners on the axes, so its "
-                  "optimum often sits exactly on one and a weight is driven to zero, "
-                  "giving sparsity. L2's circle has no corners, so it shrinks weights "
-                  "without eliminating them. (b) Fitting the same degree-11 polynomial "
-                  "with increasing λ, the weights shrink by orders of magnitude, and "
-                  "(c) the fit becomes correspondingly smoother. In Keras these are "
-                  "applied per layer, to the kernel, the bias or the activation.",
+                  "In L1 and L2 regularisation, large parameter values are penalised in the "
+                  "loss function, so that the model is constrained towards parameters of more "
+                  "equal size and better generalisation is obtained. In **L1** "
+                  "regularisation the absolute values of the weights are penalised, and in "
+                  "**L2** regularisation the squares. (a) The difference in behaviour is due "
+                  "to the shape of the constraint region: the L1 diamond has corners on the "
+                  "axes, so the optimum is often located exactly at a corner and a weight is "
+                  "driven to zero, giving a sparse solution. The L2 circle has no corners, so "
+                  "the weights are reduced but not eliminated. (b) When the same degree-11 "
+                  "polynomial is fitted with increasing λ, the weights are reduced by orders "
+                  "of magnitude, and (c) the fit becomes correspondingly smoother. In PyTorch, "
+                  "L2 regularisation is applied through the weight_decay argument of the "
+                  "optimiser, and L1 regularisation is added to the loss.",
                   png=png)
 
 
@@ -407,17 +451,18 @@ def fig_dropout_mask(ctx: BuildContext) -> Figure:
     ax.set_xticks(idx); ax.set_xlabel("unit"); ax.legend(fontsize=8)
     png = save_mpl(fig, ctx, "dropout_mask")
     return Figure("dropout_mask",
-                  "**Dropout** randomly removes nodes during training: at each "
-                  "training step a unit is dropped with some probability, producing a "
-                  "sparser network on every step and a different one each time. This "
-                  "stops the network relying on any particular neuron or path, which "
-                  "regularises it in much the same way as an L2 penalty by keeping the "
-                  "weight values down. The right-hand panel shows the bookkeeping: "
-                  "under **inverted dropout** the surviving activations are divided by "
-                  "(1 − rate), so the layer's expected output is unchanged and nothing "
-                  "has to be rescaled at inference time. In Keras dropout is an "
-                  "independent layer. Too large a rate slows convergence or causes "
-                  "underfitting.", png=png)
+                  "In **dropout**, nodes are randomly removed during training: at each "
+                  "training step a unit is dropped with a given probability, so that a "
+                  "sparser, and different, network is produced at each step. The network is "
+                  "prevented from relying on any particular neuron or path, and a "
+                  "regularising effect similar to an L2 penalty is obtained, as the weight "
+                  "values are kept small. The right-hand panel shows that in **inverted "
+                  "dropout** the remaining activations are divided by (1 − rate), so that the "
+                  "expected output of the layer is unchanged and no rescaling is required at "
+                  "inference time. In PyTorch, dropout is implemented as an independent layer, nn.Dropout, "
+                  "which is active only in training mode. "
+                  "If too large a rate is used, convergence is slowed or underfitting occurs.",
+                  png=png)
 
 
 def fig_spatial_dropout(ctx: BuildContext) -> Figure:
@@ -451,18 +496,19 @@ def fig_spatial_dropout(ctx: BuildContext) -> Figure:
         axes[r, 0].set_ylabel(lab, fontsize=9)
     png = save_mpl(fig, ctx, "spatial_dropout")
     return Figure("spatial_dropout",
-                  "Dropout was designed for fully connected networks, where removing "
-                  "a neuron's connections genuinely changes what the layer computes. "
-                  "In a convolutional network it works less well. The kernel is "
-                  "applied across a *region* of the preceding feature map, and "
-                  "neighbouring pixels in a feature map are highly correlated — as the "
-                  "top row shows. Knock out scattered pixels (middle row) and the "
-                  "surrounding values still carry nearly the same information, so the "
-                  "convolution's output barely changes and little regularisation "
-                  "happens. **Spatial dropout** (bottom row) drops entire feature maps "
-                  "instead. That does have a substantial effect on specific kernel "
-                  "channels, preventing them from relying on particular correlated "
-                  "features during a training interval.", png=png)
+                  "Dropout was designed for fully connected networks, in which the removal of "
+                  "the connections of a neuron changes what is computed by the layer. In a "
+                  "convolutional network dropout is less effective. The kernel is applied "
+                  "across a *region* of the preceding feature map, and neighbouring pixels in "
+                  "a feature map are highly correlated, as shown in the top row. When "
+                  "scattered pixels are removed (middle row), nearly the same information is "
+                  "still carried by the surrounding values, so the output of the convolution "
+                  "is changed very little and little regularisation is obtained. In "
+                  "**spatial dropout** (bottom row), entire feature maps are dropped instead. "
+                  "This has a substantial effect on specific kernel channels, which are "
+                  "prevented from relying on particular correlated features during a "
+                  "training interval.",
+                  png=png)
 
 
 def fig_data_augmentation(ctx: BuildContext) -> Figure:
@@ -491,19 +537,20 @@ def fig_data_augmentation(ctx: BuildContext) -> Figure:
             s.set_linewidth(1.6 if name == "original" else 0.8)
     png = save_mpl(fig, ctx, "data_augmentation")
     return Figure("data_augmentation",
-                  "Ideally overfitting would be prevented by training on new data "
-                  "rather than repeating the same examples, but labelled datasets are "
-                  "finite and expensive to extend. **Data augmentation** modifies the "
-                  "existing data so that variations count as new training examples. "
-                  "The simplest and most effective approach is **affine transforms** — "
-                  "rotation, translation, scaling, shear — together with flips and "
-                  "photometric changes such as brightness. More complex augmentations "
-                  "exist, which remove segments of an image or combine parts of "
-                  "several, but the basic transforms work well. In Keras these are "
-                  "implemented as layers that can be placed at the input to any model. "
-                  "Note the balance: too little augmentation and the network still "
-                  "overfits, too much and it underfits, so the right level usually has "
-                  "to be found by experiment alongside the other regularisers.",
+                  "Ideally, overfitting would be prevented by training on new data rather "
+                  "than repeating the same examples, but labelled datasets are finite and "
+                  "expensive to extend. In **data augmentation** the existing data is "
+                  "modified so that variations of the images can be used as new training "
+                  "examples. The simplest and most effective approach is the use of **affine "
+                  "transforms** (rotation, translation, scaling and shear) together with "
+                  "flips and photometric changes such as brightness. More complex "
+                  "augmentations are available, in which segments of an image are removed or "
+                  "parts of several images are combined, but the basic transforms are "
+                  "effective. In PyTorch these are implemented as torchvision transforms, "
+                  "applied to each image as it is loaded during training. With too little augmentation the network still "
+                  "overfits, and with too much it underfits, so the appropriate level is "
+                  "usually found by experiment together with the other regularisation "
+                  "methods.",
                   png=png)
 
 
