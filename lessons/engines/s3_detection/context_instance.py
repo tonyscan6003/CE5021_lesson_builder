@@ -259,21 +259,38 @@ def dense_crf(img, P, iters=5, w_app=2.0, th_a=4.0, th_b=8.0, w_sm=1.0, th_g=1.0
     return out
 
 
-def fig_dense_crf(ctx: BuildContext) -> Figure:
+CRF_SIZE = (100, 67)
+CRF_W = dict(w_app=2.0, th_a=4.0, th_b=8.0, w_sm=1.0, th_g=1.0)
+
+
+def crf_inputs():
+    """The reduced image and DeepLabV3's class probabilities on it (the CRF's unary)."""
     img = _sheep400()
-    cats = D.categories("deeplab"); sheep = cats.index("sheep")
     L8 = D.semantic_scores("sheep_400", img)["logits8"]
-    W_, H_ = 100, 67
+    W_, H_ = CRF_SIZE
     small = cv2.resize(img, (W_, H_), interpolation=cv2.INTER_AREA)
     lg = np.stack([cv2.resize(L8[k], (W_, H_), interpolation=cv2.INTER_LINEAR)
                    for k in range(L8.shape[0])])
     P = np.exp(lg - lg.max(0)); P /= P.sum(0)
+    return small, P
+
+
+def crf_result():
+    """(small image, mean-field iterates Q[0..5], Mask R-CNN reference mask)."""
+    small, P = crf_inputs()
+    W_, H_ = CRF_SIZE
     res = TV.cached("dense_crf_sheep", dict(size=[W_, H_], iters=5, w=[2, 4, 8, 1, 1]),
                     lambda: dict(q=np.stack(dense_crf(small, P)).astype(np.float16)))
-    Q = res["q"].astype(np.float32)
     img800 = load_image("sheep", max_side=800)
     ref = cv2.resize(D.instance_masks("sheep", img800)["masks"].any(0).astype(np.float32),
                      (W_, H_), interpolation=cv2.INTER_AREA) > 0.5
+    return small, res["q"].astype(np.float32), ref
+
+
+def fig_dense_crf(ctx: BuildContext) -> Figure:
+    cats = D.categories("deeplab"); sheep = cats.index("sheep")
+    W_, H_ = CRF_SIZE
+    small, Q, ref = crf_result()
     iou = lambda m: (m & ref).sum() / (m | ref).sum()
     before, after = iou(Q[0].argmax(0) == sheep), iou(Q[-1].argmax(0) == sheep)
     assert after > before, (before, after)

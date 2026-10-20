@@ -13,6 +13,8 @@ Figures
                            convolution, checked against PyTorch; the checkerboard
     unpooling              max pooling with indices, unpooling, transpose convolution
     unet                   the U-Net with every shape computed
+    (slide diagrams output_tensor, fcn_architecture, transpose_1d and
+     segnet_architecture are in seg_diagrams.py)
 
 Source: reference/legacy_md/lesson_3_5_sem_seg_partA + lesson_3_5_script.
 """
@@ -25,9 +27,10 @@ from .._common import BuildContext, Figure, C, SERIES, save_mpl, load_image, syn
 from .. import _torchdet as D
 from .. import _volumes as V
 
-FIGURES = ["segmentation_types", "segmentation_datasets", "segmentation_output",
-           "segmentation_metrics", "fully_convolutional", "output_resolution",
-           "conv_as_matrix", "transpose_conv", "unpooling", "unet"]
+FIGURES = ["segmentation_types", "segmentation_datasets", "output_tensor",
+           "segmentation_output", "segmentation_metrics", "fcn_architecture",
+           "fully_convolutional", "output_resolution", "conv_as_matrix", "transpose_1d",
+           "transpose_conv", "segnet_architecture", "unpooling", "unet"]
 
 
 def voc_palette(n=256):
@@ -537,10 +540,13 @@ def fig_unet(ctx: BuildContext) -> Figure:
 
 
 def build(ctx: BuildContext) -> list[Figure]:
+    from . import seg_diagrams as SG
     return [fig_segmentation_types(ctx), fig_segmentation_datasets(ctx),
-            fig_segmentation_output(ctx), fig_segmentation_metrics(ctx),
+            SG.fig_output_tensor(ctx), fig_segmentation_output(ctx),
+            fig_segmentation_metrics(ctx), SG.fig_fcn_architecture(ctx),
             fig_fully_convolutional(ctx), fig_output_resolution(ctx), fig_conv_as_matrix(ctx),
-            fig_transpose_conv(ctx), fig_unpooling(ctx), fig_unet(ctx)]
+            SG.fig_transpose_1d(ctx), fig_transpose_conv(ctx), SG.fig_segnet_architecture(ctx),
+            fig_unpooling(ctx), fig_unet(ctx)]
 
 
 def demo() -> None:

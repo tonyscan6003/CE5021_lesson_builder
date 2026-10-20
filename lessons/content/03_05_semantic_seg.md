@@ -40,6 +40,8 @@ As with object detection, many datasets are available for semantic segmentation.
 
 In image classification and object detection, a vector of class probabilities is output, and the class is usually found with an argmax operation across the vector. In semantic segmentation a class must be predicted at every pixel, so an $H \times W \times N_{classes}$ tensor is output. The argmax is applied across all classes at each pixel position to find the class with the highest probability, and the classes are gathered into a single RGB image, with a false colour assigned to each class.
 
+{{fig output_tensor}}
+
 {{fig segmentation_output}}
 
 ## Evaluating semantic segmentation
@@ -55,6 +57,8 @@ Where the ground truth and the prediction overlap, a true positive is recorded; 
 ## Fully convolutional networks
 
 The first neural network for semantic segmentation described here is the **fully convolutional network** (FCN). It was not the first system to use neural networks for semantic segmentation, but it is reasonably simple, can be trained end to end, and is recognised as an important development; similar architectures were used in many later systems. FCN is based on a pre-trained image classifier. In an image classifier, information from across the image is aggregated into an output feature map by several convolution stages, and the feature map is converted into a vector of class probabilities by a fully connected network. For semantic segmentation the class of each pixel must be predicted, so the classifier is modified. First, the fully connected stages are converted into convolution stages, as in SSD, so that the network is fully convolutional and accepts inputs of any size.
+
+{{fig fcn_architecture}}
 
 {{fig fully_convolutional}}
 
@@ -72,6 +76,8 @@ The transpose convolution is used by FCN and many other networks to upsample fea
 
 In deep learning frameworks such as PyTorch, the transpose convolution is not performed with the transposed matrix. Instead, it is emulated by direct convolution, and the weights for the upsampling are learned with the other weights of the network. The emulated transpose convolution is also known as **fractionally strided convolution**. When a $3 \times 3$ kernel is convolved with a $4 \times 4$ input, a $2 \times 2$ output results; for the transpose, a $2 \times 2$ input must give a $4 \times 4$ output, which is achieved by padding the input with two zeros on each side and convolving with a $3 \times 3$ kernel. When a $5 \times 5$ input is convolved with a $3 \times 3$ kernel at stride 2, the transpose is obtained by inserting a zero between the samples as well as padding, followed by a direct convolution with a $3 \times 3$ kernel at stride 1, which gives a $5 \times 5$ output. The second case is the more common in semantic segmentation, where convolution with stride 2 is used for downsampling and fractionally strided convolution for upsampling.
 
+{{fig transpose_1d}}
+
 {{fig transpose_conv}}
 
 {{example transpose_conv1 seed=4}}
@@ -81,6 +87,8 @@ In deep learning frameworks such as PyTorch, the transpose convolution is not pe
 ## Encoder–decoder networks
 
 Encoder–decoder networks are an extension of the fully convolutional network. DeconvNet and SegNet proposed the same architecture, in which a complete decoding network is included after the encoding part. These networks use the encoding, or downsampling, part of VGG-16, and learn the decoding, or upsampling, part with end-to-end training. To obtain good-quality predictions, they retain and reuse the spatial information that is normally discarded by the pooling stages of the encoder. In a regular max pooling operation, the largest activation in each region is retained, and the spatial information is lost. In the encoder–decoder networks, the positions of the maxima are stored during pooling; in the decoder, an **unpooling** operation places the input values at the stored positions, and the other elements of the output remain zero. A transpose convolution is then used to interpolate this sparse feature map.
+
+{{fig segnet_architecture}}
 
 {{fig unpooling}}
 
