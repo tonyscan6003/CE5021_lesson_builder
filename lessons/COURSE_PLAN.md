@@ -1,9 +1,10 @@
 # CE5021 Deep Learning for Computer Vision — Lesson Builder Course Plan
 
-Status: **Sections 1 and 2 complete (11 lessons); Section 3's 6 to go** (2 Oct 2026).
-`lessons/site/` holds the index, 11 lesson pages and 77 figures. Section 3's
-lessons appear greyed out as "coming soon" on the index. A full clean build
-takes about 1 min 45 s, most of it lesson 2.5's image optimisations.
+Status: **all three sections complete — 17 lessons** (20 Oct 2026).
+`lessons/site/` holds the index, 17 lesson pages, 135 figures, 34 worked
+examples and 109 self-check questions. A full clean build takes about a minute
+from the committed PyTorch cache (`data/_torch/`, 15 MB); recomputing every
+network output from scratch takes about 20 minutes on the CPU.
 
 This repository was inherited from the CE6021 Machine Vision lesson builder.
 The build system, figure-engine contract, page templates, publishing scripts
@@ -25,7 +26,7 @@ can be recovered from there at any time.
 | **Section 1, all six lessons** — prose, 39 figures, 18 worked examples, 36 self-check questions | done |
 | **Section 2, all five lessons** — prose, 38 figures, 6 worked examples, 32 self-check questions | done |
 | Shared infrastructure: `_arch.py`, `_tinynet.py`, `_torchvis.py`, `_volumes.py`, `build/selfcheck_tools.py` | done (section 10) |
-| Section 3 (6 lessons) | **not started** |
+| **Section 3, all six lessons** — prose, 58 figures, 10 worked examples, 41 self-check questions | done (section 12) |
 
 ### Decisions taken
 
@@ -553,3 +554,48 @@ read as machine-written.
   should be able to:".
 - Worked examples are reproduced verbatim from the autoquiz bank and are not
   restyled.
+
+## 12. Notes from building Section 3
+
+**Real networks wherever the lesson shows real behaviour.** Section 3 uses
+torchvision's pre-trained models through `engines/_torchdet.py` (ResNet-50,
+Faster R-CNN v2, RetinaNet v2, SSD300, Mask R-CNN v2, DeepLabV3), cached in
+`data/_torch/` like lesson 2.5. Mechanisms the lessons ask students to compute
+by hand stay in NumPy (`engines/_detmetrics.py`: IoU, ranked matching, PR
+curves, interpolation, AP, NMS; selective search and objectness in
+`s3_detection/region_proposals.py`; the dense CRF in `context_instance.py`).
+Where a PyTorch operator exists, the NumPy version is checked against it
+(transpose convolution against `conv_transpose2d`; RoIPool / RoIAlign use
+torchvision's own operators).
+
+**Ground truth drawn by hand, independent of every model.** The seven sheep
+(`intro_detection.SHEEP_GT`, 800 px) and the 13 objects of lesson 3.2
+(`region_proposals.GT`, 400 px) were drawn from close-ups and checked
+against the image; detectors are scored against them, never against their
+own output.
+
+**What the measurements showed, and how the pages report it:**
+
+- 3.1: Faster R-CNN finds all seven sheep with IoU above 0.93, so the
+  "raise T2" panel uses 0.95 (the strictest COCO threshold) to produce false
+  negatives. Its real false positives (a box on one head where two sheep
+  overlap; a 'bird' on a post) are used as the error examples.
+- 3.2: the simplified objectness cues behave as the slides say — edge density
+  is fooled by water, colour contrast finds the sheep — but the combined
+  objectness misses the small sheep; the caption says so. Selective search
+  beats objectness, which beats random windows, on proposal recall.
+- 3.3: the RPN reaches 100% recall within 30 proposals on the same 13
+  objects; selective search levels off at 92% after ~170. The accuracy / speed figure uses mAP
+  read from torchvision's weight metadata and times measured on the build
+  machine (stated in the caption).
+- 3.4: on RetinaNet's real anchors for the sheep photo there are 845
+  negatives per positive; with cross-entropy the positives carry ~3% of the
+  loss, with focal loss (γ = 2) ~75% (asserted).
+- 3.6: the input-gradient "effective receptive field" is noisy; the caption
+  reports the density ratio (≈ 6× on the sheep) as well as the share outside
+  the sheep's box, rather than a contour of the noisy map. The exact dense
+  CRF improves DeepLab's sheep IoU against Mask R-CNN's masks (asserted).
+
+**Cache hygiene.** Exploratory calls also write to `data/_torch/`. Before
+committing, delete files no figure uses and rebuild: a needed file that was
+deleted is recomputed and reported as "computed".

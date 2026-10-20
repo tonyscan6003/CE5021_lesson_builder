@@ -1,0 +1,60 @@
+# 3.6 Context and instance segmentation
+# Written against lesson_3_6_sem_seg_partB / lesson_3_6_script; dilated
+# convolution arithmetic is practised in the dilated_conv worked example (from
+# Grasple_transpose_dilated_conv).
+- q: Why can a lack of context cause errors in semantic segmentation?
+  options:
+    - Because the image resolution is too high
+    - Because a pixel's label depends on the surrounding scene, and a network with too small a receptive field cannot see it
+    - Because pooling layers add context
+    - Because context increases the number of classes
+  answer: 1
+  explain: A boat on a lake can be mislabelled as a car if the network does not take the water into account. A larger receptive field lets deep neurons use the surrounding scene.
+- q: Three 3 × 3 convolutions with dilation rates 1, 2 and 4 are stacked. What is the receptive field of one output pixel?
+  options:
+    - 9 × 9
+    - 27 × 27
+    - 15 × 15
+    - 7 × 7
+  answer: 2
+  explain: 'Each dilated 3 × 3 convolution adds 2·d: 1 + 2(1 + 2 + 4) = 15. With dilation 1 at every layer it would be only 7 × 7, for the same 27 weights.'
+- q: How does the number of parameters of a 3 × 3 convolution change when its dilation rate is increased from 1 to 4?
+  options:
+    - It increases sixteenfold
+    - It decreases
+    - It increases fourfold
+    - It is unchanged
+  answer: 3
+  explain: The kernel still has 9 weights per channel; they are applied to more widely spaced inputs, so the receptive field grows at no extra cost.
+- q: What does the pyramid pooling module of PSPNet contribute to the segmentation?
+  options:
+    - It removes the need for a backbone network
+    - It aggregates information at several scales by pooling the feature map to 1 × 1, 2 × 2, 3 × 3 and 6 × 6 bins and concatenating the upsampled results with the features
+    - It upsamples the output with a learned decoder
+    - It detects object instances
+  answer: 1
+  explain: The pooled maps summarise the whole scene and its regions; concatenated with the original features they give every pixel access to global and regional context.
+- q: What is a conditional random field used for in DeepLab?
+  options:
+    - As post-processing that sharpens the segmentation by encouraging nearby pixels of similar colour to take the same label
+    - To compute the IoU
+    - To replace the backbone network
+    - To generate region proposals
+  answer: 0
+  explain: The CRF's pairwise terms connect every pair of pixels; mean-field inference refines the network's blurred boundaries towards the image edges.
+- q: Why does Mask R-CNN replace RoI pooling with RoIAlign?
+  options:
+    - RoI pooling quantises the region to whole feature-map cells, misaligning the features with the region; RoIAlign interpolates the features at exact positions
+    - RoI pooling cannot handle rectangular regions
+    - RoIAlign produces larger outputs
+    - RoIAlign is faster
+  answer: 0
+  explain: For pixel-accurate masks the features must correspond exactly to the proposed region. Removing the quantisation was found to be the key to good mask prediction.
+- q: Mask R-CNN predicts a mask for each class. Which mask is used for a detected object?
+  options:
+    - The average of all the masks
+    - The mask with the largest area
+    - The mask of the class predicted by the classification branch
+    - The mask of the background class
+  answer: 2
+  explain: The classification branch decides the class; only that class's m × m mask is resized into the predicted box.

@@ -353,3 +353,53 @@ def vgg_fully_convolutional(key: str, img: np.ndarray, cls: int) -> dict:
                     p5_shape=np.array(p5.shape[1:]),
                     check=np.array(float((a[0] - b[0, :, 0, 0]).abs().max())))
     return TV.cached(f"vgg_fcn_{key}", dict(key=key, shape=img.shape, cls=cls), run)
+
+
+def deeplab_internals(key: str, img: np.ndarray, point: tuple, cls_name: str) -> dict:
+    """DeepLabV3 internals for one image: the backbone's 2048-channel output
+    (stride 8), the ASPP dilation rates of the model, and the effective
+    receptive field of one output pixel: |d score(cls, point) / d input|,
+    summed over the colour channels."""
+    def run():
+        import torch
+        net, w = _load("deeplab")
+        cats = w.meta["categories"]
+        c = cats.index(cls_name)
+        x = w.transforms(resize_size=None)(_tensor(img))[None].requires_grad_(True)
+        feats = net.backbone(x)["out"]
+        logits = net.classifier(feats)
+        up = torch.nn.functional.interpolate(logits, size=img.shape[:2], mode="bilinear",
+                                             align_corners=False)
+        up[0, c, point[1], point[0]].backward()
+        erf = x.grad[0].abs().sum(0)
+        aspp = net.classifier[0]
+        rates = [m[0].dilation[0] for m in aspp.convs[1:4]]
+        return dict(erf=erf.detach().cpu().numpy().astype(np.float32),
+                    feats=feats[0].detach().cpu().numpy().astype(np.float16),
+                    rates=np.array(rates), aspp_out=np.array(aspp.project[0].out_channels))
+    return TV.cached(f"deeplab_int_{key}", dict(key=key, shape=img.shape, point=list(point),
+                                                cls=cls_name), run)
+
+
+def mask_head_outputs(key: str, img: np.ndarray, score_min=0.5) -> dict:
+    """Mask R-CNN's own m x m mask predictions (before they are resized into
+    the boxes), captured from the mask head, for the final detections."""
+    def run():
+        import torch
+        net, _ = _load("mask_rcnn")
+        store = {}
+        h = net.roi_heads.mask_predictor.register_forward_hook(
+            lambda m, i, o: store.__setitem__("logits", o))
+        with torch.no_grad():
+            out = net([_tensor(img)])[0]
+        h.remove()
+        lg = store["logits"]                                  # (N, classes, 28, 28)
+        lab = out["labels"]
+        m = lg[torch.arange(len(lab)), lab].sigmoid()
+        keep = out["scores"] >= score_min
+        return dict(small=m[keep].cpu().numpy().astype(np.float16),
+                    boxes=out["boxes"][keep].cpu().numpy().astype(np.float32),
+                    labels=lab[keep].cpu().numpy().astype(np.int16),
+                    scores=out["scores"][keep].cpu().numpy().astype(np.float32),
+                    full=(out["masks"][keep][:, 0] * 255).to(torch.uint8).cpu().numpy())
+    return TV.cached(f"mask_head_{key}", dict(key=key, shape=img.shape, score_min=score_min), run)

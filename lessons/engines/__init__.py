@@ -3,8 +3,8 @@
 REGISTRY lists every engine module in course order together with the lesson
 it belongs to and the title shown in the Streamlit examples app.
 
-Only the lessons that have been built appear here; see COURSE_PLAN.md for the
-full 17-lesson map and the build order.
+All 17 lessons of the course plan are registered; see COURSE_PLAN.md for the
+lesson map.
 """
 
 REGISTRY = [
@@ -25,4 +25,5 @@ REGISTRY = [
     ("s3_detection.two_stage",           "03_03", "3.3 Two-stage detectors"),
     ("s3_detection.single_stage",        "03_04", "3.4 Single-stage detectors"),
     ("s3_detection.semantic_seg",        "03_05", "3.5 Semantic segmentation"),
+    ("s3_detection.context_instance",    "03_06", "3.6 Context & instance segmentation"),
 ]
