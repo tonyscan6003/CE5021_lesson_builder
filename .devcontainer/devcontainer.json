@@ -3,6 +3,9 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  // GPU passthrough for PyTorch. Needs the NVIDIA driver on the host (on
+  // Windows/WSL2: the Windows NVIDIA driver and Docker Desktop's WSL2 backend).
+  "runArgs": ["--gpus=all"],
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"

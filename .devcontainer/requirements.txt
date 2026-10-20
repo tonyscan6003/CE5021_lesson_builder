@@ -1,4 +1,4 @@
-# CE6021 lesson builder — figure engines, site builder and interactive examples.
+# CE5021 lesson builder — figure engines, site builder and interactive examples.
 # Installed into the devcontainer image by .devcontainer/Dockerfile.
 
 # Figure engines and interactive examples
@@ -10,6 +10,12 @@ scikit-learn
 matplotlib
 plotly
 streamlit
+
+# Deep learning: pre-trained VGG-16 for the lesson 2.5 feature-visualisation
+# figures. The PyPI wheels include CUDA and use the GPU when the container is
+# started with --gpus=all (see devcontainer.json).
+torch
+torchvision
 
 # Site builder
 markdown-it-py

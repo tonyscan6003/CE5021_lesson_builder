@@ -2,20 +2,19 @@
 
 Figures
     reconstruction          inversion: what survives of an image at increasing depth
-    activation_maximisation the input that most excites one unit, at four depths
+    activation_maximisation the input that most excites one unit / one channel, five layers
     class_templates         activation maximisation on a trained classifier's outputs
-    texture_statistics      style as Gram matrices; textures re-synthesised from them
+    style_transfer          Gram-matrix texture synthesis and full style transfer
     style_transfer_loop     how content and style losses combine into style transfer
     deep_dream              gradient ascent on a photo, amplifying what a layer sees
     adversarial_fgsm        the fast gradient sign attack, and why it is not just noise
     patch_attack            changing only a small patch — the stop-sign stickers
     pose_generalisation     accuracy as test digits are rotated away from upright
 
-Two genuine models are used, and the captions say which:
-  * engines/_fixednet.py — a FIXED network (a Gabor filter bank, ReLU and
-    pooling) with an exact input gradient. The visualisation algorithms run on
-    it for real; what they reveal is how depth and pooling change what a layer
-    retains, not what a trained CNN has learned.
+Genuine trained models are used throughout:
+  * engines/_torchvis.py — VGG-16 with its ImageNet weights (PyTorch), for
+    reconstruction, activation maximisation, style transfer and deep dream.
+    Results are cached in data/_torch/ and recomputed when the settings change.
   * a softmax classifier TRAINED on the sklearn digits. The adversarial and
     generalisation experiments attack and test this real trained model.
 
@@ -29,62 +28,20 @@ import matplotlib.pyplot as plt
 from scipy import ndimage
 
 from .._common import BuildContext, Figure, C, SERIES, save_mpl, plotly_html, load_image, use_source
-from .. import _fixednet as FN
+from .. import _torchvis as TV
+
+# channels of the five style layers conv1_1 ... conv5_1 of VGG-16
+TV_STYLE_CHANNELS = (64, 128, 256, 512, 512)
 
 FIGURES = ["reconstruction", "activation_maximisation", "class_templates",
-           "texture_statistics", "style_transfer_loop", "deep_dream",
+           "style_transfer", "style_transfer_loop", "deep_dream",
            "adversarial_fgsm", "patch_attack", "pose_generalisation"]
-
-DEPTHS = (0, 2, 3, 4)
-
-
-def receptive_field(depth, k=FN.BANK.shape[-1]):
-    """conv k x k (stride 1) then average pooling 2^d at stride 2^d (lesson 1.4)."""
-    p = 2 ** depth
-    r = 1
-    r = p * r + (p - p)          # back through the pooling layer (k = s = p)
-    r = 1 * r + (k - 1)          # back through the convolution (stride 1)
-    return r
-
 
 def _square(img, n):
     h, w = img.shape[:2]
     s = min(h, w)
     img = img[(h - s) // 2:(h - s) // 2 + s, (w - s) // 2:(w - s) // 2 + s]
     return cv2.resize(img, (n, n), interpolation=cv2.INTER_AREA)
-
-
-def _texture_crop(key, frac, n=64):
-    im = load_image(key)
-    h, w = im.shape[:2]
-    y0, y1, x0, x1 = frac
-    return _square(im[int(y0 * h):int(y1 * h), int(x0 * w):int(x1 * w)], n).transpose(2, 0, 1) / 255.0
-
-
-def synthesise_texture(style, depths=(0, 1, 2), iters=150, seed=0):
-    """Gatys-style texture synthesis: match only the Gram matrices (plus mean colour),
-    starting from noise. No content term, so the layout is free to change."""
-    gs = {d: FN.gram(FN.features(style, d)[0]) for d in depths}
-    gss = {d: (g ** 2).sum() for d, g in gs.items()}
-    mu = style.mean((1, 2), keepdims=True)
-
-    def fg(x):
-        tot, grad = 0.0, np.zeros_like(x)
-        for d, G0 in gs.items():
-            phi, cache = FN.features(x, d)
-            Fm = phi.reshape(phi.shape[0], -1)
-            dG = Fm @ Fm.T / Fm.shape[1] - G0
-            tot += (dG ** 2).sum() / gss[d]
-            grad += FN.backward(((4.0 / gss[d]) * (dG @ Fm) / Fm.shape[1]).reshape(phi.shape),
-                                cache)
-        dm = x.mean((1, 2), keepdims=True) - mu      # Gabor filters are zero-mean, so
-        tot += 5 * (dm ** 2).sum()                   # colour must be matched separately
-        grad += 10 * dm / (x.shape[1] * x.shape[2])
-        t, gt = FN.tv(x)
-        return tot + 2e-5 * t, grad + 2e-5 * gt     # just enough to suppress pixel noise
-
-    x0 = np.random.default_rng(seed).uniform(0.3, 0.7, style.shape)
-    return FN.optimise(fg, x0, iters)[0]
 
 
 # -- the trained classifier ------------------------------------------------------
@@ -147,76 +104,90 @@ def patch_attack(x, y, W, b, size=3, steps=40, alpha=0.25):
 # Figures
 # ---------------------------------------------------------------------------
 
+REC_LAYERS = ["conv1_2", "conv2_2", "conv3_3", "conv4_3", "conv5_3"]
+
+
 def fig_reconstruction(ctx: BuildContext) -> Figure:
-    img = _square(load_image("owl", gray=True), 96) / 255.0
-    recs = [FN.reconstruct(img, d, iters=200) for d in DEPTHS]
-    corr = [np.corrcoef(img.ravel(), r.ravel())[0, 1] for r in recs]
-    fig, axes = plt.subplots(1, 5, figsize=(13.5, 3.3))
-    axes[0].imshow(img, cmap="gray", vmin=0, vmax=1)
-    axes[0].set_title("target image", fontsize=10)
-    for ax, d, r, cc in zip(axes[1:], DEPTHS, recs, corr):
-        ax.imshow(r, cmap="gray", vmin=0, vmax=1)
-        fm = 96 // 2 ** d
-        ax.set_title(f"from depth {d}: {fm}×{fm} maps\ncorrelation {cc:.2f}", fontsize=9.5)
+    img = _square(load_image("owl"), 224)
+    # the smoothness penalty must grow with depth: deep features constrain the
+    # pixels less, and without it the deep reconstructions drown in noise
+    tv = {"conv1_2": 1.0, "conv2_2": 2.0, "conv3_3": 4.0, "conv4_3": 10.0, "conv5_3": 10.0}
+    cfg = dict(image="owl", size=224, layers=REC_LAYERS, iters=500, tv=tv)
+    rec = TV.cached("reconstruction", cfg, lambda: {
+        l: TV.reconstruct(img, l, iters=cfg["iters"], tv_weight=tv[l]) for l in REC_LAYERS})
+    g = lambda a: a.astype(float).mean(2).ravel()
+    corr = [np.corrcoef(g(img), g(rec[l]))[0, 1] for l in REC_LAYERS]
+    fig, axes = plt.subplots(1, 6, figsize=(14, 2.9))
+    axes[0].imshow(img); axes[0].set_title("target image", fontsize=10)
+    for ax, l, cc in zip(axes[1:], REC_LAYERS, corr):
+        ax.imshow(rec[l])
+        n = 224 // 2 ** (int(l[4]) - 1)
+        ax.set_title(f"from {l}: {n}×{n} maps\ncorrelation {cc:.2f}", fontsize=9.5)
     for ax in axes:
         ax.set_xticks([]); ax.set_yticks([])
     png = save_mpl(fig, ctx, "reconstruction")
     return Figure("reconstruction",
-                  "**Reconstruction** (inversion) is used to determine what information "
-                  "about the image is retained in the feature maps of a layer. The target is "
-                  "passed through the network and its features at one depth are stored. "
-                  "Starting from random noise, the *pixels* are then adjusted by gradient "
-                  "descent until the same features are produced by the noise image, with a "
-                  "smoothness penalty used as a regulariser so that the result looks "
-                  "natural. From the earliest features the reconstruction is almost exact. "
-                  "From deeper features detail is lost, and only an increasingly abstract "
-                  "composition of the image is retained, as shown by the decreasing "
-                  "correlation with the original. The network used here is fixed, consisting "
-                  "of oriented Gabor filters, ReLU and pooling, with 'deeper' meaning more "
-                  "pooling, rather than a trained CNN; it therefore shows the algorithm and "
-                  "the effect of depth, but not what is encoded in the deep layers of a "
-                  "trained network. In a trained network, *semantic* information about "
-                  "objects is retained in the deep layers instead.",
+                  "**Reconstruction** (inversion) with VGG-16 trained on ImageNet. The "
+                  "target image is passed through the network and its features at one layer "
+                  "are stored. Starting from random noise, the *pixels* are then adjusted by "
+                  "gradient descent until the same features are produced, with a smoothness "
+                  "(total variation) penalty used as a regulariser so that the result looks "
+                  "natural. From the early layers the reconstruction is almost exact, as many "
+                  "low-level features are retained. From deeper layers the fine detail and "
+                  "the exact colours are lost, and an increasingly abstract version of the "
+                  "image is recovered, in which the parts of the owl that the network uses "
+                  "for recognition, such as the eyes and the texture of the feathers, are "
+                  "retained in approximately the right places. The correlation with the "
+                  "target decreases with depth accordingly.",
                   png=png)
 
 
+AM_LAYERS = {"conv1_2": 25, "conv2_2": 120, "conv3_3": 140, "conv4_3": 260, "conv5_3": 280}
+
+
 def fig_activation_maximisation(ctx: BuildContext) -> Figure:
-    filters = [0, 2, 4, 6]            # four orientations, even phase, short wavelength
-    n = 64
-    fig, axes = plt.subplots(len(filters), len(DEPTHS), figsize=(10, 9.4))
-    for j, d in enumerate(DEPTHS):
-        rf = receptive_field(d)
-        # the maximised unit is the centre of the POOLED map, which covers input
-        # pixels cy*p .. cy*p+p-1, widened by the kernel's half-width each side
-        p_, half = 2 ** d, FN.BANK.shape[-1] // 2
-        left = (n // p_) // 2 * p_ - half - 0.5
-        for i, f in enumerate(filters):
-            x = FN.activation_max(n, d, f)
-            ax = axes[i, j]
-            ax.imshow(x, cmap="gray", vmin=x.min(), vmax=x.max())
-            ax.add_patch(plt.Rectangle((left, left), rf, rf,
-                                       fill=False, ec=C["red"], lw=1.2, ls="--"))
-            ax.set_xticks([]); ax.set_yticks([])
-        axes[0, j].set_title(f"depth {d}\nreceptive field {rf} × {rf}", fontsize=10)
-    for i, f in enumerate(filters):
-        axes[i, 0].set_ylabel(f"filter {f // 2 + 1}", fontsize=9)
+    size = 224
+    cfg = dict(layers=AM_LAYERS, size=size, steps=384)
+    res = TV.cached("activation_maximisation", cfg, lambda: {
+        f"{l}_{mode}": TV.activation_max(l, ch, unit=(mode == "unit"), size=size,
+                                         steps=cfg["steps"])
+        for l, ch in AM_LAYERS.items() for mode in ("unit", "channel")})
+    fig, axes = plt.subplots(2, len(AM_LAYERS), figsize=(14, 6.1))
+    for j, (l, ch) in enumerate(AM_LAYERS.items()):
+        stride = 2 ** (int(l[4]) - 1)
+        rf = TV.RF[l]
+        # the maximised unit is the centre of the feature map; its receptive
+        # field is centred on the input pixels that unit's position covers
+        c = (size // stride) // 2 * stride + (stride - 1) / 2
+        ax = axes[0, j]
+        ax.imshow(res[f"{l}_unit"])
+        ax.add_patch(plt.Rectangle((c - rf / 2, c - rf / 2), rf, rf, fill=False,
+                                   ec="white", lw=1.4, ls="--"))
+        ax.set_title(f"{l}, channel {ch}\nreceptive field {rf} × {rf}", fontsize=9.5)
+        axes[1, j].imshow(res[f"{l}_channel"])
+    axes[0, 0].set_ylabel("one unit\n(centre of the map)", fontsize=9.5)
+    axes[1, 0].set_ylabel("whole channel", fontsize=9.5)
+    for ax in axes.ravel():
+        ax.set_xticks([]); ax.set_yticks([])
     png = save_mpl(fig, ctx, "activation_maximisation")
     return Figure("activation_maximisation",
-                  "**Activation maximisation** is used to find the input to which one neuron "
-                  "responds most strongly. Starting from a near-blank image, the pixels are "
-                  "changed by **gradient ascent**, as the quantity is to be maximised, to "
-                  "increase the output of one unit, here the centre of one feature map. A "
-                  "penalty on the pixel values prevents the image from developing extreme "
-                  "noise patterns that would also excite the unit. Each row corresponds to a "
-                  "different filter, and each column to a deeper layer of the same fixed "
-                  "network. The preferred stimulus is the oriented grating of that filter, "
-                  "and it **increases in size with depth**, as the receptive field of the "
-                  "unit increases; the dashed square is the receptive field calculated with "
-                  "the formula of Lesson 1.4. The same increase is seen in the VGG-16 "
-                  "visualisations in the lecture slides. In a trained network the content "
-                  "also changes with depth, from edges and colour blobs to textures to parts "
-                  "of objects; as this fixed network detects only edges, only the size "
-                  "changes here.",
+                  "**Activation maximisation** with VGG-16 trained on ImageNet: the input "
+                  "image to which a neuron responds most strongly. Starting from a "
+                  "near-blank image, the pixels are changed by **gradient ascent**, as the "
+                  "quantity is to be maximised. As many unnatural noise patterns would also "
+                  "excite the neuron, regularisation is required; here the image is "
+                  "randomly shifted at every step and a smoothness penalty is applied, so "
+                  "that only patterns to which the neuron responds robustly are retained. "
+                  "Top row: one unit, the centre of one feature map, is maximised in each of "
+                  "five layers, starting from a grey image. Only the pixels within the "
+                  "receptive field of the unit (dashed, calculated with the formula of "
+                  "Lesson 1.4) can affect it, so the pattern is confined to the receptive "
+                  "field, apart from a faint halo caused by the random shifts, and "
+                  "**increases in size with depth**; the rest of the image remains grey. Bottom row: the same channels maximised over the whole feature map, "
+                  "with the image optimised in a smoothed frequency representation, which "
+                  "shows the feature itself. Early layers respond to colours and oriented edges, the middle "
+                  "layers to textures and repeated patterns, and the deepest layers to "
+                  "complex structures resembling parts of objects.",
                   png=png)
 
 
@@ -257,39 +228,52 @@ def fig_class_templates(ctx: BuildContext) -> Figure:
                   png=png)
 
 
-def fig_texture_statistics(ctx: BuildContext) -> Figure:
-    srcs = [("zebra", (0.25, 0.7, 0.3, 0.75)), ("brickwork", (0.0, 0.45, 0.0, 1.0)),
-            ("macaw", (0.3, 0.9, 0.45, 0.95))]
-    styles = [(k, _texture_crop(k, f)) for k, f in srcs]
-    synths = [synthesise_texture(s) for _, s in styles]
-    fig, axes = plt.subplots(2, 3, figsize=(10, 7.0))
-    for j, ((k, s), syn) in enumerate(zip(styles, synths)):
-        axes[0, j].imshow(s.transpose(1, 2, 0))
-        axes[0, j].set_title(f"texture: {k}", fontsize=10)
-        axes[1, j].imshow(syn.transpose(1, 2, 0))
-        axes[1, j].set_title("re-synthesised from noise\nby matching only its Gram matrices",
-                             fontsize=9.5)
-        for r in range(2):
-            axes[r, j].set_xticks([]); axes[r, j].set_yticks([])
-    png = save_mpl(fig, ctx, "texture_statistics")
-    return Figure("texture_statistics",
-                  "The representation of style in a network. The **Gram matrix** of a layer "
-                  "is the inner product of every pair of its feature maps, summed over all "
-                  "positions: entry (i, j) is large when features i and j tend to be active "
-                  "together anywhere in the image. As the sum is taken over positions, "
+ST_CONTENT = "sacre_coeur"
+
+
+def fig_style_transfer(ctx: BuildContext) -> Figure:
+    content = load_image(ST_CONTENT, max_side=320)
+    style = load_image("starry_night", max_side=320)
+    # style weights β relative to a content weight α = 1
+    BETAS = (1e6, 1e7)
+    cfg = dict(content=ST_CONTENT, style="starry_night", side=320, iters=500,
+               betas=BETAS, tv=1.0)
+    res = TV.cached("style_transfer", cfg, lambda: {
+        "texture": TV.style_transfer(None, style, size=content.shape[:2], iters=cfg["iters"],
+                                     style_weight=BETAS[0], tv_weight=cfg["tv"]),
+        **{f"transfer_{b:g}": TV.style_transfer(content, style, iters=cfg["iters"],
+                                                style_weight=b, tv_weight=cfg["tv"])
+           for b in BETAS}})
+    fig, axes = plt.subplots(1, 5, figsize=(16, 3.1))
+    panels = [(content, "(a) content image"), (style, "(b) style image"),
+              (res["texture"], "(c) style only:\ntexture synthesis"),
+              (res[f"transfer_{BETAS[0]:g}"], f"(d) style transfer\nβ/α = $10^{{{np.log10(BETAS[0]):.0f}}}$"),
+              (res[f"transfer_{BETAS[1]:g}"], f"(e) more weight on style\nβ/α = $10^{{{np.log10(BETAS[1]):.0f}}}$")]
+    for ax, (im, title) in zip(axes, panels):
+        ax.imshow(im); ax.set_title(title, fontsize=10)
+        ax.set_xticks([]); ax.set_yticks([])
+    png = save_mpl(fig, ctx, "style_transfer")
+    nch = sum(TV_STYLE_CHANNELS)
+    return Figure("style_transfer",
+                  "Style transfer with VGG-16 trained on ImageNet. The **Gram matrix** of a "
+                  "layer is the inner product of every pair of its feature maps, summed over "
+                  "all positions: entry (i, j) is large when features i and j tend to be "
+                  "active together anywhere in the image. As the sum is taken over positions, "
                   "information about *where* features occur is discarded and only "
                   "information about *which features co-occur* is retained, which "
-                  "corresponds to texture. For this network the Gram matrix of a colour "
-                  f"image is {3 * len(FN.BANK)} × {3 * len(FN.BANK)}, with one row and "
-                  "column per feature map, regardless of the image size. The bottom row "
-                  "shows that texture is captured by the Gram matrix: when the pixels of a "
-                  "noise image are adjusted until the Gram matrices match (at three depths), "
-                  "the stripes, bricks and feathers are recovered, with the correct "
-                  "orientations and colours but a completely different layout. This is run "
-                  "on the fixed Gabor network of this lesson, whose features are sufficient "
-                  "for texture. Full style transfer also requires a content term from the "
-                  "deep layers of a *trained* network, which this network does not have; "
-                  "the combination of the two is shown in the next figure.",
+                  "corresponds to style, or texture. Gram matrices are taken from five "
+                  f"layers, conv1_1 to conv5_1, {nch:,} rows and columns in total, so that "
+                  "texture is captured at small scales in the early layers and at larger "
+                  "scales in the deeper layers. (c) When a noise image is adjusted until "
+                  "only its Gram matrices match those of the style image, the brush strokes, "
+                  "swirls and colours of the painting are reproduced but its layout is not. "
+                  "(d) When a content loss on a deep layer (conv4_2) of the content image is "
+                  "added, the noise image converges to the building of the content image "
+                  "painted in the style of the artwork. (e) The balance is set by the ratio "
+                  "of the style weight β to the content weight α: when β/α is increased "
+                  "tenfold, the style dominates and the building is only partly preserved. "
+                  "All of the generated images are produced from random noise, as described "
+                  "in the steps below.",
                   png=png)
 
 
@@ -347,37 +331,35 @@ def fig_style_transfer_loop(ctx: BuildContext) -> Figure:
                   png=png)
 
 
+DD_LAYERS = ["conv4_3", "conv5_3"]
+
+
 def fig_deep_dream(ctx: BuildContext) -> Figure:
-    src = load_image("pyramids", gray=True)
-    g = cv2.resize(src, (176, 128), interpolation=cv2.INTER_AREA) / 255.0
-    pad = 12
-    gp = np.pad(g, pad, mode="reflect")          # reflect-pad so the border does not
-    outs = []                                    # get dreamed into a frame
-    for d in (1, 3):
-        outs.append(FN.deep_dream(gp, d, steps=40)[pad:-pad, pad:-pad])
-    fig, axes = plt.subplots(1, 3, figsize=(13, 3.6))
-    axes[0].imshow(g, cmap="gray", vmin=0, vmax=1); axes[0].set_title("input photograph",
-                                                                     fontsize=10)
-    for ax, o, d in zip(axes[1:], outs, (1, 3)):
-        ax.imshow(o, cmap="gray", vmin=0, vmax=1)
-        ax.set_title(f"after 40 steps of gradient ascent on depth {d}", fontsize=10)
+    src = load_image("pyramids", max_side=448)
+    cfg = dict(image="pyramids", side=448, layers=DD_LAYERS, octaves=4, steps=24)
+    res = TV.cached("deep_dream", cfg, lambda: {
+        l: TV.deep_dream(src, l, octaves=cfg["octaves"], steps=cfg["steps"])
+        for l in DD_LAYERS})
+    fig, axes = plt.subplots(1, 3, figsize=(14, 3.6))
+    axes[0].imshow(src); axes[0].set_title("content image", fontsize=10)
+    for ax, l in zip(axes[1:], DD_LAYERS):
+        ax.imshow(res[l]); ax.set_title(f"deep dream on {l}", fontsize=10)
     for ax in axes:
         ax.set_xticks([]); ax.set_yticks([])
     png = save_mpl(fig, ctx, "deep_dream")
     return Figure("deep_dream",
-                  "**Deep dream** is activation maximisation started from a photograph "
-                  "rather than noise. The network responds to the features already present "
-                  "in the photograph, and these responses are amplified by gradient ascent, "
-                  "so that the image is modified towards whatever the layer detects in it. "
-                  "When run on the fixed network of this lesson, whose only features are "
-                  "oriented edges, only edges can be amplified: the outlines of the pyramids "
-                  "are reinforced and surrounded by halos, more coarsely for the deeper, more "
-                  "pooled layer. With a trained network, when many deep layers are "
-                  "maximised together, learned parts of objects are amplified instead, which "
-                  "produces the characteristic hallucinatory images: horizon lines become "
-                  "towers and pagodas, and leaves become birds and insects. These results "
-                  "reveal the associations learned by the network between image features "
-                  "and concepts.",
+                  "**Deep dream** with VGG-16 trained on ImageNet: activation maximisation "
+                  "started from a photograph rather than noise. The network responds to "
+                  "the features already present in the photograph, and these responses are "
+                  "amplified by gradient ascent, so that the image is modified towards "
+                  "whatever the layer detects in it. The ascent is repeated at four scales "
+                  "(octaves), from coarse to fine, so that features of every size are "
+                  "amplified. With conv4_3, dog-like faces and eyes appear over the pyramids "
+                  "and the sky is covered in repeated patterns; with the deepest layer, "
+                  "conv5_3, larger insect-like and bird-like creatures emerge from the "
+                  "outlines of the pyramids. Many ImageNet classes are breeds of dog, birds "
+                  "and insects, and these results reveal the associations learned by the "
+                  "network between image features and the objects of those classes.",
                   png=png)
 
 
@@ -546,9 +528,8 @@ def fig_pose_generalisation(ctx: BuildContext) -> Figure:
 
 
 def build(ctx: BuildContext) -> list[Figure]:
-    FN.gradcheck()
     return [fig_reconstruction(ctx), fig_activation_maximisation(ctx),
-            fig_class_templates(ctx), fig_texture_statistics(ctx),
+            fig_class_templates(ctx), fig_style_transfer(ctx),
             fig_style_transfer_loop(ctx), fig_deep_dream(ctx),
             fig_adversarial_fgsm(ctx), fig_patch_attack(ctx),
             fig_pose_generalisation(ctx)]
@@ -589,10 +570,12 @@ def demo() -> None:
 
     with tab2:
         key = st.selectbox("image", ["owl", "lion", "zebra", "sphinx"])
-        d = st.slider("depth (more pooling)", 0, 4, 2)
+        layer = st.select_slider("VGG-16 layer", REC_LAYERS, value="conv3_3")
+        st.caption(f"running on {TV.device()}")
         if st.button("reconstruct from noise"):
-            img = _square(load_image(key, gray=True), 96) / 255.0
-            r = FN.reconstruct(img, d, iters=150)
+            img = _square(load_image(key), 160)
+            with st.spinner("optimising the image..."):
+                r = TV.reconstruct(img, layer, iters=150)
             c1, c2 = st.columns(2)
-            c1.image(img, caption="target", clamp=True)
-            c2.image(r, caption=f"from depth {d} features", clamp=True)
+            c1.image(img, caption="target")
+            c2.image(r, caption=f"from {layer} features")

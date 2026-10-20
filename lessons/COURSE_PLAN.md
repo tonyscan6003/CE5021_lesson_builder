@@ -24,7 +24,7 @@ can be recovered from there at any time.
 | CE6021 content and engines retired; `s1_convnets/` created | done |
 | **Section 1, all six lessons** — prose, 39 figures, 18 worked examples, 36 self-check questions | done |
 | **Section 2, all five lessons** — prose, 38 figures, 6 worked examples, 32 self-check questions | done |
-| Shared infrastructure: `_arch.py`, `_tinynet.py`, `_fixednet.py`, `_volumes.py`, `build/selfcheck_tools.py` | done (section 10) |
+| Shared infrastructure: `_arch.py`, `_tinynet.py`, `_torchvis.py`, `_volumes.py`, `build/selfcheck_tools.py` | done (section 10) |
 | Section 3 (6 lessons) | **not started** |
 
 ### Decisions taken
@@ -32,15 +32,16 @@ can be recovered from there at any time.
 1. **CE6021 content is replaced, not kept alongside.** `content/`, `engines/s1_*`
    … `s6_*` and `content/_selfcheck/` are rewritten for CE5021. The baseline
    commit is the archive.
-2. **No deep-learning framework is added.** Figures are NumPy + matplotlib +
-   Plotly, as now. Everything CE5021 needs to *show* — convolution arithmetic,
-   receptive fields, transpose and dilated convolution, batch norm, dropout,
-   LR schedules, loss curves, PR/AP curves, IoU, anchor boxes, NMS — is exactly
-   computable without one. Published architectures (AlexNet, VGG, Inception,
-   ResNet, DenseNet, U-Net, SSD, FPN, Mask R-CNN) become schematic block
-   diagrams whose parameter counts, FLOPs, memory and output sizes are
-   **computed at build time from the layer specification**, not typed in.
-   See "Why no PyTorch" below for what this costs.
+2. **NumPy by default; PyTorch only where a trained network is the point.**
+   Figures are NumPy + matplotlib + Plotly. Everything CE5021 needs to *show*
+   about mechanisms — convolution arithmetic, receptive fields, transpose and
+   dilated convolution, batch norm, dropout, LR schedules, loss curves, PR/AP
+   curves, IoU, anchor boxes, NMS — is exactly computable without a framework.
+   Published architectures become block diagrams whose parameter counts, FLOPs,
+   memory and output sizes are **computed at build time from the layer
+   specification**. The exception, added after Section 2 was first built, is
+   lesson 2.5's feature visualisation, which runs on a pre-trained VGG-16 in
+   PyTorch (`engines/_torchvis.py`); see section 5.
 3. **Lesson 1.6 does not exist** in the source material and 1.7 is renumbered
    to 1.6, so Section 1 is a contiguous 1.1–1.6.
 4. **Lesson 3.7 (Pose Estimation) is dropped** — no longer on the syllabus. Its
@@ -331,34 +332,28 @@ are the priority — they carry most of the exam question types.
 
 ---
 
-## 5. Why no PyTorch
+## 5. Where PyTorch is used
 
-Worth recording, because it is the one place this course plan gives something
-up. CE5021 is a deep-learning module, and a reader may reasonably expect
-figures showing real feature maps from a real trained network.
+The course plan started NumPy-only. That gave every mechanism figure numbers
+the student can check by hand, a small container and a fast, offline build — and
+it still does for everything except one lesson.
 
-What the NumPy-only decision costs, concretely:
+**Lesson 2.5** (reconstruction, activation maximisation, style transfer, deep
+dream) is about what a *trained* network has learned, and a fixed stand-in
+network (the Gabor filter bank first used here) could only show how each
+algorithm works, not what it reveals. Those four figures therefore run on
+torchvision's VGG-16 with its ImageNet weights, through `engines/_torchvis.py`:
 
-- 2.5 runs every visualisation algorithm for real, but on a *fixed* Gabor-filter
-  network (`_fixednet.py`) rather than a trained CNN, so it shows how each
-  technique works and how depth changes what survives — not what a trained
-  network's deep layers know. Full style transfer is shown as a diagram plus
-  genuine Gram-matrix texture synthesis, because with one fixed layer of
-  features the full transfer was not convincing. The adversarial and
-  generalisation figures attack a genuinely trained classifier on the digits.
-- 3.3–3.6 show detector and segmentation *mechanisms* (RoI projection, anchor
-  matching, NMS, transpose convolution, RoIAlign, CRF mean-field) computed
-  exactly, but not inference output from a pretrained detector on a photograph.
-
-What it buys: the devcontainer stays small, `build_site.py` stays a
-seconds-not-minutes operation with no weight downloads, the build is
-deterministic and offline-capable, and every number printed in a figure is
-computed from a specification the student can check by hand — which is what the
-exam asks them to do.
-
-If real network outputs are wanted later, the clean seam is a single new engine
-package that requires `torch`/`torchvision`, with those lessons' figures
-falling back to the schematic versions when the import fails.
+- PyTorch is part of the dev container (`.devcontainer/requirements.txt`, the
+  PyPI CUDA wheels). `devcontainer.json` passes `--gpus=all`; without a visible
+  GPU the code runs on the CPU (about 30 minutes for all four figures).
+- Results are cached in `data/_torch/*.npz` with a hash of the settings that
+  produced them, and the cache is committed. A build reuses it and recomputes
+  only when a figure's settings — or `_torchvis.VERSION` — change;
+  `CE5021_RECOMPUTE=1` forces a recompute.
+- The adversarial and generalisation figures in 2.5 still attack a classifier
+  trained on the digits in NumPy, and 3.3–3.6 still show detector and
+  segmentation *mechanisms* computed exactly rather than pretrained inference.
 
 ## 6. Build order
 
@@ -496,11 +491,12 @@ would need vendoring locally first if the LMS blocks external scripts.
 - `_tinynet.py` — a small MLP with hand-written backprop, gradient-checked to
   1e-7, for training experiments on the sklearn digits (2.3 degradation,
   2.4 transfer). Each runs in seconds.
-- `_fixednet.py` — Gabor filter bank → ReLU → pooling, with an exact input
-  gradient (checked to 1e-9) and the four 2.5 techniques built on it.
-  Convolutions are one broadcast FFT call (matches direct correlation to
-  1e-15). Note SciPy's `fftconvolve(mode="same")` crops *every* axis to the
-  first argument's shape, including un-convolved ones — broadcast first.
+- `_torchvis.py` — pre-trained VGG-16 (PyTorch) and the four 2.5 feature
+  visualisation techniques, with the results cached in `data/_torch/`. It
+  replaced `_fixednet.py`, a fixed Gabor-filter network used for the first
+  version of 2.5 (still in the git history). Activation maximisation uses the
+  pre-ReLU convolution output: a unit that starts inactive has a ReLU output
+  of zero and so no gradient to climb.
 - `_volumes.py` — the volume-drawing helpers, moved out of 1.3's engine.
 - `build/selfcheck_tools.py` — writes and validates the self-check YAML.
   Use it for every new question: `yaml.dump()` on a scalar appends the

@@ -269,3 +269,9 @@ sklearn_digits:
   licence: "CC BY 4.0"
   licence_url: "https://creativecommons.org/licenses/by/4.0/"
   source_url: "https://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits"
+starry_night:
+  commons: "Van Gogh - Starry Night - Google Art Project.jpg"
+  width: 1024
+  title: "The Starry Night (1889)"
+  author: "Vincent van Gogh"
+  note: "style image for lesson 2.5 style transfer (as in Gatys et al.)"

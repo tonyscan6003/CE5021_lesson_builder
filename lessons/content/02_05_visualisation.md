@@ -25,7 +25,7 @@ In the previous lessons, networks have been treated as image classifiers, and it
 
 In the first part of this lesson, four techniques used to understand what a network has learned are described. All four are based on the same principle: the network is kept **fixed**, and gradient-based optimisation is used to modify the **input image**.
 
-The figures in this lesson are produced with a small **fixed** network, so that the techniques can be run without a deep learning framework. The network consists of a bank of oriented Gabor filters followed by ReLU and pooling, with deeper layers obtained by further pooling. Gabor filters are similar to the filters typically learned in the first layer of a trained CNN, so the network is a reasonable model of the *early* layers, and each algorithm can be run exactly as described. However, the network has not been trained, so the figures show how each technique operates and how depth affects the information retained by a layer, but not what is learned in the deep layers of a trained network. Where a figure is produced with a trained model, this is stated in the caption.
+The figures for reconstruction, activation maximisation, style transfer and deep dream are produced with **VGG-16** trained on ImageNet, the network used for these visualisations in the lecture slides, with the pre-trained weights provided by PyTorch. Each technique is run exactly as described: the weights of the network are not changed, and only the pixels of the input image are optimised.
 
 ## Reconstruction
 
@@ -61,7 +61,7 @@ In style transfer, the style of one image, usually an artwork, is transferred on
 
 As shown by reconstruction, sufficient information is held in the early layers for an image to be reconstructed accurately, while information about objects and their relationships, the **content**, is held in the deeper layers without fine detail. **Style**, or texture, information is also retained by a network, and is obtained from the inner products of the feature maps, which form the **Gram matrix**.
 
-{{fig texture_statistics}}
+{{fig style_transfer}}
 
 Texture appears at different scales, with small-scale texture obtained from early layers and large-scale texture from deeper layers.
 
