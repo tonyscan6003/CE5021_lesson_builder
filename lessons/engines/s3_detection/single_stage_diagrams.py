@@ -4,14 +4,12 @@ Figures (built by single_stage.build, in lesson order)
     detection_system     slide 3a: classifier conv layers + prediction head
     head_sliding         slide 3b: a 3 x 3 head sliding over a real ResNet-50 map
     gt_assignment        slide 4c: anchors at the object's cell, IoU computed, > 0.5 kept
-    anchor_examples      slide 5: two dogs, anchor sets at two cells, matches computed
     box_dimensions       slide 6: anchor, prediction and ground truth with their dimensions
     scale_grids          slide 9: a large object on a coarse grid, a small one on a fine grid
     ssd_architecture     slide 10: SSD300 as volumes, shapes read from torchvision's model
     fpn_detector         slide 11: ResNet-50 + FPN + shared head (RetinaNet), as volumes
 
-The slides' own photographs are used (the cat, the two dogs, the dog with a
-ball, all from Wikimedia Commons with their credits). Boxes come from
+The slides' own photographs are used (the cat and the dog with a ball, all from Wikimedia Commons with their credits). Boxes come from
 torchvision's Faster R-CNN (used as the ground truth, as noted in the
 captions); anchor matching uses engines/_detmetrics.iou.
 """
@@ -197,58 +195,6 @@ def fig_gt_assignment(ctx: BuildContext) -> Figure:
                   "wide anchor is a negative example for the confidence. Assigning an object "
                   "to several anchors increases the number of positive examples. The calculation of the "
                   "IoU of every anchor with every object adds computation during training.",
-                  png=png)
-
-
-def fig_anchor_examples(ctx: BuildContext) -> Figure:
-    side = 400
-    img = load_image("two_dogs", max_side=side)
-    full = load_image("two_dogs", max_side=800)
-    det = D.detect("two_dogs", full)
-    cats = D.categories("faster_rcnn")
-    dogs = [b * side / 800 for b, l, sc in zip(det["boxes"], det["labels"], det["scores"])
-            if cats[l] == "dog" and sc > 0.9][:2]
-    dogs = sorted(dogs, key=lambda b: b[0])
-    s = 50
-    h, w = img.shape[:2]
-    nx, ny = w // s, h // s
-    fig, axes = plt.subplots(1, 2, figsize=(13.5, 5.2))
-    ax = axes[0]
-    ax.imshow(img)
-    for g in dogs:
-        _rect(ax, g, C["green"], lw=2.4)
-    ax.set_xticks([]); ax.set_yticks([])
-    ax.set_title("(a) input image and ground-truth bounding boxes", fontsize=10)
-    ax = axes[1]
-    ax.imshow(img, alpha=0.3, extent=(0, w, h, 0))
-    _grid(ax, 0, 0, nx * s, ny * s, nx, ny, col="k", lw=0.8)
-    sizes = [3.4 * s, 4.6 * s]
-    txt = []
-    for g, col in zip(dogs, [C["blue"], C["red"]]):
-        gcx, gcy = (g[0] + g[2]) / 2, (g[1] + g[3]) / 2
-        cx, cy = (int(gcx // s) + 0.5) * s, (int(gcy // s) + 0.5) * s
-        an = anchors_at(cx, cy, sizes, ratios=(1.5,))
-        v = M.iou(an, g[None])[:, 0]
-        for b, val in zip(an, v):
-            _rect(ax, b, col, lw=2.4 if val > 0.5 else 1.0, ls="-" if val > 0.5 else (0, (4, 3)))
-        ax.add_patch(plt.Rectangle((cx - s / 2, cy - s / 2), s, s, fc=col, alpha=0.35, zorder=5))
-        txt.append((int((v > 0.5).sum()), float(v.max())))
-    ax.set_xlim(0, nx * s); ax.set_ylim(ny * s, 0); ax.set_xticks([]); ax.set_yticks([])
-    ax.set_title("(b) anchor-based detection: a set of anchors at each object's cell "
-                 "(positives solid)", fontsize=10)
-    png = save_mpl(fig, ctx, "anchor_examples")
-    return Figure("anchor_examples",
-                  "**Anchor boxes** as priors, on the photograph used in the slides. (a) The "
-                  "two dogs and their bounding boxes (Faster R-CNN's detections, used here "
-                  "as the ground truth). (b) At every cell a set of anchors of several sizes "
-                  "and aspect ratios is available; the sets at the cells containing the "
-                  "centres of the two dogs are drawn (blue and red). The anchors whose IoU "
-                  f"with a dog exceeds 0.5 are positive ({txt[0][0]} for the left dog, best IoU "
-                  f"{txt[0][1]:.2f}; {txt[1][0]} for the right dog, best IoU {txt[1][1]:.2f}) and "
-                  "are trained to predict the offset and scale of that dog's box. As several "
-                  "anchors are available at each cell, overlapping objects at the same "
-                  "location can each be matched to a different anchor. The anchor sizes are "
-                  "set in advance, which biases the detector towards objects of those sizes.",
                   png=png)
 
 

@@ -52,8 +52,6 @@ Training an object detector is more difficult than training an image classifier,
 
 {{fig gt_assignment}}
 
-{{fig anchor_examples}}
-
 {{fig anchor_assignment}}
 
 Anchor boxes act as a prior, which can give faster training convergence, as some of the anchors are already close to the size and shape of the objects in the dataset. The anchor dimensions are set in advance for the types of object in the dataset, which can bias the detector. Anchors work well for large objects with wide aspect ratios, such as aeroplanes, but small objects can be difficult to learn. As a set of anchors is placed at each cell, multiple anchors can be selected when objects overlap at the same location. The computation of the IoU of every anchor with every object adds to the computation during training, but allows several anchors in the same or neighbouring cells to be positive, which increases the number of positive examples. All anchors whose IoU is below the threshold are used as negative examples for the confidence, so there are always many more negative than positive examples.

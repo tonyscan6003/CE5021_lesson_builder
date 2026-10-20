@@ -14,7 +14,7 @@ Figures
     fpn_levels            RetinaNet's real P3-P7 feature maps; the level of each match
     ssd_multiscale        SSD300's 6 feature maps and 8,732 default boxes (torchvision)
     (the slide diagrams -- detection_system, head_sliding, gt_assignment,
-     anchor_examples, box_dimensions, scale_grids, ssd_architecture and
+     box_dimensions, scale_grids, ssd_architecture and
      fpn_detector -- are in single_stage_diagrams.py)
     depthwise_separable   standard vs depthwise + pointwise: parameters and MACs
     nms_steps             non-maximum suppression stepped through real raw detections
@@ -40,7 +40,7 @@ from .. import _torchvis as TV
 from .intro_detection import SHEEP_GT
 
 FIGURES = ["feature_location", "detection_system", "head_sliding", "prediction_head",
-           "gt_assignment", "anchor_examples", "anchor_assignment", "box_dimensions",
+           "gt_assignment", "anchor_assignment", "box_dimensions",
            "box_parameterisation", "detection_loss", "focal_loss", "scale_grids", "fpn_levels",
            "ssd_architecture", "ssd_multiscale", "fpn_detector", "depthwise_separable",
            "nms_steps"]
@@ -379,7 +379,7 @@ def fig_focal_loss(ctx: BuildContext) -> Figure:
                   "from being learned. The focal loss multiplies the cross-entropy by "
                   "(1 − p_t)^γ, which reduces the loss of well-classified examples towards "
                   "zero, and γ = 2 is typically chosen. (b, c) The effect, measured with "
-                  "RetinaNet's real outputs for the anchors of Figure 7: almost all of the "
+                  "RetinaNet's real outputs for the anchors of Figure 6: almost all of the "
                   "negatives are already classified as background with high confidence, "
                   f"but with cross-entropy the positives account for only {shares[0]:.1%} of "
                   "the total loss on this image. With γ = 2 the easy negatives contribute "
@@ -602,8 +602,7 @@ def fig_nms_steps(ctx: BuildContext) -> Figure:
 def build(ctx: BuildContext) -> list[Figure]:
     from . import single_stage_diagrams as SD
     return [fig_feature_location(ctx), SD.fig_detection_system(ctx), SD.fig_head_sliding(ctx),
-            fig_prediction_head(ctx), SD.fig_gt_assignment(ctx), SD.fig_anchor_examples(ctx),
-            fig_anchor_assignment(ctx), SD.fig_box_dimensions(ctx),
+            fig_prediction_head(ctx), SD.fig_gt_assignment(ctx), fig_anchor_assignment(ctx), SD.fig_box_dimensions(ctx),
             fig_box_parameterisation(ctx), fig_detection_loss(ctx), fig_focal_loss(ctx),
             SD.fig_scale_grids(ctx), fig_fpn_levels(ctx), SD.fig_ssd_architecture(ctx),
             fig_ssd_multiscale(ctx), SD.fig_fpn_detector(ctx), fig_depthwise_separable(ctx),
