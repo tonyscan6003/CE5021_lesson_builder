@@ -24,4 +24,5 @@ REGISTRY = [
     ("s3_detection.region_proposals",    "03_02", "3.2 Region proposals"),
     ("s3_detection.two_stage",           "03_03", "3.3 Two-stage detectors"),
     ("s3_detection.single_stage",        "03_04", "3.4 Single-stage detectors"),
+    ("s3_detection.semantic_seg",        "03_05", "3.5 Semantic segmentation"),
 ]

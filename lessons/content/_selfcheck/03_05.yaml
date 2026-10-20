@@ -1,0 +1,60 @@
+# 3.5 Semantic segmentation
+# Written against lesson_3_5_sem_seg_partA / lesson_3_5_script; the matrix and
+# transpose-convolution arithmetic is practised in the worked examples (from
+# Grasple_transpose_dilated_conv).
+- q: What distinguishes instance segmentation from semantic segmentation?
+  options:
+    - Instance segmentation does not use classes
+    - Instance segmentation separates individual objects of the same class, combining detection with segmentation
+    - Instance segmentation predicts a class for each pixel
+    - Instance segmentation only finds bounding boxes
+  answer: 1
+  explain: Semantic segmentation gives every sheep pixel the label 'sheep'; instance segmentation also says which sheep each pixel belongs to.
+- q: A segmentation network has 21 classes and an input of 256 × 320 pixels. What is the shape of its output before the argmax?
+  options:
+    - 1 × 21
+    - 256 × 320 × 21
+    - 256 × 320 × 1
+    - 21 × 21
+  answer: 1
+  explain: A class probability is predicted at every pixel, giving H × W × N_classes; the argmax over the last dimension gives the H × W label map.
+- q: For one class, a prediction has 80 true positive, 20 false positive and 40 false negative pixels. What is the IoU?
+  options:
+    - '0.80'
+    - '0.57'
+    - '0.67'
+    - '0.50'
+  answer: 1
+  explain: IoU = TP / (TP + FP + FN) = 80 / 140 = 0.57. Pixel accuracy would also count the true negatives, which is why it is dominated by the background.
+- q: Why can a fully convolutional network accept inputs of any size?
+  options:
+    - Because it uses global average pooling
+    - Because it resizes every input to 224 × 224
+    - Because its fully connected layers have been converted into convolutions, which do not require a fixed input size
+    - Because it has no pooling layers
+  answer: 2
+  explain: Only the dense layers fix the input size. Applied as convolutions with the same weights, they produce a map of predictions whose size follows the input.
+- q: A 2 × 2 feature map is upsampled by a transpose convolution with a 3 × 3 kernel and stride 2. What is the output size?
+  options:
+    - 3 × 3
+    - 5 × 5
+    - 6 × 6
+    - 4 × 4
+  answer: 1
+  explain: 'The output size is (n − 1)·s + k = (2 − 1)·2 + 3 = 5: a zero is inserted between the inputs, the result is padded and convolved at stride 1.'
+- q: How do DeconvNet and SegNet recover the spatial detail lost by max pooling?
+  options:
+    - By concatenating encoder and decoder feature maps
+    - By using larger kernels in the decoder
+    - By storing the positions of the maxima during pooling and unpooling the decoder's values to those positions
+    - By removing the pooling layers
+  answer: 2
+  explain: Unpooling places each value back where its maximum came from, and a convolution fills in the sparse map. U-Net instead concatenates the encoder's feature maps through skip connections.
+- q: What does the U-Net use instead of unpooling to transfer spatial information to the decoder?
+  options:
+    - Global average pooling
+    - Dilated convolution
+    - A region proposal network
+    - Skip connections that concatenate encoder feature maps with the upsampled decoder maps
+  answer: 3
+  explain: The encoder maps are copied (and cropped) and concatenated with the decoder maps at the same resolution, giving the decoder fine spatial detail.

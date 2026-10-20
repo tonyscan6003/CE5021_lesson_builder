@@ -300,3 +300,56 @@ def ssd_default_boxes() -> dict:
         return dict(shapes=shapes, channels=chans, per_cell=per_cell,
                     anchors=anchors.cpu().numpy().astype(np.float32))
     return TV.cached("ssd300_default_boxes", dict(model="ssd300", v=2), run)
+
+
+def semantic_scores(key: str, img: np.ndarray, every=2) -> dict:
+    """DeepLabV3's full output: per-class softmax scores (21 Pascal VOC
+    classes incl. background) at every `every`-th pixel, plus the logits at the
+    network's own output resolution (stride 8) for resolution experiments."""
+    def run():
+        import torch
+        import torch.nn.functional as F
+        net, w = _load("deeplab")
+        x = w.transforms(resize_size=None)(_tensor(img))[None]
+        with torch.no_grad():
+            feats = net.backbone(x)["out"]
+            logits8 = net.classifier(feats)
+        logits = F.interpolate(logits8, size=img.shape[:2], mode="bilinear", align_corners=False)
+        prob = logits.softmax(1)[0, :, ::every, ::every]
+        return dict(prob=prob.cpu().numpy().astype(np.float16),
+                    logits8=logits8[0].cpu().numpy().astype(np.float32))
+    return TV.cached(f"deeplab_scores_{key}", dict(key=key, shape=img.shape, every=every), run)
+
+
+def vgg_fully_convolutional(key: str, img: np.ndarray, cls: int) -> dict:
+    """VGG-16's classifier made fully convolutional, as in FCN: fc6 (25088 ->
+    4096) becomes a 7 x 7 convolution over pool5, fc7 and fc8 become 1 x 1
+    convolutions, with exactly the same weights. Applied to an image larger
+    than 224 x 224 it gives a map of class scores instead of one vector."""
+    def run():
+        import torch
+        import torch.nn.functional as F
+        from torchvision import models
+        vgg = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1).eval().to(TV.device())
+        fc6, fc7, fc8 = vgg.classifier[0], vgg.classifier[3], vgg.classifier[6]
+        x = TV.to_tensor(img)
+        mean = torch.tensor([0.485, 0.456, 0.406], device=x.device).view(1, 3, 1, 1)
+        std = torch.tensor([0.229, 0.224, 0.225], device=x.device).view(1, 3, 1, 1)
+        with torch.no_grad():
+            p5 = vgg.features((x - mean) / std)
+            h = F.relu(F.conv2d(p5, fc6.weight.view(4096, 512, 7, 7), fc6.bias))
+            h = F.relu(F.conv2d(h, fc7.weight.view(4096, 4096, 1, 1), fc7.bias))
+            s = F.conv2d(h, fc8.weight.view(1000, 4096, 1, 1), fc8.bias)
+            prob = s.softmax(1)[0]
+            # check: on a 224 x 224 input the score map is 1 x 1 and equals the classifier
+            x224 = F.interpolate(x, size=(224, 224), mode="bilinear", align_corners=False)
+            z = vgg.features((x224 - mean) / std)
+            a = vgg.classifier(torch.flatten(vgg.avgpool(z), 1))
+            b = F.conv2d(F.relu(F.conv2d(F.relu(F.conv2d(z, fc6.weight.view(4096, 512, 7, 7),
+                         fc6.bias)), fc7.weight.view(4096, 4096, 1, 1), fc7.bias)),
+                         fc8.weight.view(1000, 4096, 1, 1), fc8.bias)
+        return dict(score=prob[cls].cpu().numpy().astype(np.float32),
+                    top=prob.argmax(0).cpu().numpy().astype(np.int16),
+                    p5_shape=np.array(p5.shape[1:]),
+                    check=np.array(float((a[0] - b[0, :, 0, 0]).abs().max())))
+    return TV.cached(f"vgg_fcn_{key}", dict(key=key, shape=img.shape, cls=cls), run)
