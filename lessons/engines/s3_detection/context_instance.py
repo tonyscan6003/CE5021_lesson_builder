@@ -31,8 +31,10 @@ from .intro_detection import SHEEP_GT
 from .semantic_seg import PAL, _overlay
 
 FIGURES = ["effective_receptive_field", "dilated_conv", "dilated_stack",
-           "pyramid_scene_parsing", "dense_crf", "deeplab_framework",
-           "instance_vs_semantic", "roi_align", "mask_rcnn_output"]
+           "psp_architecture", "pyramid_scene_parsing", "crf_graph", "dense_crf",
+           "deeplab_pipeline", "deeplab_framework", "instance_approaches",
+           "instance_vs_semantic", "mask_rcnn_pipeline", "roi_grids", "roi_align",
+           "mask_rcnn_output"]
 
 
 def _clean(ax):
@@ -506,9 +508,13 @@ def fig_mask_rcnn_output(ctx: BuildContext) -> Figure:
 
 
 def build(ctx: BuildContext) -> list[Figure]:
+    from . import context_diagrams as CD
     return [fig_effective_receptive_field(ctx), fig_dilated_conv(ctx), fig_dilated_stack(ctx),
-            fig_pyramid_scene_parsing(ctx), fig_dense_crf(ctx), fig_deeplab_framework(ctx),
-            fig_instance_vs_semantic(ctx), fig_roi_align(ctx), fig_mask_rcnn_output(ctx)]
+            CD.fig_psp_architecture(ctx), fig_pyramid_scene_parsing(ctx), CD.fig_crf_graph(ctx),
+            fig_dense_crf(ctx), CD.fig_deeplab_pipeline(ctx), fig_deeplab_framework(ctx),
+            CD.fig_instance_approaches(ctx), fig_instance_vs_semantic(ctx),
+            CD.fig_mask_rcnn_pipeline(ctx), CD.fig_roi_grids(ctx), fig_roi_align(ctx),
+            fig_mask_rcnn_output(ctx)]
 
 
 def demo() -> None:
