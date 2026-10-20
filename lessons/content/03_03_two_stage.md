@@ -3,7 +3,7 @@ id: "03_03"
 title: Two-stage object detection
 section: 3
 engines: [s3_detection.two_stage]
-practice: [rfield]
+practice: []
 summary: The R-CNN family of two-stage detectors — R-CNN with CNN features, spatial pyramid pooling, Fast R-CNN with region of interest projection and pooling, class activation maps, and Faster R-CNN with its region proposal network — and how two-stage detectors compare with single-stage detectors.
 ---
 
@@ -22,7 +22,7 @@ On completion of this lesson the student should be able to:
 
 In this lesson object detection with deep convolutional neural networks is discussed, with a focus on frameworks that use region proposals to achieve high-accuracy object recognition: R-CNN, where R stands for region, and its successors Fast R-CNN and Faster R-CNN.
 
-The original R-CNN has several problems, which were introduced in Lesson 3.1. The region proposal generator produces regions of different shapes and sizes, which is a problem for neural networks that require a fixed input size; in R-CNN the regions are warped to a fixed size, but a modification of the network architecture to accept inputs of any size, through spatial pyramid pooling and region of interest pooling, is a more elegant solution. The image classifier operates on overlapping regions several times, which is inefficient; with region of interest projection, introduced in Fast R-CNN, the whole image is processed once by the convolution layers. Finally, the separate selective search algorithm prevents end-to-end training; in Faster R-CNN it is replaced by a neural network equivalent.
+In this lesson two-stage object detection is introduced, starting from the early approach of combining region proposals with a pre-trained image classifier, and following the improvements made in each successive detector. The basic approach has several problems. The region proposal generator produces regions of different shapes and sizes, which is a problem for neural networks that require a fixed input size; in R-CNN the regions are warped to a fixed size, but a modification of the network architecture to accept inputs of any size, through spatial pyramid pooling and region of interest pooling, is a more elegant solution. The image classifier operates on overlapping regions several times, which is inefficient; with region of interest projection, introduced in Fast R-CNN, the whole image is processed once by the convolution layers. Finally, the separate region proposal algorithm prevents end-to-end training; in Faster R-CNN it is replaced by a neural network equivalent.
 
 {{fig rcnn_pipeline}}
 
@@ -83,8 +83,6 @@ As the spatial position of objects is retained in the output feature maps of the
 The projected regions of varying sizes are converted to vectors of a standard size by RoI pooling, and these vectors are processed by the second stage of the network to predict classes and bounding boxes.
 
 {{fig roi_pooling}}
-
-{{example rfield seed=7}}
 
 The disadvantage of Fast R-CNN is that selective search is still used to determine the region proposals. It is trained independently of the rest of the network, so the system is not yet trained fully end to end.
 

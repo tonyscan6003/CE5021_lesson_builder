@@ -174,7 +174,13 @@ def fig_spp_layer(ctx: BuildContext) -> Figure:
                   "size of the map, so that the number of bins does not. Each bin gives "
                   "one value per channel, so both inputs produce a vector of "
                   "(16 + 4 + 1) × 512 = 10,752 values, and the region proposals no longer "
-                  "need to be warped.",
+                  "need to be warped. The bins are uneven because the size of the map is "
+                  "not a multiple of the number of bins: 14 cells cannot be divided into 4 "
+                  "equal bins, so the bins are 3 or 4 cells wide (the boundaries are at "
+                  "⌊i·14/4⌋). This occurs in practice for almost every input, and the exact "
+                  "rounding rule differs between implementations; in some, such as "
+                  "PyTorch's adaptive pooling, neighbouring bins overlap by one cell "
+                  "instead.",
                   png=png)
 
 

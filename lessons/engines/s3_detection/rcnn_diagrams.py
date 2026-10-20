@@ -91,17 +91,7 @@ def fig_rcnn_pipeline(ctx: BuildContext) -> Figure:
     B.arrow(ax, x2, y + h / 2, x2 + 0.35, y + h / 2)
     p2 = B.photo(ax, img, x2 + 0.42, y, h, boxes=chosen, box_col=[C["red"], C["green"]], lw=1.8,
                  box_labels=labels, label="labelled regions (objects)", fs=FS)
-    tx = p2[2] + 0.3
-    items = [("C1: use of convolutional features", C["green"]),
-             ("P2: region proposals of different sizes", C["red"]),
-             ("   C2: spatial pyramid / RoI pooling (Fast R-CNN)", C["green"]),
-             ("P3: overlapping regions classified several times", C["red"]),
-             ("   C3: RoI projection (Fast R-CNN)", C["green"]),
-             ("P4: proposals trained independently", C["red"]),
-             ("   C4: region proposal network (Faster R-CNN)", C["green"])]
-    for j, (s, col) in enumerate(items):
-        ax.text(tx, y + h - 0.05 - j * 0.32, s, fontsize=FS, color=col, va="top")
-    ax.set_xlim(0, tx + 4.6)
+    ax.set_xlim(0, p2[2] + 0.1)
     png = save_mpl(fig, ctx, "rcnn_pipeline")
     return Figure("rcnn_pipeline",
                   "The basic deep learning object detection pipeline, with region proposals "
@@ -113,8 +103,7 @@ def fig_rcnn_pipeline(ctx: BuildContext) -> Figure:
                   "probability given by ResNet-50, an ImageNet classifier: the regions are "
                   "found, but an ImageNet classifier gives its closest class rather than "
                   "'person' or 'bicycle', and has no 'background' class with which to reject "
-                  "the other proposals. The concepts, problems and solutions of the R-CNN "
-                  "family, which are developed in this lesson, are listed on the right.",
+                  "the other proposals.",
                   png=png)
 
 
@@ -170,7 +159,7 @@ def fig_transfer_features(ctx: BuildContext) -> Figure:
     ax.text(4.95, 2.07, "replaced by", fontsize=FS - 0.5, color=C["grey"], va="center")
     png = save_mpl(fig, ctx, "transfer_features")
     return Figure("transfer_features",
-                  "**C1: the use of convolutional features**, one of the first applications "
+                  "**The use of convolutional features**, one of the first applications "
                   "of transfer learning. In a classical recognition system (top), image "
                   "patches are converted into feature vectors by an engineered "
                   f"representation, here HOG with {len(hogs[0])} values per patch, and the "
@@ -421,7 +410,7 @@ def fig_spp_diagram(ctx: BuildContext) -> Figure:
             "(10,752 for C = 512)", ha="center", va="top", fontsize=FS)
     png = save_mpl(fig, ctx, "spp_diagram")
     return Figure("spp_diagram",
-                  "**C2: spatial pyramid pooling** (SPP). (a) The size limitation arises "
+                  "**Spatial pyramid pooling** (SPP). (a) The size limitation arises "
                   "from the fully connected layers, not the convolution layers, but in "
                   "R-CNN it was met by warping every proposal to a fixed input size. (b) "
                   "With an SPP layer between the convolution layers and the fully connected "
@@ -597,7 +586,7 @@ def fig_faster_rcnn_pipeline(ctx: BuildContext) -> Figure:
     _faster(ax, img, box, 0.1, 1.8)
     png = save_mpl(fig, ctx, "faster_rcnn_pipeline")
     return Figure("faster_rcnn_pipeline",
-                  "**C4: Faster R-CNN** eliminates the external region proposal generator. "
+                  "**Faster R-CNN** eliminates the external region proposal generator. "
                   "A small **region proposal network** (RPN) takes the output feature maps "
                   "of the backbone as its input and predicts the proposals, which are "
                   "projected onto the same feature maps (red) and processed by the Fast "
