@@ -1,12 +1,7 @@
 # 3.2 Region proposals
-# Source: reference/Grasple_object_detection (exercise 106864). These three
-# questions are about the sliding-window/image-pyramid approach that region
-# proposals replace, which is exactly how lesson_3_2_script motivates the
-# topic; the HOG-specific question from the same exercise is classical
-# machine vision and is not used.
-# INCOMPLETE — 3 of a target 5-6 questions. Top up from
-# lesson_3_2_region_proposals (objectness cues, selective search, region
-# similarity measures).
+# Source: reference/Grasple_object_detection (exercise 106864) for the first three
+# questions, which motivate proposals by the cost of the sliding window and image
+# pyramid; the rest are written against lesson_3_2_region_proposals.
 - q: Why is a sliding window necessary in a classical object detector?
   options:
     - To reduce noise in the image
@@ -28,3 +23,35 @@
     - It increases computation time
   answer: 2
   explain: More pyramid levels and smaller window steps give better accuracy but multiply the number of detector evaluations. That cost is exactly what region proposal methods set out to reduce. The original image is retained, so no information is lost.
+- q: Which objectness cue is most likely to produce false positive proposals on rippled water?
+  options:
+    - Colour contrast
+    - Edge density
+    - Superpixel straddling
+    - Location and size
+  answer: 1
+  explain: Edge density scores a window by the Canny edges near its boundary. Ripples produce many edges everywhere, so windows covering only water score highly.
+- q: What property of superpixels is used by the superpixel straddling cue?
+  options:
+    - Superpixels are brighter than the background
+    - Superpixels are only found inside objects
+    - Superpixels do not cross object boundaries, so a window cutting through superpixels is unlikely to fit an object
+    - Superpixels always have the same size
+  answer: 2
+  explain: A window that contains or excludes whole superpixels follows object boundaries; a window that cuts through them does not. This is the best single objectness cue.
+- q: How does selective search produce proposals at different scales?
+  options:
+    - By training a neural network on proposal boxes
+    - By over-segmenting the image and repeatedly merging the most similar neighbouring regions, taking the bounding box of every region formed
+    - By scoring thousands of random windows
+    - By applying a sliding window to an image pyramid
+  answer: 1
+  explain: Small regions are merged into larger ones until one region remains. Every region along the way contributes a bounding box, from object parts to whole objects.
+- q: Which proposals are used as hard negative examples when the SVM is trained in the selective search system?
+  options:
+    - Proposals that do not overlap any object
+    - Ground-truth boxes of other classes
+    - Proposals overlapping a ground-truth box by 20–50%
+    - Proposals overlapping a ground-truth box by more than 70%
+  answer: 2
+  explain: Partially overlapping proposals look similar to the objects but are badly placed, so they are difficult examples that teach the classifier to reject inaccurate regions.
