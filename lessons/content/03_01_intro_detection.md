@@ -30,11 +30,17 @@ The object detection task is more challenging than image classification. In imag
 
 {{fig detection_task}}
 
-A pre-trained image classifier provides a good starting point for an object detection system. In the naive approach, a sliding window is used: the region of the image under the window is passed to the classifier, and if a valid class is identified, an object of that class is assumed to be present within the window. The window is moved exhaustively across the entire image.
+## Naive object detection
+
+A pre-trained image classifier provides a good starting point for an object detection system. In the naive approach, the classifier is used as a detector with a **sliding window**. A window of fixed size is placed over the image, the region under the window is passed to the classifier, and if a valid class is identified, an object of that class is assumed to be present within the window. The window is moved exhaustively across the entire image, in steps of a few pixels, so that objects can be found at any position.
+
+The window has a fixed size, as the classifier requires a fixed input size, so an object is only detected if it is approximately the same size as the window. Objects that are larger than the window cannot be detected directly. To detect objects of different sizes, an **image pyramid** is used: the image is reduced in size repeatedly, and the sliding window is applied at every level of the pyramid. A large object becomes small enough to fit the window at one of the reduced levels.
+
+{{fig window_pyramid}}
+
+This approach is how classical object detectors, such as the HOG pedestrian detector and the Viola–Jones face detector, operate, and it was acceptable for them as their classifiers are computationally lightweight. For a large neural network, however, it is far too computationally expensive and slow. A high-resolution image can contain thousands of window positions, the image pyramid multiplies them again, and windows of several aspect ratios may also be needed to fit objects of different shapes.
 
 {{fig sliding_window}}
-
-This approach is too computationally expensive and slow when the classifier is a large neural network. A high-resolution image can contain thousands of window positions, and to detect objects at different scales an image pyramid must also be used, which further increases the amount of computation.
 
 ## Region proposals
 

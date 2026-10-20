@@ -3,6 +3,8 @@
 Figures
     detection_task        classification vs localisation vs detection vs instance
                           segmentation, from real pre-trained models on one photo
+    window_pyramid        a fixed window over a 4-level pyramid: the ball fits at level 0,
+                          the dog only at level 3
     sliding_window        windows x scales x pyramid levels counted for a real image
     proposal_pipeline     region proposals warped and classified by a real ResNet-50
     detection_datasets    Pascal VOC, ImageNet, MS COCO and Open Images compared
@@ -35,7 +37,7 @@ from .. import _arch as A
 from .. import _detmetrics as M
 from .. import _torchdet as D
 
-FIGURES = ["detection_task", "sliding_window", "proposal_pipeline", "detection_datasets",
+FIGURES = ["detection_task", "window_pyramid", "sliding_window", "proposal_pipeline", "detection_datasets",
            "iou_boxes", "tp_fp_fn", "pr_curve", "mean_average_precision",
            "detection_errors", "coco_error_analysis", "detection_augmentation"]
 
@@ -170,6 +172,75 @@ def fig_sliding_window(ctx: BuildContext) -> Figure:
                   f"requires {macs / 1e9:.1f} G multiply-accumulates per window, approximately "
                   f"{total * macs / 1e12:.0f} × 10¹² multiply-accumulates are required for "
                   "this one image, which is far too slow for practical use.",
+                  png=png)
+
+
+def fig_window_pyramid(ctx: BuildContext) -> Figure:
+    """A fixed-size window moved over every level of an image pyramid: each
+    object is only matched by the window at the level where its size fits."""
+    img = load_image("dog_ball", max_side=SIDE)
+    det = D.detect("dog_ball", img)
+    cats, icats = _cats(), D.categories("resnet50")
+    names = [cats[l] for l in det["labels"]]
+    objs = {"ball": det["boxes"][names.index("sports ball")], "dog": det["boxes"][names.index("dog")]}
+    win, stride, factor, L = 128, 16, 1.6, 4
+    levels, best = [], {}
+    for k in range(L):
+        sc = factor ** -k
+        im = cv2.resize(img, (int(img.shape[1] * sc), int(img.shape[0] * sc)),
+                        interpolation=cv2.INTER_AREA)
+        h, w = im.shape[:2]
+        xs, ys = np.arange(0, w - win + 1, stride), np.arange(0, h - win + 1, stride)
+        wins = np.array([[x, y, x + win, y + win] for y in ys for x in xs], float)
+        levels.append((sc, im, wins))
+        for name, b in objs.items():
+            v = M.iou(wins, b[None] * sc)[:, 0]
+            i = int(np.argmax(v))
+            if name not in best or v[i] > best[name][1]:
+                best[name] = (k, float(v[i]), wins[i])
+    # the claim of the figure: the ball fits the window at full size, the dog only when reduced
+    assert best["ball"][0] == 0 and best["dog"][0] == L - 1, best
+    assert best["ball"][1] > 0.5 and best["dog"][1] > 0.5, best
+    total = sum(len(l[2]) for l in levels)
+    widths = [l[1].shape[1] for l in levels]
+    fig = plt.figure(figsize=(16, 5.0))
+    gs = fig.add_gridspec(1, L, width_ratios=widths, wspace=0.08)
+    for k, (sc, im, wins) in enumerate(levels):
+        ax = fig.add_subplot(gs[k])
+        ax.imshow(im); _clean(ax)
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+        # every 4th window position (in both directions), faint
+        for wb in wins:
+            if (wb[0] / stride) % 4 == 0 and (wb[1] / stride) % 4 == 0:
+                ax.add_patch(plt.Rectangle(wb[:2], win, win, fill=False, ec="white", lw=0.5,
+                                           alpha=0.5))
+        ax.add_patch(plt.Rectangle((2, 2), win, win, fill=False, ec=C["yellow"], lw=2.2))
+        for name, (kk, v, wb) in best.items():
+            if kk == k:
+                col = C["green"]
+                ax.add_patch(plt.Rectangle(wb[:2], win, win, fill=False, ec=col, lw=2.6))
+                ax.text(wb[0] + 2, wb[3] - 3, f"{name}: IoU {v:.2f}", fontsize=8, va="bottom",
+                        bbox=dict(fc=col, ec="none", pad=1.0, alpha=0.9))
+        ax.set_title(f"level {k}: {im.shape[1]} × {im.shape[0]}\n{len(wins):,} window positions",
+                     fontsize=10)
+    png = save_mpl(fig, ctx, "window_pyramid")
+    (kb, vb, _), (kd, vd, _) = best["ball"], best["dog"]
+    return Figure("window_pyramid",
+                  "**Naive object detection** with a sliding window and an image pyramid, "
+                  "on a real photograph. A window of fixed size, "
+                  f"{win} × {win} pixels (yellow), is moved over the image in steps of "
+                  f"{stride} pixels (every fourth position is drawn), and the region under "
+                  "each position is passed to an image classifier. The ball is roughly the "
+                  f"size of the window at full resolution (level 0, best IoU {vb:.2f}), but "
+                  "the dog is far larger than the window, and no position covers it. The "
+                  f"image is therefore reduced repeatedly, by a factor of {factor} at each "
+                  "level, and the window is moved over every level of the resulting **image "
+                  f"pyramid**: only at level {kd} has the dog become small enough to fit the "
+                  f"window (IoU {vd:.2f}). The green windows are the positions that best fit "
+                  f"each object (boxes from Faster R-CNN). In total {total:,} window "
+                  "positions must be classified for this one image, almost all of them "
+                  "containing no object.",
                   png=png)
 
 
@@ -504,7 +575,7 @@ def fig_mean_average_precision(ctx: BuildContext) -> Figure:
                   f"is raised from 0.5 to 0.75 the mAP falls from {m50:.2f} to {m75:.2f}, "
                   "as fewer predictions are placed accurately enough to count as true "
                   "positives. The IoU threshold must therefore always be stated when "
-                  "detectors are compared. (Simulated detections, scored as in Figure 7.)",
+                  "detectors are compared. (Simulated detections, scored as in Figure 8.)",
                   png=png)
 
 
@@ -703,7 +774,7 @@ def fig_detection_augmentation(ctx: BuildContext) -> Figure:
 
 
 def build(ctx: BuildContext) -> list[Figure]:
-    return [fig_detection_task(ctx), fig_sliding_window(ctx), fig_proposal_pipeline(ctx),
+    return [fig_detection_task(ctx), fig_window_pyramid(ctx), fig_sliding_window(ctx), fig_proposal_pipeline(ctx),
             fig_detection_datasets(ctx), fig_iou_boxes(ctx), fig_tp_fp_fn(ctx),
             fig_pr_curve(ctx), fig_mean_average_precision(ctx), fig_detection_errors(ctx),
             fig_coco_error_analysis(ctx), fig_detection_augmentation(ctx)]
