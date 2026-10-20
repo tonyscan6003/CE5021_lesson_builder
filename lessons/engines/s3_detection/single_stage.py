@@ -453,10 +453,10 @@ def fig_ssd_multiscale(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "ssd_multiscale")
     return Figure("ssd_multiscale",
                   "The **Single Shot MultiBox Detector** (SSD) uses feature maps at several "
-                  "scales. The fine feature maps of VGG-16 do not contain enough semantic "
-                  "information about small objects, so SSD starts from the conv5 stage of "
-                  "VGG-16, which does, and adds further convolution layers that "
-                  "progressively downsample it, giving six feature maps from "
+                  "scales. The finest map is VGG-16's conv4_3, with L2 normalisation; the "
+                  "others are fc7, converted to a convolution after conv5_3, and further "
+                  "convolution layers that progressively downsample it, giving six feature "
+                  "maps from "
                   f"{shapes[0][1]} × {shapes[0][0]} to 1 × 1 for a 300 × 300 input. At every "
                   "cell of every map, boxes and classes are predicted with 3 × 3 "
                   "convolutions, relative to a set of default (anchor) boxes, which are "

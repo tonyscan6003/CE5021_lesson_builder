@@ -40,14 +40,14 @@
     - Overlapping detections of the same object
   answer: 1
   explain: Each easy negative has a small cross-entropy, but there are tens of thousands of them. The factor (1 − p_t)^γ reduces their loss towards zero so that the hard positives dominate training.
-- q: Why does SSD not predict from the fine feature maps of VGG-16 directly?
+- q: From which layers does SSD300 take its multi-scale prediction maps?
   options:
-    - They have no spatial information
-    - They are too large to store
-    - They lack semantic information about small objects, so SSD builds its multi-scale maps from the final conv5 stage
-    - VGG-16 has no fine feature maps
-  answer: 2
-  explain: Early layers extract generic features. SSD starts from the semantically strong conv5 stage and adds downsampling layers; FPN instead adds a top-down pathway to bring semantic information into the fine maps.
+    - From every convolution layer of VGG-16, starting with conv1_1
+    - From VGG-16's conv4_3 for the finest map, then fc7 (as a convolution) and extra layers that downsample further
+    - From conv5_3 only, upsampled to several sizes
+    - From a top-down pyramid built on a ResNet-50 backbone
+  answer: 1
+  explain: "The earliest VGG-16 layers carry little semantic information, so SSD starts at conv4_3 (38 × 38, stride 8, L2-normalised) and adds fc7 and extra downsampling layers for the coarser maps. Upsampling and a top-down pathway are features of FPN, not SSD."
 - q: Why must all levels of a feature pyramid network have the same depth?
   options:
     - So that the levels have the same spatial size

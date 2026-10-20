@@ -112,7 +112,7 @@ The fine feature maps of the image classifier may, however, not perform as well 
 
 ## SSD
 
-The **Single Shot MultiBox Detector** (SSD) is a well-known detector that uses multi-scale feature maps. SSD is based on VGG-16, but does not use the fine feature maps of VGG-16, as they do not contain semantic information about small objects. Instead, the final convolution stage of VGG-16, which does contain semantic information, is used as the starting layer for a series of multi-scale maps. An increased input size is used to allow enough spatial resolution for downsampling between the maps. Boxes and classes are predicted at each of the maps with $3 \times 3$ convolutions, relative to anchor (default) boxes.
+The **Single Shot MultiBox Detector** (SSD) is a well-known detector that uses multi-scale feature maps. SSD is based on VGG-16. The earliest, finest feature maps of VGG-16 are not used, as they contain little semantic information about objects. The finest prediction map is taken from the conv4_3 layer, at a stride of 8 ($38 \times 38$ for a $300 \times 300$ input), with an L2 normalisation applied to it, and the remaining maps are taken from the converted fully connected layer fc7, after conv5_3, and from extra convolution layers that progressively downsample it. An increased input size is used to allow enough spatial resolution for downsampling between the maps. Boxes and classes are predicted at each of the maps with $3 \times 3$ convolutions, relative to anchor (default) boxes.
 
 {{fig ssd_architecture}}
 
