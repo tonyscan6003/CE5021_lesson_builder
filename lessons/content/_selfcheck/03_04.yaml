@@ -1,8 +1,6 @@
 # 3.4 Single-stage object detection
-# Source: reference/Grasple_object_detection (exercise 106864).
-# INCOMPLETE — 1 of a target 5-6 questions. Top up from
-# lesson_3_4_obj_det_partB_single_stage (anchor boxes, box parameterisation,
-# focal loss and training imbalance, the scale problem, SSD, FPN).
+# Source: reference/Grasple_object_detection (exercise 106864) for the NMS question;
+# the rest are written against lesson_3_4_obj_det_partB_single_stage.
 - q: What is the purpose of non-maximum suppression (NMS) in object detection?
   options:
     - To increase the number of detected objects
@@ -10,3 +8,51 @@
     - To enhance the image quality
   answer: 1
   explain: A dense detector fires several times around the same object. NMS keeps the highest-confidence box and discards the others that overlap it above an IoU threshold, so each object ends up with one detection.
+- q: Why is a 3 × 3 kernel sufficient for the prediction head of a single-stage detector, even for large objects?
+  options:
+    - The head is applied to the input image
+    - Large objects are detected by the classifier instead
+    - Each feature-map cell has a large receptive field, and the extent of the object is encoded in the depth of the feature map
+    - Large objects are always resized to 3 × 3
+  answer: 2
+  explain: The backbone has already aggregated information over a wide region; the head only needs to read it out locally at each cell.
+- q: An anchor has centre (100, 80), width 40 and height 20. A ground-truth box has centre (110, 80) and width 80. What are t_x and t_w?
+  options:
+    - t_x = 0.25, t_w = log 2 ≈ 0.69
+    - t_x = 0.5, t_w = 2
+    - t_x = 0.25, t_w = 2
+    - t_x = 10, t_w = 40
+  answer: 0
+  explain: t_x = (110 − 100)/40 = 0.25 and t_w = log(80/40) = log 2 ≈ 0.69. The logarithm makes the scaling symmetric and regularises the prediction.
+- q: Why does the regression term of the detection loss include the factor p_i^gt?
+  options:
+    - To normalise the loss
+    - To include the background class
+    - So that only positive anchors, matched to an object, contribute to the box regression
+    - To weight confident predictions more
+  answer: 2
+  explain: Negative anchors have no ground-truth box to regress towards, so p_i^gt = 0 removes them from the regression term; they still contribute to the confidence loss.
+- q: What problem does the focal loss address?
+  options:
+    - Slow inference
+    - The large number of easy negative examples dominating the cross-entropy loss
+    - Objects of different scales
+    - Overlapping detections of the same object
+  answer: 1
+  explain: Each easy negative has a small cross-entropy, but there are tens of thousands of them. The factor (1 − p_t)^γ reduces their loss towards zero so that the hard positives dominate training.
+- q: Why does SSD not predict from the fine feature maps of VGG-16 directly?
+  options:
+    - They have no spatial information
+    - They are too large to store
+    - They lack semantic information about small objects, so SSD builds its multi-scale maps from the final conv5 stage
+    - VGG-16 has no fine feature maps
+  answer: 2
+  explain: Early layers extract generic features. SSD starts from the semantically strong conv5 stage and adds downsampling layers; FPN instead adds a top-down pathway to bring semantic information into the fine maps.
+- q: Why must all levels of a feature pyramid network have the same depth?
+  options:
+    - So that the levels have the same spatial size
+    - Because the backbone requires it
+    - Because a single prediction head is shared across all levels
+    - To reduce computation
+  answer: 2
+  explain: The same convolutional head is applied at every level, so every level must present the same number of channels (256 in RetinaNet).

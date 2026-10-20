@@ -206,3 +206,97 @@ def time_detectors(key: str, img: np.ndarray, repeats=3) -> dict:
                     device=np.array(str(TV.device())))
     return TV.cached(f"timing_{key}", dict(key=key, shape=img.shape, models=list(ZOO),
                                            repeats=repeats, device=str(TV.device())), run)
+
+
+def raw_detections(key: str, img: np.ndarray, score_min=0.3) -> dict:
+    """Faster R-CNN v2 with its own NMS switched off (IoU threshold 1.0), so
+    the overlapping boxes that NMS removes can be shown and NMS stepped through."""
+    def run():
+        import torch
+        from torchvision.models import detection
+        w = detection.FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+        net = detection.fasterrcnn_resnet50_fpn_v2(weights=w, box_nms_thresh=1.0,
+                                                    box_score_thresh=score_min,
+                                                    detections_per_img=500).eval().to(TV.device())
+        with torch.no_grad():
+            out = net([_tensor(img)])[0]
+        return dict(boxes=out["boxes"].cpu().numpy().astype(np.float32),
+                    labels=out["labels"].cpu().numpy().astype(np.int16),
+                    scores=out["scores"].cpu().numpy().astype(np.float32))
+    return TV.cached(f"raw_frcnn_{key}", dict(key=key, shape=img.shape, score_min=score_min), run)
+
+
+def retinanet_internals(key: str, img: np.ndarray, gt: np.ndarray, cls_name: str,
+                        gammas=(0.0, 0.5, 1.0, 2.0, 5.0)) -> dict:
+    """RetinaNet's real anchors and classification outputs for one image.
+
+    Anchors are matched to the ground truth `gt` with RetinaNet's rule (IoU >=
+    0.5 positive, < 0.4 negative, otherwise ignored). For every anchor the
+    sigmoid outputs over all classes are scored against its target (the GT
+    class for a positive, all zeros for a negative) with the focal loss for
+    each gamma (gamma = 0 is cross-entropy). Returned per anchor: level, IoU,
+    label (1 / 0 / -1), p_t of the target class, and the loss per gamma; plus
+    the FPN feature-map shapes and channel-mean maps of each level.
+    """
+    def run():
+        import torch
+        import torch.nn.functional as F
+        from torchvision.models import detection
+        from torchvision.ops import box_iou
+        w = detection.RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT
+        net, _ = _load("retinanet")
+        cats = w.meta["categories"]
+        c = cats.index(cls_name)
+        with torch.no_grad():
+            images, _ = net.transform([_tensor(img)])
+            feats = list(net.backbone(images.tensors).values())
+            head = net.head(feats)
+            anchors = net.anchor_generator(images, feats)[0]
+            logits = head["cls_logits"][0]                          # (A, K)
+            h, w_ = images.image_sizes[0]
+            s = torch.tensor([w_ / img.shape[1], h / img.shape[0]] * 2, device=anchors.device)
+            g = torch.as_tensor(gt, dtype=torch.float32, device=anchors.device) * s
+            iou = box_iou(anchors, g).max(1).values
+            label = torch.full_like(iou, -1)
+            label[iou < 0.4] = 0
+            label[iou >= 0.5] = 1
+            target = torch.zeros_like(logits)
+            target[label == 1, c] = 1
+            p = logits.sigmoid()
+            pt_all = torch.where(target == 1, p, 1 - p)
+            ce = F.binary_cross_entropy_with_logits(logits, target, reduction="none")
+            losses = {f"loss_g{g_}": ((1 - pt_all) ** g_ * ce).sum(1).cpu().numpy().astype(np.float32)
+                      for g_ in gammas}
+            pt = torch.where(label == 1, p[:, c], 1 - p.max(1).values)
+            sizes = [f.shape[-2] * f.shape[-1] for f in feats]
+            per = len(anchors) // sum(sizes)
+            level = np.concatenate([np.full(n * per, k) for k, n in enumerate(sizes)])
+            maps = {f"map{k}": f[0].norm(dim=0).cpu().numpy().astype(np.float16)
+                    for k, f in enumerate(feats)}
+        return dict(level=level.astype(np.int8), iou=iou.cpu().numpy().astype(np.float32),
+                    label=label.cpu().numpy().astype(np.int8), pt=pt.cpu().numpy().astype(np.float32),
+                    anchors=(anchors / s).cpu().numpy().astype(np.float32),
+                    shapes=np.array([f.shape[-2:] for f in feats]), gammas=np.array(gammas),
+                    **losses, **maps)
+    return TV.cached(f"retina_{key}", dict(key=key, shape=img.shape, gt=np.asarray(gt).tolist(),
+                                           cls=cls_name, gammas=list(gammas)), run)
+
+
+def ssd_default_boxes() -> dict:
+    """SSD300's default boxes per feature map, from torchvision's own model."""
+    def run():
+        import torch
+        from torchvision.models import detection
+        net, _ = _load("ssd300")
+        with torch.no_grad():
+            x = torch.zeros(1, 3, 300, 300, device=TV.device())
+            feats = list(net.backbone(x).values())
+            from torchvision.models.detection.image_list import ImageList
+            il = ImageList(x, [(300, 300)])
+            anchors = net.anchor_generator(il, feats)[0]
+        shapes = np.array([f.shape[-2:] for f in feats])
+        chans = np.array([f.shape[1] for f in feats])
+        per_cell = np.array(net.anchor_generator.num_anchors_per_location())
+        return dict(shapes=shapes, channels=chans, per_cell=per_cell,
+                    anchors=anchors.cpu().numpy().astype(np.float32))
+    return TV.cached("ssd300_default_boxes", dict(model="ssd300", v=2), run)
