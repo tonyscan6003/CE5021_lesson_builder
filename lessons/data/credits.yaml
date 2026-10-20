@@ -103,6 +103,13 @@ dairy_cows:
   licence_url: https://creativecommons.org/licenses/by-sa/2.0
   source_url: https://commons.wikimedia.org/wiki/File:Dairy_cows_on_pasture_in_Ireland.jpg
   title: Dairy cows on pasture in Ireland
+dog_ball:
+  author: Pdpics
+  file: dog_ball.jpg
+  licence: CC BY-SA 3.0
+  licence_url: https://creativecommons.org/licenses/by-sa/3.0
+  source_url: https://commons.wikimedia.org/wiki/File:Dog_Playing_Ball.jpg
+  title: Dog Playing Ball
 faces_crumb:
   author: Graham Crumb
   file: faces_crumb.jpg
@@ -292,6 +299,13 @@ pyramids:
   licence_url: https://creativecommons.org/licenses/by-sa/2.0
   source_url: https://commons.wikimedia.org/wiki/File:All_Gizah_Pyramids.jpg
   title: All Gizah Pyramids
+ragdoll:
+  author: WeeJeeVee
+  file: ragdoll.jpg
+  licence: CC BY-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0
+  source_url: https://commons.wikimedia.org/wiki/File:Cat_in_the_garden_1.JPG
+  title: Cat in the garden
 rubiks_cube:
   author: Byjuvtvm
   file: rubiks_cube.jpg
@@ -398,6 +412,13 @@ trevi_detail:
   licence_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
   source_url: https://commons.wikimedia.org/wiki/File:Detail_Neptune_Trevi_fountain_Rome_Italy.jpg
   title: Detail Neptune Trevi fountain Rome Italy
+two_dogs:
+  author: Panyd
+  file: two_dogs.jpg
+  licence: CC BY-SA 3.0
+  licence_url: https://creativecommons.org/licenses/by-sa/3.0
+  source_url: https://commons.wikimedia.org/wiki/File:Lizzie_and_Murray_-_Two_dogs_in_a_field_2.jpg
+  title: Lizzie and Murray - Two dogs in a field
 workbench:
   author: Circacies
   file: workbench.jpg

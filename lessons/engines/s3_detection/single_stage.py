@@ -13,7 +13,9 @@ Figures
                           into positives and easy negatives for each gamma
     fpn_levels            RetinaNet's real P3-P7 feature maps; the level of each match
     ssd_multiscale        SSD300's 6 feature maps and 8,732 default boxes (torchvision)
-    feature_pyramid       bottom-up, top-down and lateral paths with computed shapes
+    (the slide diagrams -- detection_system, head_sliding, gt_assignment,
+     anchor_examples, box_dimensions, scale_grids, ssd_architecture and
+     fpn_detector -- are in single_stage_diagrams.py)
     depthwise_separable   standard vs depthwise + pointwise: parameters and MACs
     nms_steps             non-maximum suppression stepped through real raw detections
                           (interactive)
@@ -37,9 +39,11 @@ from .. import _torchdet as D
 from .. import _torchvis as TV
 from .intro_detection import SHEEP_GT
 
-FIGURES = ["feature_location", "prediction_head", "anchor_assignment", "box_parameterisation",
-           "detection_loss", "focal_loss", "fpn_levels", "ssd_multiscale",
-           "feature_pyramid", "depthwise_separable", "nms_steps"]
+FIGURES = ["feature_location", "detection_system", "head_sliding", "prediction_head",
+           "gt_assignment", "anchor_examples", "anchor_assignment", "box_dimensions",
+           "box_parameterisation", "detection_loss", "focal_loss", "scale_grids", "fpn_levels",
+           "ssd_architecture", "ssd_multiscale", "fpn_detector", "depthwise_separable",
+           "nms_steps"]
 
 
 def _box(ax, b, col, lw=2.0, ls="-", label=None, fs=8, alpha=1.0):
@@ -106,7 +110,7 @@ def fig_prediction_head(ctx: BuildContext) -> Figure:
     img = _sheep()
     s, rf = 16, TV.RF["conv5_3"] + 2 * 16           # conv5_3, plus the 3 x 3 head
     gh, gw = img.shape[0] // s, img.shape[1] // s
-    B, Cn = 3, 20
+    B, Cn = 2, 81                                    # as on the slide: 2 boxes, COCO
     cy, cx = 16, 9                                   # a cell on the large sheep
     fig = plt.figure(figsize=(14.5, 4.6))
     gs = fig.add_gridspec(1, 2, width_ratios=[1.45, 1], wspace=0.08)
@@ -127,27 +131,32 @@ def fig_prediction_head(ctx: BuildContext) -> Figure:
                  f"(orange) at one cell (red),\nwhose receptive field (dashed) is {rf} × {rf} "
                  "pixels", fontsize=10)
     ax = fig.add_subplot(gs[1]); ax.axis("off")
-    x = 0.0
-    cols = []
+    # the slide's output vector: [4 coordinates][1][4 coordinates][1][81 classes]
+    segs = []
     for b in range(B):
-        for k, nm in enumerate(["t_x", "t_y", "t_w", "t_h", "conf"]):
-            cols.append((nm if b == 0 else "", C["sky"] if k < 4 else C["green"]))
-    cols += [("", C["purple"])] * Cn
-    w = 0.92 / len(cols)
-    for k, (nm, col) in enumerate(cols):
-        ax.add_patch(plt.Rectangle((0.04 + k * w, 0.52), w * 0.95, 0.12, fc=col, ec=C["ink"],
-                                   lw=0.5, transform=ax.transAxes))
-    for b in range(B):
-        ax.text(0.04 + (b * 5 + 2.5) * w, 0.69, f"anchor {b + 1}", ha="center", fontsize=8.5,
+        segs += [("4 × coordinates\n(t_x, t_y, t_w, t_h)", 4, "#e1d5e7"), ("1 ×", 1, "#d5e8d4")]
+    segs.append((f"{Cn} × class\n(COCO: 80 + background)", 9, "#dae8fc"))
+    tot = sum(n for _, n, _ in segs)
+    x = 0.02
+    for k, (lab, n, col) in enumerate(segs):
+        w = 0.96 * n / tot
+        ax.add_patch(plt.Rectangle((x, 0.5), w, 0.13, fc=col, ec=C["grey"], lw=0.9,
+                                   transform=ax.transAxes))
+        ax.text(x + w / 2, 0.565, lab.split("\n")[0], ha="center", va="center", fontsize=8.5,
                 transform=ax.transAxes)
-    ax.text(0.04 + (B * 5 + Cn / 2) * w, 0.69, f"{Cn} class probabilities", ha="center",
-            fontsize=8.5, transform=ax.transAxes)
-    ax.text(0.04, 0.42, "t_x, t_y, t_w, t_h: box relative to the anchor\nconf: object or "
-            "background", fontsize=9, transform=ax.transAxes, va="top")
-    ax.text(0.04, 0.2, f"one cell: {B} × (4 + 1) + {Cn} = {B * 5 + Cn} values\n"
+        if "\n" in lab:
+            ax.text(x + w / 2, 0.47, lab.split("\n")[1], ha="center", va="top", fontsize=7.5,
+                    transform=ax.transAxes, color=C["grey"])
+        if n == 1:
+            ax.annotate("confidence", xy=(x + w / 2, 0.64), xytext=(x + w / 2 - 0.05, 0.78),
+                        xycoords="axes fraction", fontsize=8.5, ha="center",
+                        arrowprops=dict(arrowstyle="->", lw=0.9))
+        x += w
+    ax.text(0.02, 0.28, f"one cell: {B} × (4 + 1) + {Cn} = {B * 5 + Cn} values\n"
             f"output tensor: {gw} × {gh} × {B * 5 + Cn}", fontsize=10.5, color=C["red"],
             transform=ax.transAxes, va="top")
-    ax.set_title("(b) the output vector predicted at each cell", fontsize=10)
+    ax.set_title(f"(b) the output vector at each feature-map position ({B} boxes predicted)",
+                 fontsize=10)
     png = save_mpl(fig, ctx, "prediction_head")
     return Figure("prediction_head",
                   "The **prediction head** of a basic single-stage detector, a small "
@@ -159,8 +168,11 @@ def fig_prediction_head(ctx: BuildContext) -> Figure:
                   "object is encoded in the depth of the feature map at that cell, so a "
                   "small kernel is sufficient. (b) At each cell the head predicts, for each "
                   "anchor box, four box values relative to the anchor and the cell position "
-                  "and a confidence, and, usually once per cell, the class probabilities "
-                  f"(here {B} anchors and {Cn} classes). The predicted box is relative to "
+                  "and a confidence, and, usually once per cell, the class probabilities: "
+                  f"here {B} boxes and the {Cn} classes of COCO (80 object classes and "
+                  "background). Because the class is predicted once per cell, both boxes "
+                  "receive the same class, which can be wrong when two different objects "
+                  "share a cell. The predicted box is relative to "
                   "the cell and must be corrected by the coarse position of the cell to "
                   "obtain coordinates in the image. The confidence is sometimes replaced by "
                   "a background class.",
@@ -358,7 +370,7 @@ def fig_focal_loss(ctx: BuildContext) -> Figure:
                   "from being learned. The focal loss multiplies the cross-entropy by "
                   "(1 − p_t)^γ, which reduces the loss of well-classified examples towards "
                   "zero, and γ = 2 is typically chosen. (b, c) The effect, measured with "
-                  "RetinaNet's real outputs for the anchors of Figure 3: almost all of the "
+                  "RetinaNet's real outputs for the anchors of Figure 7: almost all of the "
                   "negatives are already classified as background with high confidence, "
                   f"but with cross-entropy the positives account for only {shares[0]:.1%} of "
                   "the total loss on this image. With γ = 2 the easy negatives contribute "
@@ -451,61 +463,6 @@ def fig_ssd_multiscale(ctx: BuildContext) -> Figure:
                   "small on the fine maps and large on the coarse maps (two levels are "
                   f"shown on the left, for the centre cell). In total {total:,} boxes are "
                   "predicted for each image.",
-                  png=png)
-
-
-def fig_feature_pyramid(ctx: BuildContext) -> Figure:
-    H, W = 800, 1216                                   # RetinaNet input for this photo
-    bottom = [("C3", 512, 8), ("C4", 1024, 16), ("C5", 2048, 32)]
-    top = [("P3", 8), ("P4", 16), ("P5", 32), ("P6", 64), ("P7", 128)]
-    fig, ax = plt.subplots(figsize=(13.5, 5.6))
-    yb = {n: 0.6 + k * 1.35 for k, (n, _, _) in enumerate(bottom)}
-    for n, c, s in bottom:
-        w = 0.5 + 1.2 * np.sqrt(c / 2048)
-        ax.add_patch(plt.Rectangle((0.6, yb[n]), w, 0.85, fc=C["blue"], alpha=0.55, ec=C["ink"]))
-        ax.text(0.6 + w / 2, yb[n] + 0.42, f"{n}\n{H // s} × {W // s} × {c}", ha="center",
-                va="center", fontsize=9)
-    ax.text(1.3, 0.15, "bottom-up: ResNet-50 backbone", ha="center", fontsize=9.5,
-            color=C["blue"])
-    for k, (n, s) in enumerate(top):
-        y = 0.6 + k * 1.35 if k < 3 else 0.6 + 2 * 1.35 + (k - 2) * 0.95
-        ax.add_patch(plt.Rectangle((5.2, y), 1.6, 0.75, fc=C["green"], alpha=0.5, ec=C["ink"]))
-        ax.text(6.0, y + 0.37, f"{n}: {-(-H // s)} × {-(-W // s)} × 256", ha="center",
-                va="center", fontsize=9)
-        ax.add_patch(plt.Rectangle((8.4, y + 0.1), 1.5, 0.55, fc=C["purple"], alpha=0.5,
-                                   ec=C["ink"]))
-        ax.text(9.15, y + 0.37, "shared head", ha="center", va="center", fontsize=8.5)
-        ax.annotate("", xy=(8.38, y + 0.37), xytext=(6.82, y + 0.37),
-                    arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.1))
-    for k, (n, c, s) in enumerate(bottom):
-        w = 0.5 + 1.2 * np.sqrt(c / 2048)
-        ax.annotate("", xy=(5.18, yb[n] + 0.4), xytext=(0.62 + w, yb[n] + 0.42),
-                    arrowprops=dict(arrowstyle="->", color=C["orange"], lw=1.3))
-        ax.text(3.6, yb[n] + 0.52, "1 × 1 conv (lateral)", fontsize=8.5, color=C["orange"],
-                ha="center")
-        if k:
-            ax.annotate("", xy=(6.0, 0.6 + (k - 1) * 1.35 + 0.77), xytext=(6.0, 0.6 + k * 1.35),
-                        arrowprops=dict(arrowstyle="->", color=C["red"], lw=1.3))
-            ax.text(6.08, 0.6 + k * 1.35 - 0.27, "×2 upsample, add", fontsize=8,
-                    color=C["red"])
-    ax.text(6.9, 4.9, "P6, P7: stride-2\nconvolutions", fontsize=8.5, color=C["grey"])
-    ax.text(6.0, 0.15, "top-down pyramid", ha="center", fontsize=9.5, color=C["green"])
-    ax.set_xlim(0.3, 10.2); ax.set_ylim(0, 6.2); ax.axis("off")
-    ax.set_title(f"Feature pyramid network as used in RetinaNet, for a {W} × {H} input",
-                 fontsize=10.5)
-    png = save_mpl(fig, ctx, "feature_pyramid")
-    return Figure("feature_pyramid",
-                  "The **feature pyramid network** (FPN), with the shapes computed for the "
-                  "RetinaNet input of Figure 7. The bottom-up path is the backbone, here "
-                  "ResNet-50, whose fine feature maps have poor semantic information. A "
-                  "parallel top-down pyramid is therefore built, starting from the last, "
-                  "semantically strong feature map: each level is upsampled by two and added "
-                  "to the corresponding backbone map, reduced to 256 channels by a 1 × 1 "
-                  "**lateral** convolution, which combines semantic information with fine "
-                  "spatial detail. Two further levels, P6 and P7, are created by "
-                  "downsampling. All levels have the same depth so that a common prediction "
-                  "head can be shared between them. FPN gives good performance on small "
-                  "objects and is used in many modern detectors.",
                   png=png)
 
 
@@ -634,10 +591,14 @@ def fig_nms_steps(ctx: BuildContext) -> Figure:
 
 
 def build(ctx: BuildContext) -> list[Figure]:
-    return [fig_feature_location(ctx), fig_prediction_head(ctx), fig_anchor_assignment(ctx),
+    from . import single_stage_diagrams as SD
+    return [fig_feature_location(ctx), SD.fig_detection_system(ctx), SD.fig_head_sliding(ctx),
+            fig_prediction_head(ctx), SD.fig_gt_assignment(ctx), SD.fig_anchor_examples(ctx),
+            fig_anchor_assignment(ctx), SD.fig_box_dimensions(ctx),
             fig_box_parameterisation(ctx), fig_detection_loss(ctx), fig_focal_loss(ctx),
-            fig_fpn_levels(ctx), fig_ssd_multiscale(ctx), fig_feature_pyramid(ctx),
-            fig_depthwise_separable(ctx), fig_nms_steps(ctx)]
+            SD.fig_scale_grids(ctx), fig_fpn_levels(ctx), SD.fig_ssd_architecture(ctx),
+            fig_ssd_multiscale(ctx), SD.fig_fpn_detector(ctx), fig_depthwise_separable(ctx),
+            fig_nms_steps(ctx)]
 
 
 def demo() -> None:

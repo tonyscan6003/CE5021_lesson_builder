@@ -38,6 +38,10 @@ The location of the activation gives coarse information about the location of an
 
 A single-stage detector is constructed by adding a **prediction head**, itself a small convolutional network usually with $3 \times 3$ kernels, to the output feature map of a pre-trained image classifier. As the head moves over the feature map, it predicts a confidence, which indicates whether an object is present in the current region of the feature map, together with the class and the bounding box of the object. Each cell of the feature map has a large receptive field and captures the extent of the object in the image, so this information is held in the depth of the feature map and small kernels are sufficient.
 
+{{fig detection_system}}
+
+{{fig head_sliding}}
+
 {{fig prediction_head}}
 
 The bounding box predicted by the head is relative to the current position in the feature map, so it must be corrected by that coarse position to obtain coordinates in the image. The predictions are output as a vector at each cell: for each box, four coordinate values and a confidence, together with a set of class probabilities, usually a softmax output. Several boxes are commonly predicted at each cell, as a consequence of the use of anchor boxes. The confidence does not always have to be predicted separately; instead a background class can be added to the classes, although the background class then dominates training. The class is usually predicted once for each cell, although it can be predicted for each anchor at the cost of a larger network.
@@ -45,6 +49,10 @@ The bounding box predicted by the head is relative to the current position in th
 ## Anchor boxes and ground-truth assignment
 
 Training an object detector is more difficult than training an image classifier, as there are multiple ground-truth objects of different sizes and classes at different locations in each image. The feature-map cells that contain valid objects must be identified and assigned the correct ground truth. **Anchor boxes** are used for this purpose. If an anchor box overlaps a ground-truth box with an IoU above a threshold, the anchor is selected as a positive prediction, and the head is trained to predict the offset and scale of the ground truth from the anchor.
+
+{{fig gt_assignment}}
+
+{{fig anchor_examples}}
 
 {{fig anchor_assignment}}
 
@@ -57,6 +65,8 @@ The head does not predict the bounding-box coordinates directly. Instead, it pre
 $$t_x = \frac{x - x_a}{w_a}, \qquad t_y = \frac{y - y_a}{h_a}, \qquad t_w = \log\frac{w}{w_a}, \qquad t_h = \log\frac{h}{h_a}, \tag{1}$$
 
 where $x_a, y_a, w_a, h_a$ are the centre, width and height of the anchor, which is centred on the current cell, and $x, y, w, h$ those of the predicted box. The ground-truth values $t^*$ are obtained with the same equations from the ground-truth box. These equations are those of the Faster R-CNN region proposal network, which is functionally equivalent to a single-stage detector; many variations are used in the literature.
+
+{{fig box_dimensions}}
 
 {{fig box_parameterisation}}
 
@@ -94,6 +104,8 @@ Focal loss is widely used in object detection. When cross-entropy is also used f
 
 A basic single-stage detector makes its predictions from a single output feature map, usually the last convolution layer of the image classifier, which has a coarse spatial resolution and a wide receptive field and can usually be trained to localise only large objects. Small objects can be detected by increasing the image resolution or by using an image pyramid, at the cost of extra computation. A more efficient approach is to use feature maps of the image classifier at different scales: larger objects are detected in coarse feature maps with large receptive fields, and smaller objects in fine feature maps with smaller receptive fields. Each feature map is assigned a nominal scale, and the anchor boxes of that map are sized for objects around it.
 
+{{fig scale_grids}}
+
 {{fig fpn_levels}}
 
 The fine feature maps of the image classifier may, however, not perform as well as expected, as their filters extract more generic features and may not contain explicit semantic information about small objects. SSD and feature pyramid networks take different approaches to ensuring semantic information in the fine feature maps.
@@ -102,13 +114,15 @@ The fine feature maps of the image classifier may, however, not perform as well 
 
 The **Single Shot MultiBox Detector** (SSD) is a well-known detector that uses multi-scale feature maps. SSD is based on VGG-16, but does not use the fine feature maps of VGG-16, as they do not contain semantic information about small objects. Instead, the final convolution stage of VGG-16, which does contain semantic information, is used as the starting layer for a series of multi-scale maps. An increased input size is used to allow enough spatial resolution for downsampling between the maps. Boxes and classes are predicted at each of the maps with $3 \times 3$ convolutions, relative to anchor (default) boxes.
 
+{{fig ssd_architecture}}
+
 {{fig ssd_multiscale}}
 
 ## Feature pyramid networks
 
 The **feature pyramid network** (FPN) is another multi-scale approach. It also uses a pre-trained image classifier, here ResNet-50, as the backbone, but takes a different approach to the poor semantic information of the fine feature maps: a parallel pyramid is generated, starting from the semantic output of the image classifier. This starting feature map is upsampled and combined with the fine feature maps, and two further levels are created by downsampling. A common prediction head is used for all levels of the pyramid, so all levels must have the same depth.
 
-{{fig feature_pyramid}}
+{{fig fpn_detector}}
 
 FPN gives good performance for small objects. It can be trained on input images of different sizes, with larger images giving better performance on small objects at the cost of computation, and it is used in many modern object detectors.
 

@@ -281,3 +281,21 @@ cyclist:
   title: "A commuter cyclist in the London morning rush hour"
   author: "ProfDEH"
   note: "lesson 3.3 slides 2-4 (and 3.1 slide 3)"
+two_dogs:
+  commons: "Lizzie and Murray - Two dogs in a field 2.jpg"
+  width: 1024
+  title: "Lizzie and Murray - Two dogs in a field"
+  author: "Panyd"
+  note: "lesson 3.4 slide 5"
+dog_ball:
+  commons: "Dog Playing Ball.jpg"
+  width: 1024
+  title: "Dog Playing Ball"
+  author: "Pdpics"
+  note: "lesson 3.4 slide 9"
+ragdoll:
+  commons: "Cat in the garden 1.JPG"
+  width: 1024
+  title: "Cat in the garden"
+  author: "WeeJeeVee"
+  note: "lesson 3.4 slide 4 (the slide's Ragdoll photo, if this is it)"
