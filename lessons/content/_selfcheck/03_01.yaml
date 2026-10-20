@@ -1,0 +1,60 @@
+# 3.1 Introduction to object detection
+# Written against lesson_3_1_introduction / lesson_3_1_script; the IoU and
+# precision/recall arithmetic is practised in the worked examples, from the
+# Grasple_obj_det_deep_learning exercises 105760 and 109371.
+- q: Why is a sliding window with a pre-trained image classifier impractical as an object detector?
+  options:
+    - The classifier would need to be retrained for every window size
+    - Sliding windows cannot find more than one object
+    - The classifier cannot be applied to part of an image
+    - Thousands of window positions, repeated over an image pyramid, must each be classified
+  answer: 3
+  explain: The classifier is run once per window position, and an image pyramid multiplies the positions again to cover different scales. With a large network this is far too slow. More than one object can be found, but only at great cost.
+- q: A predicted box and a ground-truth box each have an area of 100 pixels and overlap in an area of 50 pixels. What is their IoU?
+  options:
+    - '0.67'
+    - '0.33'
+    - '0.50'
+    - '0.25'
+  answer: 1
+  explain: The union is 100 + 100 − 50 = 150 pixels, so IoU = 50 / 150 = 0.33. Dividing by one box area gives 0.5, which ignores the part of the union outside that box.
+- q: A prediction has a confidence above T1 but an IoU with the nearest ground-truth box below T2. How is it counted?
+  options:
+    - False positive
+    - It is ignored
+    - True positive
+    - False negative
+  answer: 0
+  explain: Predictions are only ignored when their confidence is below T1. Above T1, the IoU decides between a true positive (IoU > T2) and a false positive (IoU < T2). A false negative is an object that no prediction detects.
+- q: Why are true negatives not used to evaluate object detectors?
+  options:
+    - They are only used for multi-class detectors
+    - Detectors cannot output a negative prediction
+    - True negatives are always zero in detection
+    - The background would provide an enormous number of true negatives, dominating any metric that used them
+  answer: 3
+  explain: Almost every location in an image is background, so the true negatives would vastly outnumber the true positives. Precision and recall do not depend on true negatives, which is why they are used instead.
+- q: What happens to precision and recall when the confidence threshold T1 is lowered?
+  options:
+    - Both increase
+    - Neither changes, as they depend only on the IoU threshold
+    - Precision tends to decrease and recall increases
+    - Precision increases and recall decreases
+  answer: 2
+  explain: More predictions are kept, so more objects are found (recall rises) but more of the kept predictions are wrong (precision tends to fall). Moving down a ranked list of detections traces out exactly this trade-off.
+- q: Why is the precision–recall curve interpolated before the average precision is calculated?
+  options:
+    - Because the raw curve zig-zags, and p_interp(r) = max precision at any recall ≥ r gives a monotonic curve whose area can be summed as rectangles
+    - Because the area under a curve can only be found for straight lines
+    - To remove the false positives from the curve
+    - To make the recall values evenly spaced
+  answer: 0
+  explain: The raw precision moves up and down as recall increases. Taking the maximum precision to the right of each recall value removes the zig-zags, and the area under the resulting step curve is the AP.
+- q: Why must the IoU threshold be stated when the mAP of two detectors is compared?
+  options:
+    - Because a stricter IoU threshold turns poorly localised true positives into false positives, lowering the AP
+    - Because the mAP is only defined for an IoU of 0.5
+    - It need not be stated; the mAP does not depend on it
+    - Because the IoU threshold changes the number of classes
+  answer: 0
+  explain: The AP and mAP are calculated from precision–recall curves obtained at a fixed IoU threshold T2. Raising T2 demands more accurate boxes, so fewer predictions count as true positives and the AP falls.
