@@ -22,4 +22,5 @@ REGISTRY = [
     ("s2_classification.visualisation",  "02_05", "2.5 Visualisation & adversarial attack"),
     ("s3_detection.intro_detection",     "03_01", "3.1 Object detection metrics"),
     ("s3_detection.region_proposals",    "03_02", "3.2 Region proposals"),
+    ("s3_detection.two_stage",           "03_03", "3.3 Two-stage detectors"),
 ]

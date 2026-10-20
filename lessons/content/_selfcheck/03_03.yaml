@@ -1,0 +1,50 @@
+# 3.3 Two-stage object detection
+# Written against lesson_3_3_obj_det_partA_w_reg_Prop / lesson_3_3_script.
+- q: Why must region proposals be warped to a fixed size in the original R-CNN?
+  options:
+    - Because selective search outputs only square regions
+    - Because convolution layers only accept square inputs
+    - To reduce the number of proposals
+    - Because the fully connected layers of the network require a fixed-size input
+  answer: 3
+  explain: Convolution layers accept any input size; it is the fully connected layers that need a fixed-length vector. Spatial pyramid pooling and RoI pooling remove the need to warp.
+- q: A feature map is pooled with spatial pyramid pooling levels of 4 × 4, 2 × 2 and 1 × 1 bins and has 256 channels. How long is the output vector?
+  options:
+    - 1,792
+    - It depends on the size of the feature map
+    - 5,376
+    - '256'
+  answer: 2
+  explain: 'There are 16 + 4 + 1 = 21 bins, each giving one value per channel: 21 × 256 = 5,376, whatever the size of the map.'
+- q: What is the main computational advantage of region of interest projection in Fast R-CNN?
+  options:
+    - The convolution layers are applied once per image instead of once per proposal
+    - The fully connected layers are removed
+    - The image is processed at a lower resolution
+    - The proposals are generated faster
+  answer: 0
+  explain: The proposals are projected onto the feature maps of the whole image, so overlapping proposals share the same convolutional computation.
+- q: How is a class activation map obtained from a network with global average pooling and one dense layer?
+  options:
+    - By averaging the input image over the class
+    - By summing the feature maps of the last convolution layer, weighted by the dense-layer weights of the predicted class
+    - By training a separate localisation network
+    - By taking the gradient of the loss with respect to the weights
+  answer: 1
+  explain: The class score is a weighted sum of the pooled feature maps; applying the same weights to the unpooled maps shows where the evidence for the class lies.
+- q: What replaces selective search in Faster R-CNN?
+  options:
+    - Objectness
+    - A sliding window
+    - RoI pooling
+    - A region proposal network that shares the convolution layers of the detector
+  answer: 3
+  explain: The RPN scores anchors at every feature-map position and adjusts their boxes, using the same features as the second stage, so the proposals are learned and no external algorithm is required.
+- q: Why are two-stage detectors typically more accurate but slower than single-stage detectors?
+  options:
+    - They do not use convolution
+    - They use larger images
+    - They are trained on more data
+    - The second stage classifies each proposal and refines its box again, at the cost of extra computation per region
+  answer: 3
+  explain: The RPN is functionally a single-stage detector; the extra RoI-pooling stage refines the boxes and classes, which improves accuracy but reduces the frame rate.
