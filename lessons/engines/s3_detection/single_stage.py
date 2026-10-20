@@ -92,17 +92,25 @@ def fig_feature_location(ctx: BuildContext) -> Figure:
     _box(axes[1], np.array(car) / s - 0.5, "white", lw=1.4, ls="--")
     axes[1].set_title(f"VGG-16 conv5_3, channel {ch} of 512 ({f.shape[2]} × {f.shape[1]})",
                       fontsize=10)
+    zero = (f == 0).mean()
+    ccy, ccx = int((car[1] + car[3]) / 2 // s), int((car[0] + car[2]) / 2 // s)
+    active = int((f[:, ccy, ccx] > 0).sum())
     png = save_mpl(fig, ctx, "feature_location")
     return Figure("feature_location",
                   "The feature maps of an image classifier contain both spatial and semantic "
                   "information. The photograph is passed once through the convolution "
                   "layers of VGG-16, trained on ImageNet classification, and one channel of "
                   "the conv5_3 feature map is shown: the channel whose activation is most "
-                  "concentrated on the car (dashed). The position of the activation gives "
-                  "coarse information about the location of the object, while the fine "
-                  "information about its extent is held in the depth of the feature map, "
-                  "across the 512 channels. Unlike a sliding window, the image needs to be "
-                  "processed only once to obtain this information.",
+                  "concentrated on the car (dashed). The position of the activation indicates "
+                  f"approximately where the object is, but only at the resolution of the map: "
+                  f"each cell covers {s} × {s} pixels of the image. The map is also sparse: "
+                  f"after the ReLU, {zero:.0%} of its values are zero, and at the cell at the "
+                  f"centre of the car only {active} of the 512 channels are active. A detector "
+                  "therefore does not read the box directly from the feature map; a prediction "
+                  "head is trained to regress the box from these features, and accurate "
+                  "localisation, particularly of small objects, needs higher-resolution feature "
+                  "maps, which is the purpose of the multi-scale detectors described later in "
+                  "this lesson. Unlike a sliding window, the image is processed only once.",
                   png=png)
 
 
@@ -164,9 +172,10 @@ def fig_prediction_head(ctx: BuildContext) -> Figure:
                   "position of the output feature map of the backbone. (a) For VGG-16 "
                   f"conv5_3 the grid has a stride of {s} pixels, and each cell has a "
                   f"receptive field of {rf} pixels, calculated with the formula of Lesson "
-                  "1.4, which is large enough to contain the whole sheep: the extent of the "
-                  "object is encoded in the depth of the feature map at that cell, so a "
-                  "small kernel is sufficient. (b) At each cell the head predicts, for each "
+                  "1.4, which is large enough to contain the whole sheep, so the features at "
+                  "that cell are computed from the whole object and a small kernel is "
+                  "sufficient for the head; the box itself is learned as a regression from "
+                  "the anchor. (b) At each cell the head predicts, for each "
                   "anchor box, four box values relative to the anchor and the cell position "
                   "and a confidence, and, usually once per cell, the class probabilities: "
                   f"here {B} boxes and the {Cn} classes of COCO (80 object classes and "

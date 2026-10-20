@@ -12,7 +12,7 @@
   options:
     - The head is applied to the input image
     - Large objects are detected by the classifier instead
-    - Each feature-map cell has a large receptive field, and the extent of the object is encoded in the depth of the feature map
+    - Each feature-map cell has a large receptive field, so its features are computed from a large region of the image
     - Large objects are always resized to 3 × 3
   answer: 2
   explain: The backbone has already aggregated information over a wide region; the head only needs to read it out locally at each cell.

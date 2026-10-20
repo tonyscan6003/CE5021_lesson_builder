@@ -149,8 +149,10 @@ def fig_head_sliding(ctx: BuildContext) -> Figure:
                   "position of the output feature map. (b) At each position it predicts a "
                   "confidence that an object is present in that region of the feature map, "
                   "together with the class and the bounding box. Each cell has a large "
-                  "receptive field, so the extent of the object is held in the depth of the "
-                  "feature map at that cell and a small kernel is sufficient.",
+                  "receptive field, so the features at a cell are computed from a large region "
+                  "of the image and a small kernel is sufficient. The coarse grid limits how "
+                  "precisely objects can be located, which is addressed by the multi-scale "
+                  "feature maps described later in this lesson.",
                   png=png)
 
 

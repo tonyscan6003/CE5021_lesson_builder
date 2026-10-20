@@ -32,11 +32,11 @@ Instead, the information about the whole image that is available in the convolut
 
 {{fig feature_location}}
 
-The location of the activation gives coarse information about the location of an object, and fine information about its spatial extent can be obtained from the channels of the feature map. Each image therefore needs to be processed only once by the convolution layers.
+The location of the activation gives coarse information about the location of an object, at the resolution of the feature map. The feature maps are also sparse, as most channels are not activated at any given position, so the bounding box cannot be read directly from them; instead, a prediction head is trained to regress the box from the features. Each image needs to be processed only once by the convolution layers. Accurate localisation, particularly of small objects, requires feature maps of higher resolution, which is addressed by the multi-scale detectors described later in this lesson.
 
 ## The prediction head
 
-A single-stage detector is constructed by adding a **prediction head**, itself a small convolutional network usually with $3 \times 3$ kernels, to the output feature map of a pre-trained image classifier. As the head moves over the feature map, it predicts a confidence, which indicates whether an object is present in the current region of the feature map, together with the class and the bounding box of the object. Each cell of the feature map has a large receptive field and captures the extent of the object in the image, so this information is held in the depth of the feature map and small kernels are sufficient.
+A single-stage detector is constructed by adding a **prediction head**, itself a small convolutional network usually with $3 \times 3$ kernels, to the output feature map of a pre-trained image classifier. As the head moves over the feature map, it predicts a confidence, which indicates whether an object is present in the current region of the feature map, together with the class and the bounding box of the object. Each cell of the feature map has a large receptive field, so the features at a cell are computed from a large region of the image, and small kernels are sufficient for the head.
 
 {{fig detection_system}}
 
