@@ -1,15 +1,22 @@
 """Lesson 3.3 — Two-stage object detection with region proposals.
 
-Figures
-    rcnn_family           R-CNN -> Fast R-CNN -> Faster R-CNN: the problems and solutions
+Figures (in lesson order; the slide diagrams are in rcnn_diagrams.py)
+    rcnn_pipeline         slide 2: proposals + image classifier on the slides' cyclist
+    transfer_features     slide 3: engineered vs learned features for the SVM
+    rcnn_training         slide 4: training the CNN, the SVMs, and inference
     rcnn_cost             CNN computation per image and SVM feature storage, computed
-    spp_layer             spatial pyramid pooling of real VGG-16 feature maps of two sizes
-    class_activation_map  real CAMs from ResNet-50 (GAP + one dense layer)
-    roi_projection        proposals projected onto a real conv5_3 map; quantisation error
+    rcnn_variants         slide 5: SVM + regressor vs fully connected heads
+    spp_diagram           slide 6: warping vs SPP, and the SPP layer as volumes
+    spp_layer             SPP of real VGG-16 feature maps of two sizes
+    fast_rcnn_pipeline    slide 7: Fast R-CNN, and RoI pooling to 7 x 7 x C
+    cam_mechanism         slide 8: how a CAM is formed, real ResNet-50 values
+    class_activation_map  real CAMs from ResNet-50 on four photos
+    roi_projection        slide 9: proposals projected onto real conv5_3 maps; rounding
     roi_pooling           two RoIs of different size pooled to the same 7 x 7 output
-    rpn_proposals         anchors, the RPN's proposals and the final detections of a
-                          real Faster R-CNN
+    faster_rcnn_pipeline  slide 10: Faster R-CNN with its region proposal network
+    rpn_proposals         anchors, the RPN's proposals and the final detections
     rpn_recall            RPN vs selective search recall on lesson 3.2's 13 objects
+    stage_comparison      slide 11: two-stage vs single-stage
     two_vs_single_stage   COCO mAP (torchvision metadata) vs inference time measured here
 
 Real networks via engines/_torchvis.py (VGG-16 feature maps) and
@@ -30,9 +37,13 @@ from .. import _detmetrics as M
 from .. import _torchdet as D
 from .. import _torchvis as TV
 from . import region_proposals as RP
+from . import rcnn_diagrams as RD
+from .. import _blocks as B
 
-FIGURES = ["rcnn_family", "rcnn_cost", "spp_layer", "class_activation_map",
-           "roi_projection", "roi_pooling", "rpn_proposals", "rpn_recall",
+FIGURES = ["rcnn_pipeline", "transfer_features", "rcnn_training", "rcnn_cost",
+           "rcnn_variants", "spp_diagram", "spp_layer", "fast_rcnn_pipeline",
+           "cam_mechanism", "class_activation_map", "roi_projection", "roi_pooling",
+           "faster_rcnn_pipeline", "rpn_proposals", "rpn_recall", "stage_comparison",
            "two_vs_single_stage"]
 
 STRIDE = 16           # VGG-16 conv5_3: four 2x2 poolings
@@ -50,62 +61,7 @@ def _clean(ax):
     ax.set_xticks([]); ax.set_yticks([])
 
 
-def _stage(ax, x, y, w, h, text, col, fs=8.5):
-    ax.add_patch(plt.Rectangle((x, y), w, h, fc=col, alpha=0.55, ec=C["ink"], lw=1))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs)
-
-
-def _arrow(ax, x0, y0, x1, y1):
-    ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
-                arrowprops=dict(arrowstyle="->", color=C["ink"], lw=1.3))
-
-
 # ---------------------------------------------------------------------------
-
-def fig_rcnn_family(ctx: BuildContext) -> Figure:
-    fig, ax = plt.subplots(figsize=(14, 6.2))
-    rows = [
-        ("R-CNN (2014)", [("image", C["light"]), ("selective\nsearch", C["orange"]),
-                          ("warp each\nregion", C["light"]), ("CNN per\nregion", C["blue"]),
-                          ("SVM per class\n+ box regressor", C["purple"])],
-         "C1: CNN features    P2: regions of different sizes    P3: overlapping regions "
-         "processed many times    P4: proposals trained separately"),
-        ("Fast R-CNN (2015)", [("image", C["light"]), ("CNN once\nper image", C["blue"]),
-                               ("RoI projection\n(selective search)", C["orange"]),
-                               ("RoI pooling\n7 × 7", C["sky"]),
-                               ("dense layers:\nclass + box", C["purple"])],
-         "C2: RoI pooling (one level of SPP)    C3: RoI projection    "
-         "multi-task loss, end-to-end training of the second stage"),
-        ("Faster R-CNN (2015)", [("image", C["light"]), ("CNN once\nper image", C["blue"]),
-                                 ("region proposal\nnetwork", C["green"]),
-                                 ("RoI pooling\n7 × 7", C["sky"]),
-                                 ("dense layers:\nclass + box", C["purple"])],
-         "C4: region proposal network shares the convolution layers — no external proposals"),
-    ]
-    for r, (name, stages, note) in enumerate(rows):
-        y = 4.2 - r * 2.0
-        ax.text(-0.2, y + 0.45, name, ha="right", va="center", fontsize=10.5, weight="bold")
-        for k, (txt, col) in enumerate(stages):
-            _stage(ax, k * 2.6, y, 2.0, 0.9, txt, col)
-            if k:
-                _arrow(ax, k * 2.6 - 0.58, y + 0.45, k * 2.6 - 0.02, y + 0.45)
-        ax.text(0, y - 0.28, note, fontsize=9, color=C["red"], va="top")
-    ax.set_xlim(-3.3, 13); ax.set_ylim(-0.4, 5.4); ax.axis("off")
-    png = save_mpl(fig, ctx, "rcnn_family")
-    return Figure("rcnn_family",
-                  "The R-CNN family of two-stage detectors and the problems solved at each "
-                  "step. **R-CNN** used a pre-trained CNN as a feature extractor (C1), with "
-                  "selective search for the proposals and an SVM per class, but each "
-                  "region had to be warped to the input size of the network (P2), "
-                  "overlapping regions were processed by the CNN many times (P3), and each "
-                  "stage was trained separately (P4). **Fast R-CNN** processes the image "
-                  "once and projects the proposals onto the feature maps (C3), converts "
-                  "each region to a fixed size with RoI pooling (C2), and predicts the "
-                  "class and box with dense layers trained by a multi-task loss. **Faster "
-                  "R-CNN** replaces selective search with a region proposal network that "
-                  "shares the convolution layers (C4).",
-                  png=png)
-
 
 def fig_rcnn_cost(ctx: BuildContext) -> Figure:
     n_prop, n_img = 2000, 5011                       # proposals per image; VOC 2007 trainval
@@ -264,25 +220,47 @@ def fig_roi_projection(ctx: BuildContext) -> Figure:
                   np.ceil(proj[:, 2]), np.ceil(proj[:, 3])], 1)
     back = q * STRIDE
     err = np.abs(back - gt).max()
-    fig, axes = plt.subplots(1, 2, figsize=(14, 3.6))
-    ax = axes[0]
-    ax.imshow(img); _clean(ax)
-    for k, b in enumerate(gt[:4]):
-        _box(ax, b, SERIES[k], lw=2)
-    ax.set_ylim(img.shape[0] * 0.66, img.shape[0] * 0.2)
-    ax.set_title(f"proposals on the {img.shape[1]} × {img.shape[0]} image", fontsize=10)
-    ax = axes[1]
-    ax.imshow(fm.mean(0), cmap="viridis"); _clean(ax)
-    for k, (p, b) in enumerate(zip(proj[:4], q[:4])):
-        _box(ax, p - 0.5, SERIES[k], lw=1.2, ls="--")
-        _box(ax, b - 0.5, SERIES[k], lw=2)
-    ax.set_ylim(fm.shape[1] * 0.66, fm.shape[1] * 0.2)
-    ax.set_title(f"projected onto conv5_3, {fm.shape[2]} × {fm.shape[1]} (stride {STRIDE}): "
-                 "exact (dashed) and rounded to cells (solid)", fontsize=10)
+    # the slide's schematic: input with proposals -> conv layers -> stacked
+    # feature maps, drawn with the real image and the real conv5_3 channels
+    y0c, y1c = int(img.shape[0] * 0.2), int(img.shape[0] * 0.66)
+    fy0, fy1 = int(fm.shape[1] * 0.2), int(np.ceil(fm.shape[1] * 0.66))
+    fig, ax = B.canvas(14.2, 3.6, (14.2, 3.6))
+    ph = 2.4
+    pimg = B.photo(ax, img, 0.1, 0.6, ph, crop=(0, y0c, img.shape[1], y1c), boxes=gt[:4],
+                   box_col=[SERIES[k] for k in range(4)], lw=1.8,
+                   label=f"input image with proposals ({img.shape[1]} × {img.shape[0]})")
+    B.arrow(ax, pimg[2] + 0.08, 1.8, pimg[2] + 0.45, 1.8)
+    B.block(ax, pimg[2] + 0.5, 1.35, 1.2, 0.9, "conv layers\n(VGG-16)", fc=B.CONV_FC, fs=9)
+    x = pimg[2] + 1.78
+    B.arrow(ax, x, 1.8, x + 0.37, 1.8)
+    sub = fm[:, fy0:fy1]
+    chans = np.argsort(-sub.mean((1, 2)))[:2]
+    mw = ph * sub.shape[2] / sub.shape[1]
+    mx = x + 0.45
+    for j, c in enumerate(chans[::-1]):
+        off = (2 - j) * 0.22
+        ax.imshow(sub[c], cmap="viridis", extent=(mx + off, mx + off + mw, 0.6 + off, 0.6 + off + ph),
+                  zorder=2 + j, interpolation="nearest")
+    ax.imshow(sub.mean(0), cmap="viridis", extent=(mx, mx + mw, 0.6, 0.6 + ph), zorder=5,
+              interpolation="nearest")
+    sx, sy = mw / sub.shape[2], ph / sub.shape[1]
+    def cell_rect(bx, ls, lw, col):
+        ax.add_patch(plt.Rectangle((mx + bx[0] * sx, 0.6 + ph - (bx[3] - fy0) * sy),
+                                   (bx[2] - bx[0]) * sx, (bx[3] - bx[1]) * sy, fill=False,
+                                   ec=col, lw=lw, ls=ls, zorder=6))
+    for k, (pp, bq) in enumerate(zip(proj[:4], q[:4])):
+        cell_rect(pp, "--", 1.2, SERIES[k])
+        cell_rect(bq, "-", 2.0, SERIES[k])
+    ax.text(mx + mw / 2, 0.52, f"feature maps (conv5_3, {fm.shape[2]} × {fm.shape[1]} × "
+            f"{fm.shape[0]}, stride {STRIDE}): projected regions,\nexact (dashed) and rounded "
+            "to whole cells (solid)", ha="center", va="top", fontsize=9)
+    ax.set_xlim(0, mx + mw + 0.6)
     png = save_mpl(fig, ctx, "roi_projection")
     return Figure("roi_projection",
-                  "**Region of interest projection** in Fast R-CNN, using the real conv5_3 "
-                  "feature maps of VGG-16 (mean over the channels). The convolution "
+                  "**Region of interest projection** in Fast R-CNN, drawn as on the slide with "
+                  "the real conv5_3 feature maps of VGG-16 (the front map is the mean over "
+                  "the 512 channels; two individual channels are shown behind it). The "
+                  "convolution "
                   "layers are applied once to the whole image, and the proposals are "
                   "projected onto the feature maps instead of being cropped from the "
                   f"image. As the feature map is reduced by a stride of {STRIDE}, each "
@@ -481,9 +459,12 @@ def fig_two_vs_single_stage(ctx: BuildContext) -> Figure:
 
 
 def build(ctx: BuildContext) -> list[Figure]:
-    return [fig_rcnn_family(ctx), fig_rcnn_cost(ctx), fig_spp_layer(ctx),
-            fig_class_activation_map(ctx), fig_roi_projection(ctx), fig_roi_pooling(ctx),
-            fig_rpn_proposals(ctx), fig_rpn_recall(ctx), fig_two_vs_single_stage(ctx)]
+    return [RD.fig_rcnn_pipeline(ctx), RD.fig_transfer_features(ctx),
+            RD.fig_rcnn_training(ctx), fig_rcnn_cost(ctx), RD.fig_rcnn_variants(ctx),
+            RD.fig_spp_diagram(ctx), fig_spp_layer(ctx), RD.fig_fast_rcnn_pipeline(ctx),
+            RD.fig_cam_mechanism(ctx), fig_class_activation_map(ctx), fig_roi_projection(ctx),
+            fig_roi_pooling(ctx), RD.fig_faster_rcnn_pipeline(ctx), fig_rpn_proposals(ctx),
+            fig_rpn_recall(ctx), RD.fig_stage_comparison(ctx), fig_two_vs_single_stage(ctx)]
 
 
 def demo() -> None:

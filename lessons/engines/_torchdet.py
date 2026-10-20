@@ -403,3 +403,46 @@ def mask_head_outputs(key: str, img: np.ndarray, score_min=0.5) -> dict:
                     scores=out["scores"][keep].cpu().numpy().astype(np.float32),
                     full=(out["masks"][keep][:, 0] * 255).to(torch.uint8).cpu().numpy())
     return TV.cached(f"mask_head_{key}", dict(key=key, shape=img.shape, score_min=score_min), run)
+
+
+def cnn_features(key: str, img: np.ndarray) -> dict:
+    """ResNet-50's 2048-value feature vector (after global average pooling) for
+    an image patch: the 'learned features' R-CNN passes to its SVMs."""
+    def run():
+        import torch
+        net, w = _load("resnet50")
+        x = w.transforms()(_tensor(img))[None]
+        with torch.no_grad():
+            f = net.layer4(net.layer3(net.layer2(net.layer1(net.maxpool(net.relu(
+                net.bn1(net.conv1(x))))))))
+        return dict(vec=f.mean((2, 3))[0].cpu().numpy().astype(np.float32))
+    return TV.cached(f"cnnfeat_{key}", dict(key=key, shape=img.shape), run)
+
+
+def cam_parts(key: str, img: np.ndarray, k=3, side=448) -> dict:
+    """The pieces of a class activation map from ResNet-50: the predicted class,
+    the k feature maps that contribute most to its score (weight x pooled value),
+    their weights and pooled values, and the CAM itself."""
+    def run():
+        import torch
+        import torch.nn.functional as F
+        net, _ = _load("resnet50")
+        s = side / max(img.shape[:2])
+        x = F.interpolate(_tensor(img)[None], scale_factor=s, mode="bilinear", align_corners=False)
+        mean = torch.tensor([0.485, 0.456, 0.406], device=x.device).view(1, 3, 1, 1)
+        std = torch.tensor([0.229, 0.224, 0.225], device=x.device).view(1, 3, 1, 1)
+        with torch.no_grad():
+            f = net.layer4(net.layer3(net.layer2(net.layer1(net.maxpool(net.relu(
+                net.bn1(net.conv1((x - mean) / std))))))))[0]
+            g = f.mean((1, 2))
+            logits = net.fc(g[None])[0]
+            c = int(logits.argmax())
+            wv = net.fc.weight[c]
+            contrib = wv * g
+            top = torch.argsort(contrib, descending=True)[:k]
+            cam = torch.einsum("k,khw->hw", wv, f)
+        return dict(cls=np.array(c), channels=top.cpu().numpy(), maps=f[top].cpu().numpy(),
+                    weights=wv[top].cpu().numpy(), pooled=g[top].cpu().numpy(),
+                    cam=cam.cpu().numpy(), n=np.array(f.shape[0]),
+                    share=(contrib[top].sum() / contrib.sum()).cpu().numpy())
+    return TV.cached(f"camparts_{key}", dict(key=key, shape=img.shape, k=k, side=side), run)

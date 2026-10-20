@@ -275,3 +275,9 @@ starry_night:
   title: "The Starry Night (1889)"
   author: "Vincent van Gogh"
   note: "style image for lesson 2.5 style transfer (as in Gatys et al.)"
+cyclist:
+  commons: "Cyclist-189.JPG"
+  width: 1024
+  title: "A commuter cyclist in the London morning rush hour"
+  author: "ProfDEH"
+  note: "lesson 3.3 slides 2-4 (and 3.1 slide 3)"
