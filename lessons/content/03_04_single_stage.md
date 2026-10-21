@@ -124,7 +124,7 @@ The **Single Shot MultiBox Detector** (SSD) is a well-known detector that uses m
 
 ## Feature pyramid networks
 
-The **feature pyramid network** (FPN) is another multi-scale approach. It also uses a pre-trained image classifier, here ResNet-50, as the backbone, but takes a different approach to the poor semantic information of the fine feature maps: a parallel pyramid is generated, starting from the semantic output of the image classifier. This starting feature map is upsampled and combined with the fine feature maps, and two further levels are created by downsampling. A common prediction head is used for all levels of the pyramid, so all levels must have the same depth.
+The **feature pyramid network** (FPN) is another multi-scale approach. It also uses a pre-trained image classifier, here ResNet-50, as the backbone, but takes a different approach to the poor semantic information of the fine feature maps: a parallel pyramid is generated, starting from the semantic output of the image classifier. Each backbone feature map that is used, C3 to C5, is first reduced to 256 channels by a $1 \times 1$ **lateral** convolution. The starting feature map is upsampled by a factor of two and added to the lateral output of the next finer map, and the merged map is upsampled and added again, down to C3. Each merged map is passed through a $3 \times 3$ convolution to give a level of the pyramid, P3 to P5. Two further, coarser levels are created by stride-2 convolutions: P6 from the last backbone map C5, and P7 from P6. A common prediction head is used for all levels of the pyramid, so all levels must have the same depth.
 
 {{fig fpn_detector}}
 

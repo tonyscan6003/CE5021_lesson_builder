@@ -407,52 +407,97 @@ def fig_ssd_architecture(ctx: BuildContext) -> Figure:
 
 def fig_fpn_detector(ctx: BuildContext) -> Figure:
     H, W = 800, 1216                              # RetinaNet's input for the sheep photo
+    r = D.fpn_shapes(H, W)
+    # RetinaNet computes P6 from C5 (2048 channels in), not from P5
+    assert int(r["p6_in"]) == int(r["C5"][0]) and not bool(r["p6_use_P5"])
     from .._volumes import chan_len
-    side_of = lambda stride: 0.35 + 0.85 * np.sqrt(8 / stride)
-    fig, ax = B.canvas(15.0, 10.4, (14.5, 10.0))
-    bottom = [("C2", "res2", 256, 4), ("C3", "res3", 512, 8), ("C4", "res4", 1024, 16),
-              ("C5", "res5", 2048, 32)]
-    ys = {"C2": 1.1, "C3": 3.0, "C4": 4.8, "C5": 6.5}
-    xb = 2.0
-    cap = {}
-    for name, stage, c, s in bottom:
-        y, sd = ys[name], side_of(s)
+    side_of = lambda h: 0.3 + 0.55 * np.sqrt(h / 100)   # end-cap side from map height
+    top_of = lambda y, sd: y + sd / 2 + OBLIQUE[1] * sd  # top of the oblique face
+    fig, ax = B.canvas(17.0, 11.6, (14.5, 9.9))
+    gap = 0.5
+    # bottom-up pathway: the input image beside C1, then stacked upwards
+    img = load_image("sheep", max_side=800)
+    xb, y1 = 2.6, 1.1
+    ph = 1.2
+    pw = ph * img.shape[1] / img.shape[0]
+    B.photo(ax, img, xb - 0.45 - pw, y1 - ph / 2, ph, label=f"input, resized\nto {H} × {W} × 3",
+            fs=FS - 0.5)
+    B.arrow(ax, xb - 0.4, y1, xb - 0.05, y1, width=0.1)
+    stages = [("C1", "conv1"), ("C2", "res2"), ("C3", "res3"), ("C4", "res4"), ("C5", "res5")]
+    cap, prev_top = {}, None
+    for i, (name, stage) in enumerate(stages):
+        c, h, w = (int(v) for v in r[name])
+        sd = side_of(h)
+        y = y1 if prev_top is None else prev_top + gap + sd / 2
+        if prev_top is not None:
+            B.arrow(ax, xb + 0.3, prev_top + 0.06, xb + 0.3, y - sd / 2 - 0.04, width=0.1)
+        if name == "C2":
+            ax.text(xb + 0.5, y - sd / 2 - gap / 2, "max pool", va="center", fontsize=FS - 1.5,
+                    color=C["grey"])
         ln = 0.25 + 0.55 * chan_len(c) / chan_len(2048)
-        rr = volume(ax, xb, y, ln, sd, "#fff2cc", lw=1.0)
-        ax.text(xb - 0.12, y, f"{name} ({stage})\n{H // s} × {W // s} × {c}", ha="right",
-                va="center", fontsize=FS - 0.5)
-        cap[name] = (rr, y, sd)
-    names = [n for n, *_ in bottom]
-    for a_, b_ in zip(names, names[1:]):
-        B.arrow(ax, xb + 0.15, ys[a_] + cap[a_][2] / 2 + 0.25, xb + 0.15,
-                ys[b_] - cap[b_][2] / 2 - 0.05, width=0.1)
-    ax.text(xb + 0.5, 8.2, "bottom-up\npathway:\nResNet-50", ha="center", fontsize=FS)
-    xp = 6.4
-    pys = {"P3": 3.0, "P4": 4.8, "P5": 6.5, "P6": 7.95, "P7": 9.2}
-    tops = {}
-    for name, s in [("P3", 8), ("P4", 16), ("P5", 32), ("P6", 64), ("P7", 128)]:
-        y, sd = pys[name], side_of(s)
-        rr = volume(ax, xp, y, 0.3, sd, "#d5e8d4", lw=1.0)
-        ax.text(rr + 0.1, y, f"{name}\n{-(-H // s)} × {-(-W // s)} × 256", va="center",
-                fontsize=FS - 0.5)
-        tops[name] = (rr, y, sd)
-    for cname, pname in [("C3", "P3"), ("C4", "P4"), ("C5", "P5")]:
-        rr, y, sd = cap[cname]
-        B.line_arrow(ax, rr + 0.05, y, xp - 0.05, pys[pname], col=C["orange"], lw=1.5)
-        ax.text((rr + xp) / 2, y + 0.1, "1 × 1 conv (lateral)", ha="center", va="bottom",
+        used = name in ("C3", "C4", "C5")
+        rr = volume(ax, xb, y, ln, sd, "#fff2cc" if used else "#f3f3f3", lw=1.0)
+        label = f"{name} ({stage})\n{h} × {w} × {c}"
+        if used:
+            ax.text(xb - 0.12, y, label, ha="right", va="center", fontsize=FS - 0.5)
+        else:                                     # no lateral on these rows: label on the right
+            ax.text(rr + 0.12, y, label + "\n(no pyramid level in RetinaNet)", va="center",
+                    fontsize=FS - 0.5)
+        cap[name] = (rr, y, sd, ln)
+        prev_top = top_of(y, sd)
+    # merged maps M3-M5 and pyramid levels P3-P5 on the rows of C3-C5
+    xm, xp = 6.9, 9.7
+    merged, tops = {}, {}
+    for k in (3, 4, 5):
+        _, y, _, _ = cap[f"C{k}"]
+        c, h, w = (int(v) for v in r[f"M{k}"])
+        sd = side_of(h)
+        rm = volume(ax, xm, y, 0.3, sd, "#dae8fc", lw=1.0)
+        ax.text(xm + 0.15, y - sd / 2 - 0.08, f"M{k}", ha="center", va="top", fontsize=FS - 0.5)
+        merged[k] = (rm, y, sd)
+        c, h, w = (int(v) for v in r[f"P{k}"])
+        rp = volume(ax, xp, y, 0.3, sd, "#d5e8d4", lw=1.0)
+        ax.text(rp + 0.1, y, f"P{k}\n{h} × {w} × {c}", va="center", fontsize=FS - 0.5)
+        tops[f"P{k}"] = (rp, y, sd)
+        rc = cap[f"C{k}"][0]
+        B.line_arrow(ax, rc + 0.05, y, xm - 0.05, y, col=C["orange"], lw=1.5)
+        ax.text((rc + xm) / 2, y + 0.1, "1 × 1 conv (lateral)", ha="center", va="bottom",
                 fontsize=FS - 1, color=C["orange"])
-    for a_, b_ in [("P5", "P4"), ("P4", "P3")]:
-        B.line_arrow(ax, xp - 0.25, pys[a_] - tops[a_][2] / 2, xp - 0.25,
-                     pys[b_] + tops[b_][2] / 2 + 0.1, col=C["red"], lw=1.5)
-        ax.text(xp - 0.35, (pys[a_] + pys[b_]) / 2 + 0.35, "×2 upsample, add", ha="right",
-                va="center", fontsize=FS - 1, color=C["red"])
-    for a_, b_ in [("P5", "P6"), ("P6", "P7")]:
-        B.line_arrow(ax, xp - 0.25, pys[a_] + tops[a_][2] / 2 + 0.3, xp - 0.25,
-                     pys[b_] - tops[b_][2] / 2, col=C["grey"], lw=1.3)
-        ax.text(xp - 0.35, (pys[a_] + pys[b_]) / 2 + 0.25, "3 × 3 conv, stride 2", ha="right",
-                va="center", fontsize=FS - 1, color=C["grey"])
-    ax.text(xp + 0.3, 10.15, "top-down pyramid", ha="center", fontsize=FS)
-    hx, hy = 10.4, 5.6
+        B.line_arrow(ax, rm + 0.05, y, xp - 0.05, y, col=C["green"], lw=1.5)
+        ax.text((rm + xp) / 2, y + 0.1, "3 × 3 conv", ha="center", va="bottom",
+                fontsize=FS - 1, color=C["green"])
+    for a_, b_ in [(5, 4), (4, 3)]:
+        B.line_arrow(ax, xm - 0.25, merged[a_][1] - merged[a_][2] / 2, xm - 0.25,
+                     top_of(merged[b_][1], merged[b_][2]) + 0.05, col=C["red"], lw=1.5)
+        ax.text(xm - 0.35, (merged[a_][1] + merged[b_][1]) / 2 + 0.15, "×2 upsample, add",
+                ha="right", va="center", fontsize=FS - 1, color=C["red"])
+    # P6 from C5 and P7 from P6, stacked above P5
+    prev_top = top_of(tops["P5"][1], tops["P5"][2])
+    for name in ("P6", "P7"):
+        c, h, w = (int(v) for v in r[name])
+        sd = side_of(h)
+        y = prev_top + gap + 0.15 + sd / 2
+        rp = volume(ax, xp, y, 0.3, sd, "#d5e8d4", lw=1.0)
+        ax.text(rp + 0.1, y, f"{name}\n{h} × {w} × {c}", va="center", fontsize=FS - 0.5)
+        tops[name] = (rp, y, sd)
+        prev_top = top_of(y, sd)
+    rc, y5, sd5, ln5 = cap["C5"]
+    x6 = xb + ln5 / 2
+    ax.plot([x6, x6], [top_of(y5, sd5) + 0.05, tops["P6"][1]], color=C["grey"], lw=1.3)
+    B.line_arrow(ax, x6, tops["P6"][1], xp - 0.05, tops["P6"][1], col=C["grey"], lw=1.3)
+    ax.text((x6 + xp) / 2, tops["P6"][1] + 0.1, "3 × 3 conv, stride 2, from C5", ha="center",
+            va="bottom", fontsize=FS - 1, color=C["grey"])
+    B.line_arrow(ax, xp - 0.25, top_of(tops["P6"][1], tops["P6"][2]) + 0.05, xp - 0.25,
+                 tops["P7"][1] - tops["P7"][2] / 2, col=C["grey"], lw=1.3)
+    ax.text(xp - 0.35, (tops["P6"][1] + tops["P7"][1]) / 2 + 0.1,
+            "ReLU, 3 × 3 conv, stride 2", ha="right", va="center", fontsize=FS - 1,
+            color=C["grey"])
+    yl = cap["C3"][1] - cap["C3"][2] / 2 - 0.45
+    for x_, t_ in [(xm + 0.15, "merged maps"), (xp + 0.15, "pyramid levels")]:
+        ax.text(x_, yl, t_, ha="center", va="top", fontsize=FS)
+    ax.text(xb + 0.4, top_of(tops["P7"][1], tops["P7"][2]) + 0.1,
+            "bottom-up pathway:\nResNet-50", ha="center", va="top", fontsize=FS)
+    hx, hy = 13.0, (tops["P3"][1] + tops["P7"][1]) / 2
     for name, (rr, y, sd) in tops.items():
         ax.plot([rr + 1.7, hx - 0.2], [y, hy], color=C["light"], lw=0.9, zorder=0)
     for dy, title, out in [(1.0, "class subnet", "W × H × KA"), (-1.0, "box subnet", "W × H × 4A")]:
@@ -469,13 +514,19 @@ def fig_fpn_detector(ctx: BuildContext) -> Figure:
     png = save_mpl(fig, ctx, "fpn_detector")
     return Figure("fpn_detector",
                   "A detector with a **feature pyramid network**, as in RetinaNet, with the "
-                  f"shapes for a {W} × {H} input. The bottom-up path is the ResNet-50 "
-                  "backbone, whose fine feature maps (C3) have poor semantic information. A "
-                  "parallel top-down pyramid is built from the last, semantically strong map: "
-                  "each level is upsampled by two and added to the corresponding backbone map, "
-                  "reduced to 256 channels by a 1 × 1 **lateral** convolution, which combines "
-                  "semantic information with fine spatial detail. Two further levels, P6 and "
-                  "P7, are created by stride-2 convolutions. All levels have the same depth, "
+                  f"shapes read from torchvision's model for a {W} × {H} input. The bottom-up "
+                  "pathway is the ResNet-50 backbone, C1 to C5, whose fine feature maps, such "
+                  "as C3, have poor semantic information; C1 and C2 (grey) are not given "
+                  "pyramid levels in RetinaNet. Each of C3 to C5 is reduced to 256 channels by "
+                  "a 1 × 1 **lateral** convolution. A top-down pathway starts from the last, "
+                  "semantically strong map: the merged map M5 is upsampled by two and added "
+                  "to the lateral output of C4 to give M4, and M4 is upsampled and added to "
+                  "that of C3 to give M3, which combines semantic information with fine "
+                  "spatial detail. Each merged map is then passed through a 3 × 3 "
+                  "convolution to give the pyramid levels P3 to P5. Two further levels are "
+                  "created by stride-2 convolutions: P6 from C5, and P7 from P6 after a ReLU "
+                  "(in some implementations P6 is computed from P5 instead). All levels have "
+                  "the same depth, "
                   "256, so that one prediction head, a class subnet and a box subnet each of "
                   "four 3 × 3 convolutions, can be shared between them; at each position it "
                   "outputs K class scores and four box values for each of the A anchors.",

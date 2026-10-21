@@ -310,6 +310,38 @@ def ssd_default_boxes() -> dict:
     return TV.cached("ssd300_default_boxes", dict(model="ssd300", v=3), run)
 
 
+def fpn_shapes(h=800, w=1216) -> dict:
+    """Every feature-map shape (C, H, W) of RetinaNet's ResNet-50 FPN for an
+    h x w input, read with forward hooks: the backbone stages C1-C5, the merged
+    maps M3-M5 (lateral 1 x 1 conv plus the upsampled level above, the input of
+    each 3 x 3 output conv), the levels P3-P7, and the number of input channels
+    of the P6 conv, which shows whether P6 is computed from C5 or from P5."""
+    def run():
+        import torch
+        net, _ = _load("retinanet")
+        b = net.backbone
+        seen, hooks = {}, []
+        def keep(name, inp=False):
+            return lambda m, i, o: seen.update({name: tuple((i[0] if inp else o).shape[1:])})
+        hooks.append(b.body.relu.register_forward_hook(keep("C1")))
+        for k in range(1, 5):
+            hooks.append(getattr(b.body, f"layer{k}").register_forward_hook(keep(f"C{k + 1}")))
+        for k, blk in enumerate(b.fpn.layer_blocks):
+            hooks.append(blk.register_forward_hook(keep(f"M{k + 3}", inp=True)))
+            hooks.append(blk.register_forward_hook(keep(f"P{k + 3}")))
+        hooks.append(b.fpn.extra_blocks.p6.register_forward_hook(keep("P6")))
+        hooks.append(b.fpn.extra_blocks.p7.register_forward_hook(keep("P7")))
+        with torch.no_grad():
+            b(torch.zeros(1, 3, h, w, device=TV.device()))
+        for hk in hooks:
+            hk.remove()
+        out = {k: np.array(v) for k, v in seen.items()}
+        out["p6_in"] = np.array(b.fpn.extra_blocks.p6.in_channels)
+        out["p6_use_P5"] = np.array(bool(b.fpn.extra_blocks.use_P5))
+        return out
+    return TV.cached("retinanet_fpn_shapes", dict(model="retinanet", h=h, w=w, v=1), run)
+
+
 def semantic_scores(key: str, img: np.ndarray, every=2) -> dict:
     """DeepLabV3's full output: per-class softmax scores (21 Pascal VOC
     classes incl. background) at every `every`-th pixel, plus the logits at the
