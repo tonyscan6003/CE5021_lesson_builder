@@ -64,8 +64,6 @@ The first neural network for semantic segmentation described here is the **fully
 
 At this point the semantic content is high, but the spatial information is greatly reduced, as the feature maps are very coarse. To produce predictions at the pixel level, the output of the network must be upsampled. FCN has several output paths with different degrees of upsampling, and the upsampling is performed with transpose convolutions. When the output is upsampled directly by a factor of 32, the result is ill defined. A key finding of the FCN authors was that, with feedforward **skip connections** from earlier stages of the network, the spatial information still present in those stages can be used to improve the quality of the prediction.
 
-{{fig output_resolution}}
-
 ## Transpose convolution
 
 The transpose convolution is used by FCN and many other networks to upsample feature maps. A convolution can be performed as a matrix multiplication: when a $3 \times 3$ input is convolved with a $2 \times 2$ kernel, the input can be reshaped as a $9 \times 1$ vector and multiplied by a $4 \times 9$ matrix containing repeated values of the kernel, giving a $4 \times 1$ output that is reshaped into a $2 \times 2$ matrix. The transpose of this matrix, $9 \times 4$, multiplied by a $4 \times 1$ vector gives a $9 \times 1$ vector, which is reshaped into a $3 \times 3$ matrix. A regular convolution always reduces the spatial dimensions, and a transpose convolution increases them. The transpose convolution is also used in the backpropagation algorithm.

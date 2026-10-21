@@ -7,7 +7,6 @@ Figures
     segmentation_metrics   pixel accuracy, mean accuracy, per-class IoU, mIoU, FWIoU on a
                            small prediction / ground-truth pair
     fully_convolutional    VGG-16's dense layers as convolutions: a real score map
-    output_resolution      DeepLab's real scores predicted at stride 8, 16 and 32
     conv_as_matrix         a 2 x 2 convolution as a 4 x 9 matrix, and its transpose
     transpose_conv         stride-1 and stride-2 transpose convolution as direct
                            convolution, checked against PyTorch; the checkerboard
@@ -29,7 +28,7 @@ from .. import _volumes as V
 
 FIGURES = ["segmentation_types", "segmentation_datasets", "output_tensor",
            "segmentation_output", "segmentation_metrics", "fcn_architecture",
-           "fully_convolutional", "output_resolution", "conv_as_matrix", "transpose_1d",
+           "fully_convolutional", "conv_as_matrix", "transpose_1d",
            "transpose_conv", "segnet_architecture", "unpooling", "unet"]
 
 
@@ -292,45 +291,6 @@ def fig_fully_convolutional(ctx: BuildContext) -> Figure:
                   png=png)
 
 
-def fig_output_resolution(ctx: BuildContext) -> Figure:
-    import cv2
-    img = load_image("sheep", max_side=400)
-    logits8 = D.semantic_scores("sheep_400", img)["logits8"]
-    cats = D.categories("deeplab")
-    sheep = cats.index("sheep")
-    h, w = img.shape[:2]
-    outs, ious = {}, {}
-    for f in (1, 2, 4):
-        c, hh, ww = logits8.shape
-        L = logits8[:, :hh // f * f, :ww // f * f].reshape(c, hh // f, f, ww // f, f).mean((2, 4))
-        up = np.stack([cv2.resize(L[k], (w, h), interpolation=cv2.INTER_LINEAR) for k in range(c)])
-        outs[8 * f] = up.argmax(0)
-    ref = outs[8] == sheep
-    fig, axes = plt.subplots(1, 3, figsize=(15.5, 3.2))
-    for ax, s in zip(axes, (32, 16, 8)):
-        m = outs[s] == sheep
-        ious[s] = (m & ref).sum() / (m | ref).sum()
-        ax.imshow(_overlay(img, outs[s])); _clean(ax)
-        ax.set_ylim(h * 0.66, h * 0.15)
-        ax.set_title(f"predicted at stride {s} ({int(np.ceil(h / s))} × {int(np.ceil(w / s))}), "
-                     "upsampled" + (f"\nIoU with the stride-8 sheep mask: {ious[s]:.2f}"
-                                    if s != 8 else "\n(DeepLabV3's own output)"), fontsize=10)
-    png = save_mpl(fig, ctx, "output_resolution")
-    return Figure("output_resolution",
-                  "Why the resolution of the prediction matters. DeepLabV3's real class "
-                  "scores, predicted at a stride of 8 pixels, are averaged to a stride of 16 "
-                  "and 32, as if they had been predicted from a coarser feature map, and are "
-                  "then upsampled to the image size. At a stride of 32, the resolution of "
-                  "the output of FCN-32s, the shapes are ill defined and most of the small "
-                  f"sheep are lost (IoU {ious[32]:.2f} with the stride-8 result); at a stride "
-                  f"of 16 the IoU rises to {ious[16]:.2f}. In "
-                  "FCN, **skip connections** from earlier, finer stages of the network are "
-                  "added to the upsampled prediction (FCN-16s and FCN-8s), so that the "
-                  "spatial information that is still present in those stages improves the "
-                  "quality of the result.",
-                  png=png)
-
-
 def conv_matrix(kernel, n):
     """The (out² × n²) matrix C with C · vec(x) = vec(valid convolution of x)
     (cross-correlation, as in deep learning frameworks)."""
@@ -558,7 +518,7 @@ def build(ctx: BuildContext) -> list[Figure]:
     return [fig_segmentation_types(ctx), fig_segmentation_datasets(ctx),
             SG.fig_output_tensor(ctx), fig_segmentation_output(ctx),
             fig_segmentation_metrics(ctx), SG.fig_fcn_architecture(ctx),
-            fig_fully_convolutional(ctx), fig_output_resolution(ctx), fig_conv_as_matrix(ctx),
+            fig_fully_convolutional(ctx), fig_conv_as_matrix(ctx),
             SG.fig_transpose_1d(ctx), fig_transpose_conv(ctx), SG.fig_segnet_architecture(ctx),
             fig_unpooling(ctx), fig_unet(ctx)]
 
