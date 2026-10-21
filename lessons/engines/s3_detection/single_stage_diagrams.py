@@ -330,7 +330,7 @@ def fig_ssd_architecture(ctx: BuildContext) -> Figure:
     shapes, chans, k = r["shapes"], r["channels"], r["per_cell"]
     ncls = len(D.categories("ssd300"))
     total = int(sum(h * w * kk for (h, w), kk in zip(shapes, k)))
-    fig, ax = B.canvas(15.5, 5.6, (15.5, 5.6))
+    fig, ax = B.canvas(17.5, 5.6, (17.5, 5.6))
     ym = 4.0
     side_of = lambda n: 0.5 + 2.2 * np.sqrt(n / 300)
     from .._volumes import chan_len
@@ -341,19 +341,32 @@ def fig_ssd_architecture(ctx: BuildContext) -> Figure:
     B.block(ax, right + 0.5, ym - 0.55, 1.5, 1.1, "VGG-16\nbase network\n(conv layers)",
             fc=B.CONV_FC, fs=FS)
     x = right + 2.1
-    names = ["VGG-16 conv4_3", "VGG-16 fc7\nas 1 × 1 conv", "extra conv", "extra conv",
-             "extra conv", "extra conv"]
+    # fc6 is drawn between conv4_3 and fc7 but is not a prediction map; pool5 keeps
+    # the resolution of conv5_3, so fc6 and fc7 are both at the stride-16 size
+    c6, h6, w6 = (int(v) for v in r["fc6_shape"])
+    kh, kw, dh, dw = (int(v) for v in r["fc6_conv"])
+    assert (h6, w6) == tuple(shapes[1]) and (kh, dh) == (3, 6), (h6, w6, kh, dh)
+    layers = [(tuple(shapes[0]), chans[0], "VGG-16 conv4_3", True),
+              ((h6, w6), c6, f"VGG-16 fc6 as\ndilated {kh} × {kw} conv\n(not a prediction map)",
+               False),
+              (tuple(shapes[1]), chans[1], "VGG-16 fc7\nas 1 × 1 conv", True)]
+    layers += [(tuple(s), c, "extra conv", True) for s, c in zip(shapes[2:], chans[2:])]
     tops = []
-    for i, ((h, w), c) in enumerate(zip(shapes, chans)):
-        B.arrow(ax, x, ym, x + 0.32, ym)
-        x += 0.4
+    for i, ((h, w), c, name, pred) in enumerate(layers):
+        gap = 1.1 if i == 1 else 0.4
+        B.arrow(ax, x, ym, x + gap - 0.08, ym)
+        if i == 1:
+            ax.text(x + gap / 2 - 0.04, ym + 0.32, "pool4 (÷2),\nconv5_1–5_3,\npool5: 3 × 3,\nstride 1",
+                    ha="center", va="bottom", fontsize=FS - 2, color=C["grey"])
+        x += gap
         sd = side_of(h)
         ln = 0.25 + 0.35 * chan_len(c) / chan_len(1024)
-        rr = volume(ax, x, ym, ln, sd, "#dae8fc", lw=1.0)
+        rr = volume(ax, x, ym, ln, sd, "#dae8fc" if pred else "#eeeeee", lw=1.0)
         ax.text(x + ln / 2, ym + sd / 2 + OBLIQUE[1] * sd + 0.08, f"{h} × {w} × {c}",
                 ha="center", va="bottom", fontsize=FS - 0.5)
-        ax.text(x + ln / 2, ym - sd / 2 - 0.08, names[i], ha="center", va="top", fontsize=FS - 1)
-        tops.append((x + ln / 2, ym - sd / 2 - 0.55))
+        ax.text(x + ln / 2, ym - sd / 2 - 0.08, name, ha="center", va="top", fontsize=FS - 1)
+        if pred:
+            tops.append((x + ln / 2, ym - sd / 2 - 0.55))
         x = rr + 0.15
     yb = 1.75
     ybus = 0.95
@@ -375,17 +388,20 @@ def fig_ssd_architecture(ctx: BuildContext) -> Figure:
     return Figure("ssd_architecture",
                   "The **Single Shot MultiBox Detector** (SSD300), drawn in the volume "
                   "notation with every shape read from torchvision's model. VGG-16 is the "
-                  "base network, with its fully connected layer fc7 interpreted as a "
-                  "1 × 1 convolution, and further convolution layers progressively downsample "
-                  "its output to produce feature maps at six scales. At every position of every "
+                  "base network, and its fully connected layers are reinterpreted as "
+                  f"convolutions: fc6 as a {kh} × {kw} convolution with a dilation of {dh}, "
+                  "and fc7 as a 1 × 1 convolution. The pooling layer after conv5_3 is "
+                  f"changed to 3 × 3 with a stride of 1, so fc6 and fc7 remain at {h6} × "
+                  f"{w6}. The output of fc6 (grey) is not used for prediction. Further "
+                  "convolution layers progressively downsample the output of fc7 to "
+                  "produce feature maps at six scales. At every position of every "
                   "map, a 3 × 3 convolution predicts, for each default box, the "
                   f"{ncls} class scores (80 COCO classes, background and unused label "
                   "indices) and four box values. In total "
                   f"{total:,} boxes are predicted for each image, and non-maximum "
-                  "suppression is applied to the result. In the published SSD300 the finest "
-                  "prediction map is taken from VGG-16's conv4_3, with L2 normalisation, and "
-                  "the second from fc7 as a 1 × 1 convolution; conv5_3 itself is not used as "
-                  "a prediction map.",
+                  "suppression is applied to the result. The finest prediction map is taken "
+                  "from VGG-16's conv4_3, with L2 normalisation, and the second from fc7; "
+                  "neither conv5_3 nor fc6 is used as a prediction map.",
                   png=png)
 
 

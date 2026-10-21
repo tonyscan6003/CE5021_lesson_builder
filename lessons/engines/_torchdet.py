@@ -288,18 +288,26 @@ def ssd_default_boxes() -> dict:
         import torch
         from torchvision.models import detection
         net, _ = _load("ssd300")
+        # torchvision's first extra block is conv5 + the modified pool5 + fc6 + fc7;
+        # fc6 is the dilated 3 x 3 convolution, hooked here as it is not a prediction map
+        fc6 = net.backbone.extra[0][-1][1]
+        seen = {}
+        hook = fc6.register_forward_hook(lambda m, i, o: seen.update(fc6=o.shape))
         with torch.no_grad():
             x = torch.zeros(1, 3, 300, 300, device=TV.device())
             feats = list(net.backbone(x).values())
             from torchvision.models.detection.image_list import ImageList
             il = ImageList(x, [(300, 300)])
             anchors = net.anchor_generator(il, feats)[0]
+        hook.remove()
         shapes = np.array([f.shape[-2:] for f in feats])
         chans = np.array([f.shape[1] for f in feats])
         per_cell = np.array(net.anchor_generator.num_anchors_per_location())
         return dict(shapes=shapes, channels=chans, per_cell=per_cell,
-                    anchors=anchors.cpu().numpy().astype(np.float32))
-    return TV.cached("ssd300_default_boxes", dict(model="ssd300", v=2), run)
+                    anchors=anchors.cpu().numpy().astype(np.float32),
+                    fc6_shape=np.array(seen["fc6"][1:]),
+                    fc6_conv=np.array([*fc6.kernel_size, *fc6.dilation]))
+    return TV.cached("ssd300_default_boxes", dict(model="ssd300", v=3), run)
 
 
 def semantic_scores(key: str, img: np.ndarray, every=2) -> dict:
