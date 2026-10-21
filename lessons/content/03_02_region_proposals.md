@@ -3,7 +3,7 @@ id: "03_02"
 title: Region proposals
 section: 3
 engines: [s3_detection.region_proposals]
-practice: [iou]
+practice: []
 summary: Region proposals as an alternative to the sliding window — the objectness measure and its cues (saliency, colour contrast, edge density, superpixel straddling), selective search by hierarchical grouping of segmented regions, region similarity, proposal recall, and training a classifier with hard negatives.
 ---
 
@@ -88,8 +88,6 @@ The similarity of two regions is based on several measures:
 Proposal methods are compared by the **recall** they achieve, the fraction of the objects in a test set that are covered by at least one proposal with sufficient overlap, as a function of the number of proposals per image.
 
 {{fig proposal_recall}}
-
-{{example iou seed=8}}
 
 ## Object recognition with selective search
 
