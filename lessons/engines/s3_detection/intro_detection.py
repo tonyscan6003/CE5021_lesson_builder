@@ -75,48 +75,59 @@ def _clean(ax):
 # ---------------------------------------------------------------------------
 
 def fig_detection_task(ctx: BuildContext) -> Figure:
+    # (a) and (b): one dominant object, as classification and localisation assume
+    ram = _photo("ram")
+    # (c) and (d): several objects
     img = _photo("sheep")
     icats, cats = D.categories("resnet50"), _cats()
-    cls = D.classify("sheep", img)
+    cls = D.classify("ram", ram)
+    rdet = D.detect("ram", ram)
     det = D.detect("sheep", img)
     msk = D.instance_masks("sheep", img)
     keep = det["scores"] >= 0.5
-    fig, axes = plt.subplots(1, 4, figsize=(15, 3.2))
-    for ax in axes:
-        ax.imshow(img); _clean(ax)
-    axes[0].set_title(f"(a) classification: one label\n'{icats[cls['labels'][0]]}', "
-                      f"p = {cls['scores'][0]:.2f} (ResNet-50)", fontsize=9.5)
-    top = int(np.argmax(det["scores"]))
-    _box(axes[1], det["boxes"][top], C["green"], label=f"{cats[det['labels'][top]]}")
-    axes[1].set_title("(b) localisation: one class\nand one bounding box", fontsize=9.5)
+    rh, rw = ram.shape[:2]
+    sh = img.shape[0] * (0.66 - 0.12)
+    fig, axes = plt.subplots(1, 4, figsize=(16, 3.4),
+                             gridspec_kw=dict(width_ratios=[rw / rh, rw / rh,
+                                                            img.shape[1] / sh, img.shape[1] / sh],
+                                              wspace=0.06))
+    for ax, im in zip(axes, (ram, ram, img)):
+        ax.imshow(im); _clean(ax)
+    axes[0].set_title(f"(a) classification: one\nlabel for the whole image,\n"
+                      f"'{icats[cls['labels'][0]]}' (ResNet-50)", fontsize=9.5)
+    top = int(np.argmax(rdet["scores"]))
+    _box(axes[1], rdet["boxes"][top], C["green"], lw=2.2,
+         label=f"{cats[rdet['labels'][top]]} {rdet['scores'][top]:.2f}")
+    axes[1].set_title("(b) localisation: a bounding\nbox around the main object\n(Faster R-CNN)",
+                      fontsize=9.5)
     for b, l, s in zip(det["boxes"][keep], det["labels"][keep], det["scores"][keep]):
         _box(axes[2], b, C["green"], lw=1.6, label=f"{cats[l]} {s:.2f}", fs=6.5)
-    axes[2].set_title(f"(c) detection: every object,\n{keep.sum()} boxes with classes "
+    axes[2].set_title(f"(c) detection: every object,\n{keep.sum()} boxes with classes\n"
                       "(Faster R-CNN)", fontsize=9.5)
     over = img.astype(float).copy()
     for i, m in enumerate(msk["masks"]):
         col = np.array(plt.matplotlib.colors.to_rgb(SERIES[i % len(SERIES)])) * 255
         over[m] = 0.45 * over[m] + 0.55 * col
-    axes[3].imshow(over.astype(np.uint8))
+    axes[3].imshow(over.astype(np.uint8)); _clean(axes[3])
     axes[3].set_title(f"(d) instance segmentation: a mask\nfor each of the {len(msk['masks'])} "
-                      "sheep (Mask R-CNN)", fontsize=9.5)
-    for ax in axes:
+                      "sheep\n(Mask R-CNN)", fontsize=9.5)
+    for ax in axes[2:]:
         ax.set_xlim(0, img.shape[1]); ax.set_ylim(img.shape[0] * 0.66, img.shape[0] * 0.12)
     png = save_mpl(fig, ctx, "detection_task")
     return Figure("detection_task",
-                  "Four recognition tasks on the same photograph, each produced by a "
-                  "pre-trained network. (a) In image classification a single label is "
-                  "assigned to the whole image; the ImageNet classifier gives its closest "
-                  f"class, '{icats[cls['labels'][0]]}', with a probability of only "
-                  f"{cls['scores'][0]:.2f}, as the image contains several objects. (b) In "
-                  "localisation one object is classified and a bounding box is placed "
-                  "around it. (c) In object detection every object is found, and a class, "
-                  f"a bounding box and a confidence are output for each: {keep.sum()} boxes "
-                  "with a confidence above 0.5 are output, including two false positives "
-                  "that are discussed below. (d) In instance segmentation the pixels of each object "
-                  "are also identified, with a separate mask for each instance. Object "
-                  "detection is more difficult than classification, as both the class and "
-                  "the location of an unknown number of objects must be predicted.",
+                  "Four recognition tasks, each produced by a pre-trained network. (a) In image "
+                  "classification a single label is assigned to the whole image, which should "
+                  "contain one dominant object; the ImageNet classifier gives "
+                  f"'{icats[cls['labels'][0]]}' as the most probable of its 1,000 classes. (b) In "
+                  "**localisation** a bounding box is placed around the main object in the "
+                  "image, the object that defines the class of the image. (c) In object "
+                  "detection every object in an image is found, and a class, a bounding box "
+                  f"and a confidence are output for each: {keep.sum()} boxes with a confidence "
+                  "above 0.5 are output for this photograph, including two false positives that "
+                  "are discussed below. (d) In instance segmentation the pixels of each object "
+                  "are also identified, with a separate mask for each instance. Object detection "
+                  "is more difficult than classification and localisation, as both the class "
+                  "and the location of an unknown number of objects must be predicted.",
                   png=png)
 
 

@@ -306,6 +306,13 @@ ragdoll:
   licence_url: https://creativecommons.org/licenses/by-sa/4.0
   source_url: https://commons.wikimedia.org/wiki/File:Cat_in_the_garden_1.JPG
   title: Cat in the garden
+ram:
+  author: Philip Halling
+  file: ram.jpg
+  licence: CC BY-SA 2.0
+  licence_url: https://creativecommons.org/licenses/by-sa/2.0
+  source_url: https://commons.wikimedia.org/wiki/File:A_Texel_ram_-_geograph.org.uk_-_6832386.jpg
+  title: A Texel ram
 rubiks_cube:
   author: Byjuvtvm
   file: rubiks_cube.jpg
