@@ -310,16 +310,17 @@ def fig_detection_loss(ctx: BuildContext) -> Figure:
     x = np.linspace(-3, 3, 601)
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 3.8))
     ax = axes[0]
-    ax.plot(x, np.abs(x), color=C["blue"], lw=2, label="L1  |x|")
-    ax.plot(x, 0.5 * x ** 2, color=C["orange"], lw=2, label="L2  x²/2")
+    ax.plot(x, np.abs(x), color=C["blue"], lw=2, label=r"L1  $|t_k - t_k^{gt}|$")
+    ax.plot(x, 0.5 * x ** 2, color=C["orange"], lw=2, label=r"L2  $(t_k - t_k^{gt})^2/2$")
     ax.plot(x, smooth_l1(x), color=C["red"], lw=2.6, label="smooth L1 (β = 1)")
-    ax.set_ylim(0, 3.2); ax.set_xlabel("x = predicted t − target t"); ax.set_ylabel("loss")
+    ax.set_ylim(0, 3.2); ax.set_xlabel(r"$t_k - t_k^{gt}$"); ax.set_ylabel("loss")
     ax.legend(fontsize=9); ax.set_title("(a) regression losses", fontsize=10.5)
     ax = axes[1]
     ax.plot(x, np.sign(x), color=C["blue"], lw=2, label="L1")
     ax.plot(x, x, color=C["orange"], lw=2, label="L2")
     ax.plot(x, np.clip(x, -1, 1), color=C["red"], lw=2.6, label="smooth L1")
-    ax.set_ylim(-3, 3); ax.set_xlabel("x"); ax.set_ylabel("gradient"); ax.legend(fontsize=9)
+    ax.set_ylim(-3, 3); ax.set_xlabel(r"$t_k - t_k^{gt}$"); ax.set_ylabel("gradient")
+    ax.legend(fontsize=9)
     ax.set_title("(b) their gradients", fontsize=10.5)
     png = save_mpl(fig, ctx, "detection_loss")
     return Figure("detection_loss",
@@ -328,8 +329,9 @@ def fig_detection_loss(ctx: BuildContext) -> Figure:
                   "whose gradient decreases near zero and helps convergence, and for larger "
                   "errors as an L1 loss, whose gradient is bounded, which reduces the effect "
                   "of outliers and helps to prevent exploding gradients. It is a special "
-                  "case of the Huber loss. It is applied to each of t_x, t_y, t_w and t_h, "
-                  "and only for anchors that are positive.",
+                  r"case of the Huber loss. It is applied to the difference $t_k - t_k^{gt}$ "
+                  r"between the predicted and ground-truth values of each of $t_x, t_y, t_w$ "
+                  r"and $t_h$, and only for anchors that are positive.",
                   png=png)
 
 

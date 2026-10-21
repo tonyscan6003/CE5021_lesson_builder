@@ -62,7 +62,7 @@ The head does not predict the bounding-box coordinates directly. Instead, it pre
 
 $$t_x = \frac{x - x_a}{w_a}, \qquad t_y = \frac{y - y_a}{h_a}, \qquad t_w = \log\frac{w}{w_a}, \qquad t_h = \log\frac{h}{h_a}, \tag{1}$$
 
-where $x_a, y_a, w_a, h_a$ are the centre, width and height of the anchor, which is centred on the current cell, and $x, y, w, h$ those of the predicted box. The ground-truth values $t^*$ are obtained with the same equations from the ground-truth box. These equations are those of the Faster R-CNN region proposal network, which is functionally equivalent to a single-stage detector; many variations are used in the literature.
+where $x_a, y_a, w_a, h_a$ are the centre, width and height of the anchor, which is centred on the current cell, and $x, y, w, h$ those of the predicted box. The ground-truth values $t_x^{gt}, t_y^{gt}, t_w^{gt}, t_h^{gt}$ are obtained with the same equations from the ground-truth box. These equations are those of the Faster R-CNN region proposal network, which is functionally equivalent to a single-stage detector; many variations are used in the literature.
 
 {{fig box_dimensions}}
 
@@ -74,9 +74,15 @@ The overall loss is a function of the predicted object probabilities $\{p_i\}$ a
 
 $$L(\{p_i\}, \{t_i\}) = \frac{1}{N_{conf}} \sum_i L_{conf}(p_i, p_i^{gt}) + \lambda \frac{1}{N_{reg}} \sum_i p_i^{gt} L_{reg}(t_i, t_i^{gt}), \tag{2}$$
 
-where $p_i^{gt}$ is 1 when the anchor overlaps a ground-truth box with an IoU above the threshold and 0 otherwise. The two terms are normalised, with normalisations that vary between implementations, and balanced by $\lambda$. The confidence loss $L_{conf}$ is a binary cross-entropy, as the confidence is a binary classification between object and background, and both positive and negative anchors contribute to it. The factor $p_i^{gt}$ ensures that only positive anchors contribute to the regression loss. $L_{reg}$ is the sum of a **smooth L1** loss over the four values $t_k$:
+where $p_i^{gt}$ is 1 when the anchor overlaps a ground-truth box with an IoU above the threshold and 0 otherwise. The two terms are normalised, with normalisations that vary between implementations, and balanced by $\lambda$. The confidence loss $L_{conf}$ is a binary cross-entropy, as the confidence is a binary classification between object and background, and both positive and negative anchors contribute to it. The factor $p_i^{gt}$ ensures that only positive anchors contribute to the regression loss. $L_{reg}$ is the sum of **smooth L1** losses over the four box values $t_k$, $k \in \{x, y, w, h\}$, of the anchor:
 
-$$\text{smooth}_{L1}(x) = \begin{cases} 0.5\, x^2 / \beta & |x| < \beta \\ |x| - 0.5\, \beta & \text{otherwise.} \end{cases} \tag{3}$$
+$$L_{reg}(t_i, t_i^{gt}) = \sum_{k \in \{x, y, w, h\}} \text{smooth}_{L1}\left(t_k - t_k^{gt}\right), \tag{3}$$
+
+where each smooth L1 loss is calculated on the difference between a predicted and a ground-truth value:
+
+$$\text{smooth}_{L1}\left(t_k - t_k^{gt}\right) = \begin{cases} 0.5\, \left(t_k - t_k^{gt}\right)^2 / \beta & \left|t_k - t_k^{gt}\right| < \beta \\ \left|t_k - t_k^{gt}\right| - 0.5\, \beta & \text{otherwise.} \end{cases} \tag{4}$$
+
+The threshold $\beta$ is commonly set to 1.
 
 {{fig detection_loss}}
 
@@ -86,11 +92,11 @@ The classification loss can be included as a third term, using only the positive
 
 The large imbalance between positive and negative examples means that the easily classified negative examples dominate the loss and may prevent the network from learning the more difficult positive examples. The cross-entropy loss can be written with the probability of the ground-truth class, $p_t$, which is $p_i$ when $p_i^{gt} = 1$ and $1 - p_i$ otherwise:
 
-$$CE(p_t) = -\log(p_t). \tag{4}$$
+$$CE(p_t) = -\log(p_t). \tag{5}$$
 
 The cross-entropy does not fall to zero unless an example is exactly correct, so many well-classified examples together produce a large loss, which is exactly the situation with the negatives in object detection. The **focal loss**, introduced by Lin et al. in 2017, adds a scaling factor:
 
-$$FL(p_t) = -(1 - p_t)^{\gamma} \log(p_t). \tag{5}$$
+$$FL(p_t) = -(1 - p_t)^{\gamma} \log(p_t). \tag{6}$$
 
 As $\gamma$ is increased, the loss of well-classified examples is reduced towards zero, and a value of $\gamma = 2$ is typically chosen. The effect of the negative examples dominating the loss is removed, and the hard positive examples can be learned.
 
