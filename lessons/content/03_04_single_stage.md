@@ -3,7 +3,7 @@ id: "03_04"
 title: Single-stage object detection
 section: 3
 engines: [s3_detection.single_stage]
-practice: [depthwise_sep_conv, iou]
+practice: [depthwise_sep_conv]
 summary: Single-stage detectors — the prediction head and its output, anchor boxes and ground-truth assignment, bounding-box parameterisation, the detection loss, focal loss for class imbalance, multi-scale prediction with SSD and feature pyramid networks, depthwise separable convolution and non-maximum suppression.
 ---
 
@@ -143,7 +143,5 @@ Lightweight detectors for mobile and embedded applications use backbones built f
 A dense detector produces several overlapping detections of the same object, from neighbouring cells and anchors. **Non-maximum suppression** (NMS) keeps the detection with the highest confidence and removes the others that overlap it by more than an IoU threshold, so that each object ends with one detection.
 
 {{fig nms_steps}}
-
-{{example iou seed=12}}
 
 {{selfcheck 03_04}}
