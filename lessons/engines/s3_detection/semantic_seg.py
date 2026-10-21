@@ -245,36 +245,50 @@ def fig_fully_convolutional(ctx: BuildContext) -> Figure:
     ram = icats.index("ram")
     r = D.vgg_fully_convolutional("sheep_672", img, ram)
     s = r["score"]
-    fig, axes = plt.subplots(1, 2, figsize=(13.5, 3.8))
+    c, h, w = (int(v) for v in r["p5_shape"])
+    sh, sw = s.shape
+    # same weights: on a 224 x 224 input the converted network equals the classifier
+    assert float(r["check"]) < 1e-3, float(r["check"])
+    assert (sh, sw) == (h - 6, w - 6), (sh, sw, h, w)   # 7 x 7 fc6 kernel, no padding
+    n_ram = int((r["top"] == ram).sum())
+    assert s[-1].mean() < 0.2 and s[:-2].mean() > 0.6, (s[-1].mean(), s[:-2].mean())
+    fig, axes = plt.subplots(1, 2, figsize=(14, 4.0), gridspec_kw=dict(width_ratios=[1, 1.15]))
     axes[0].imshow(img); _clean(axes[0])
-    axes[0].set_title(f"input {img.shape[1]} × {img.shape[0]} (VGG-16 was trained on 224 × 224)",
-                      fontsize=10)
-    axes[1].imshow(img)
-    axes[1].imshow(s, cmap="viridis", alpha=0.65, extent=(0, img.shape[1], img.shape[0], 0),
-                   interpolation="nearest", vmin=0, vmax=1)
-    _clean(axes[1])
-    axes[1].set_title(f"fully convolutional VGG-16: {s.shape[1]} × {s.shape[0]} map of "
-                      f"p('{icats[ram]}')", fontsize=10)
+    axes[0].set_title(f"(a) input {img.shape[1]} × {img.shape[0]}", fontsize=10)
+    ax = axes[1]
+    im = ax.imshow(s, cmap="viridis", vmin=0, vmax=1, interpolation="nearest")
+    for i in range(sh):
+        for j in range(sw):
+            ax.text(j, i, f"{s[i, j]:.2f}", ha="center", va="center", fontsize=7,
+                    color="k" if s[i, j] > 0.55 else "w")
+    ax.set_xticks(range(sw)); ax.set_yticks(range(sh))
+    ax.tick_params(labelsize=7, length=0)
+    ax.set_title(f"(b) final feature map, {sw} × {sh} × 1000: the '{icats[ram]}' channel "
+                 "after a softmax", fontsize=10)
+    ax.set_xlabel(f"pool5 {w} × {h} × {c} → fc6 as 7 × 7 conv {sw} × {sh} × 4096 → "
+                  f"fc7 as 1 × 1 conv {sw} × {sh} × 4096 → fc8 as 1 × 1 conv "
+                  f"{sw} × {sh} × 1000", fontsize=8.5)
+    fig.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
     png = save_mpl(fig, ctx, "fully_convolutional")
-    c, h, w = r["p5_shape"]
     return Figure("fully_convolutional",
                   "The first step of the **fully convolutional network** (FCN): the fully "
                   "connected layers of an image classifier are converted into convolution "
-                  "layers, with exactly the same weights. Here VGG-16's first dense layer, "
+                  "layers, with exactly the same weights. In VGG-16 the first dense layer, "
                   "which connects the 7 × 7 × 512 output of the last pooling layer to 4,096 "
-                  "neurons, is applied as 4,096 kernels of 7 × 7 × 512, and the other two "
-                  "dense layers as 1 × 1 convolutions. On a 224 × 224 input the result is "
-                  "identical to the classifier (the largest difference is "
-                  f"{float(r['check']):.0e}). On a larger input the network now accepts the "
-                  f"image as it is: the pooled feature map is {w} × {h}, and instead of one "
-                  f"vector of class probabilities the network outputs a {s.shape[1]} × "
-                  f"{s.shape[0]} map of them. Each value is the classifier's output for a "
-                  "224 × 224 window of the image, at a stride of 32 pixels: the probability "
-                  "of the ImageNet class 'ram' is high for the windows filled by the two "
-                  "large sheep on the left, and lower where the sheep are small within the "
-                  "window, as on the right. The semantic "
-                  "content is high but the spatial resolution is very coarse, so the "
-                  "output must be upsampled to give a prediction at every pixel.",
+                  "neurons, becomes 4,096 kernels of 7 × 7 × 512, and the other two dense "
+                  "layers become 1 × 1 convolutions, so the network accepts an image of any "
+                  f"size. For this {img.shape[1]} × {img.shape[0]} image the last pooling "
+                  f"layer gives a {w} × {h} × {c} feature map, and the converted layers give "
+                  f"maps of {sw} × {sh} × 4,096, {sw} × {sh} × 4,096 and {sw} × {sh} × 1,000. "
+                  "The final feature map therefore holds a vector of 1,000 class scores at "
+                  f"each of its {sw} × {sh} positions, in place of the single vector of the "
+                  "classifier, and neighbouring positions are 32 pixels apart in the image. "
+                  "In (b) a softmax is applied at each position and the channel of the "
+                  f"ImageNet class 'ram' is shown: it is the most probable class at {n_ram} "
+                  f"of the {sh * sw} positions, and its probability is lowest along the "
+                  "bottom row. The semantic content is high, but the spatial resolution is "
+                  "very coarse, so the output must be upsampled to give a prediction at "
+                  "every pixel.",
                   png=png)
 
 
