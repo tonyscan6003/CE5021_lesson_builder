@@ -43,11 +43,11 @@
 - q: From which layers does SSD300 take its multi-scale prediction maps?
   options:
     - From every convolution layer of VGG-16, starting with conv1_1
-    - From VGG-16's conv4_3 for the finest map, then fc7 (as a convolution) and extra layers that downsample further
+    - From VGG-16's conv4_3 for the finest map, then fc7 interpreted as a 1 × 1 convolution, and extra layers that downsample further
     - From conv5_3 only, upsampled to several sizes
     - From a top-down pyramid built on a ResNet-50 backbone
   answer: 1
-  explain: "The earliest VGG-16 layers carry little semantic information, so SSD starts at conv4_3 (38 × 38, stride 8, L2-normalised) and adds fc7 and extra downsampling layers for the coarser maps. Upsampling and a top-down pathway are features of FPN, not SSD."
+  explain: "The earliest VGG-16 layers carry little semantic information, so SSD starts at conv4_3 (38 × 38, stride 8, L2-normalised) The fully connected layer fc7 is interpreted as a 1 × 1 convolution, whose 19 × 19 output is the second map, and extra downsampling layers give the coarser maps. Upsampling and a top-down pathway are features of FPN, not SSD."
 - q: Why must all levels of a feature pyramid network have the same depth?
   options:
     - So that the levels have the same spatial size

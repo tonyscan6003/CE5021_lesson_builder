@@ -341,7 +341,7 @@ def fig_ssd_architecture(ctx: BuildContext) -> Figure:
     B.block(ax, right + 0.5, ym - 0.55, 1.5, 1.1, "VGG-16\nbase network\n(conv layers)",
             fc=B.CONV_FC, fs=FS)
     x = right + 2.1
-    names = ["VGG-16 conv4_3", "VGG-16 fc7\n(as conv)", "extra conv", "extra conv",
+    names = ["VGG-16 conv4_3", "VGG-16 fc7\nas 1 × 1 conv", "extra conv", "extra conv",
              "extra conv", "extra conv"]
     tops = []
     for i, ((h, w), c) in enumerate(zip(shapes, chans)):
@@ -375,16 +375,17 @@ def fig_ssd_architecture(ctx: BuildContext) -> Figure:
     return Figure("ssd_architecture",
                   "The **Single Shot MultiBox Detector** (SSD300), drawn in the volume "
                   "notation with every shape read from torchvision's model. VGG-16 is the "
-                  "base network, with its fully connected layer fc7 converted into a "
-                  "convolution, and further convolution layers progressively downsample the "
-                  "output to produce feature maps at six scales. At every position of every "
+                  "base network, with its fully connected layer fc7 interpreted as a "
+                  "1 × 1 convolution, and further convolution layers progressively downsample "
+                  "its output to produce feature maps at six scales. At every position of every "
                   "map, a 3 × 3 convolution predicts, for each default box, the "
                   f"{ncls} class scores (80 COCO classes, background and unused label "
                   "indices) and four box values. In total "
                   f"{total:,} boxes are predicted for each image, and non-maximum "
                   "suppression is applied to the result. In the published SSD300 the finest "
                   "prediction map is taken from VGG-16's conv4_3, with L2 normalisation, and "
-                  "the remaining maps from conv5_3 onwards.",
+                  "the second from fc7 as a 1 × 1 convolution; conv5_3 itself is not used as "
+                  "a prediction map.",
                   png=png)
 
 

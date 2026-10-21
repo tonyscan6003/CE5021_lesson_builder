@@ -465,8 +465,8 @@ def fig_ssd_multiscale(ctx: BuildContext) -> Figure:
     return Figure("ssd_multiscale",
                   "The **Single Shot MultiBox Detector** (SSD) uses feature maps at several "
                   "scales. The finest map is VGG-16's conv4_3, with L2 normalisation; the "
-                  "others are fc7, converted to a convolution after conv5_3, and further "
-                  "convolution layers that progressively downsample it, giving six feature "
+                  "second is the output of fc7, interpreted as a 1 × 1 convolution, and the "
+                  "others are extra convolution layers that progressively downsample it, giving six feature "
                   "maps from "
                   f"{shapes[0][1]} × {shapes[0][0]} to 1 × 1 for a 300 × 300 input. At every "
                   "cell of every map, boxes and classes are predicted with 3 × 3 "
