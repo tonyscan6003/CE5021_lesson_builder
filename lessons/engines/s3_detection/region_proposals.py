@@ -69,13 +69,13 @@ def _clean(ax):
 # Objectness (Alexe, Deselaers and Ferrari)
 # ---------------------------------------------------------------------------
 
-def sample_windows(h, w, n, seed=0):
+def sample_windows(h, w, n, seed=0, min_frac=1 / 20):
     """Random windows, positions uniform and sides log-uniform from 1/20 of the
     image (small enough for the smallest sheep) up to the whole image, as the
     candidate set objectness scores."""
     rng = np.random.default_rng(seed)
-    bw = np.exp(rng.uniform(np.log(w / 20), np.log(w), n))
-    bh = np.exp(rng.uniform(np.log(h / 20), np.log(h), n))
+    bw = np.exp(rng.uniform(np.log(w * min_frac), np.log(w), n))
+    bh = np.exp(rng.uniform(np.log(h * min_frac), np.log(h), n))
     x1 = rng.uniform(0, w - bw); y1 = rng.uniform(0, h - bh)
     return np.stack([x1, y1, x1 + bw, y1 + bh], 1).round()
 
@@ -147,14 +147,14 @@ def cue_colour_contrast(img, boxes, ring=1.5, bins=8):
     return 0.5 * np.sum((hi - ho) ** 2 / (hi + ho + 1e-12), 1)
 
 
-def canny_edges(img):
-    return feature.canny(color.rgb2gray(img), sigma=1.0)
+def canny_edges(img, sigma=1.0):
+    return feature.canny(color.rgb2gray(img), sigma=sigma)
 
 
-def cue_edge_density(img, boxes, inner=0.7):
+def cue_edge_density(img, boxes, inner=0.7, sigma=1.0):
     """Density of Canny edges in the ring between a window and the window
     shrunk to `inner` of its size: object boundaries lie in that ring."""
-    E = _integral(canny_edges(img).astype(float))
+    E = _integral(canny_edges(img, sigma).astype(float))
     small = _scaled(boxes, inner).round()
     e = _boxsum(E, boxes) - _boxsum(E, small)
     a = ((boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
@@ -398,6 +398,9 @@ def fig_objectness_saliency(ctx: BuildContext) -> Figure:
                   png=png)
 
 
+ED_MIN, ED_SIGMA, ED_INNER = 1 / 4, 2.0, 0.85
+
+
 def fig_objectness_cues(ctx: BuildContext) -> Figure:
     rows = [("CC", "sheep", "colour contrast: χ² distance between LAB histograms of\n"
              "the window and of the ring around it", True),
@@ -408,10 +411,15 @@ def fig_objectness_cues(ctx: BuildContext) -> Figure:
     info = []
     for r, (cue, key, desc, _) in enumerate(rows):
         img = photo(key)
-        boxes = sample_windows(*img.shape[:2], 4000, seed=2 + r)
-        fn = {"CC": cue_colour_contrast, "ED": cue_edge_density,
-              "SS": cue_superpixel_straddling}[cue]
-        score = fn(img, boxes)
+        if cue == "ED":
+            # windows at least 1/4 of the image across, Canny at sigma 2 (fewer
+            # ripple edges) and a thin ring, so that windows at the scale of the
+            # ship compete with windows on the water
+            boxes = sample_windows(*img.shape[:2], 4000, seed=2 + r, min_frac=ED_MIN)
+            score = cue_edge_density(img, boxes, inner=ED_INNER, sigma=ED_SIGMA)
+        else:
+            boxes = sample_windows(*img.shape[:2], 4000, seed=2 + r)
+            score = {"CC": cue_colour_contrast, "SS": cue_superpixel_straddling}[cue](img, boxes)
         best, _ = top_windows(boxes, score, 5)
         hit = (M.iou(best, GT[key]).max(1) > 0.5).sum()
         # a window is 'off the object' when most of its area lies outside every
@@ -421,7 +429,7 @@ def fig_objectness_cues(ctx: BuildContext) -> Figure:
         inter = np.array([[max(0, min(b[2], q[2]) - max(b[0], q[0])) *
                            max(0, min(b[3], q[3]) - max(b[1], q[1])) for q in g] for b in best])
         off = int((inter.max(1) / ((best[:, 2] - best[:, 0]) * (best[:, 3] - best[:, 1])) < 0.5).sum())
-        info.append((cue, key, hit, off))
+        info.append((cue, key, hit, off, float(M.iou(best, g).max())))
         ax = axes[r, 0]
         if cue == "CC":
             b = best[0]
@@ -430,7 +438,7 @@ def fig_objectness_cues(ctx: BuildContext) -> Figure:
             _box(ax, _clip(_scaled(b[None], 1.5), *img.shape[:2])[0], C["orange"], lw=2.2,
                  label="surrounding ring")
         elif cue == "ED":
-            ax.imshow(canny_edges(img), cmap="gray_r")
+            ax.imshow(canny_edges(img, ED_SIGMA), cmap="gray_r")
         else:
             ax.imshow(_boundaries(img, superpixels(img)))
         ax.set_title(desc, fontsize=9.5)
@@ -445,7 +453,8 @@ def fig_objectness_cues(ctx: BuildContext) -> Figure:
     for ax in axes.ravel():
         _clean(ax)
     png = save_mpl(fig, ctx, "objectness_cues")
-    d = {c: (h, o) for c, k, h, o in info}
+    d = {c: (h, o, v) for c, k, h, o, v in info}
+    assert d["ED"][0] >= 1, d["ED"]                              # a window fits the ship
     return Figure("objectness_cues",
                   "Three further objectness cues, each computed for 4,000 random windows "
                   "(ground truth dashed white). Top: **colour contrast**. The colour "
@@ -454,10 +463,16 @@ def fig_objectness_cues(ctx: BuildContext) -> Figure:
                   "against the green field give a high contrast. An object with a colour "
                   "similar to its surroundings would not be found. Middle: **edge "
                   "density**. Objects have many edges near their boundary, so the density "
-                  "of Canny edges in an inner ring of the window is measured. The ripples "
-                  "on the water also produce many edges, so small windows on the water, "
-                  "the wake and parts of the hull all score highly: none of the top 5 "
-                  f"windows covers the ship, and {d['ED'][1]} lie mainly on the water. "
+                  "of Canny edges in an inner ring of the window is measured. Here the "
+                  "windows are at least a quarter of the image across and the edges are "
+                  "detected at a coarse scale (σ = 2), and a window fitting the ship scores "
+                  f"highly (best IoU {d['ED'][2]:.2f}); the other high-scoring windows cover "
+                  "parts of the ship. The cue is sensitive to texture, however: with "
+                  "finer edge detection (σ = 1) and smaller windows, the dense edges of the "
+                  "ripples and of the hull's details dominate, and the highest-scoring "
+                  "windows are small patches of the hull and of the water and wake, none of "
+                  "which fits the ship; the windows on the water are false positive "
+                  "proposals. "
                   "Bottom: **superpixel straddling**. Superpixels group pixels of similar "
                   "colour and texture and do not cross object boundaries, so a window that "
                   "cuts through superpixels, rather than containing them, is unlikely to "
