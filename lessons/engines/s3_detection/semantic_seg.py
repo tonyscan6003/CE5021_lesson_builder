@@ -23,6 +23,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from .._common import BuildContext, Figure, C, SERIES, save_mpl, load_image, sync_matrix
+from .. import _blocks as B
 from .. import _torchdet as D
 from .. import _volumes as V
 
@@ -305,33 +306,112 @@ def conv_matrix(kernel, n):
     return Cm
 
 
+def _grid_matrix(ax, x0, ytop, M, cell, label=None, fs=10):
+    """A matrix drawn as a grid of equal, uniformly coloured cells with its
+    values, top-left corner at (x0, ytop). Returns (x0, y0, x1, y1)."""
+    r, c = M.shape
+    for i in range(r):
+        for j in range(c):
+            ax.add_patch(plt.Rectangle((x0 + j * cell, ytop - (i + 1) * cell), cell, cell,
+                                       fc="#eef3fa", ec="#7f8c99", lw=0.8))
+            ax.text(x0 + (j + 0.5) * cell, ytop - (i + 0.5) * cell, f"{int(M[i, j])}",
+                    ha="center", va="center", fontsize=fs)
+    ax.add_patch(plt.Rectangle((x0, ytop - r * cell), c * cell, r * cell, fill=False,
+                               ec="k", lw=1.4))
+    if label:
+        ax.text(x0 + c * cell / 2, ytop - r * cell - 0.15, label, ha="center", va="top",
+                fontsize=fs)
+    return x0, ytop - r * cell, x0 + c * cell, ytop
+
+
 def fig_conv_as_matrix(ctx: BuildContext) -> Figure:
+    import torch
+    import torch.nn.functional as F
     x = np.array([[1, 2, 0], [3, 1, 2], [0, 1, 3]])
     k = np.array([[1, 2], [0, 1]])
-    Cm = conv_matrix(k, 3)
-    y = (Cm @ x.ravel()).reshape(2, 2)
+    z = np.array([[1, 2], [3, 1]])                 # the small input of the transpose convolution
+    Cm = conv_matrix(k, 3).astype(int)
+    xv = x.reshape(9, 1)
+    yv = Cm @ xv
     direct = np.array([[(x[i:i + 2, j:j + 2] * k).sum() for j in range(2)] for i in range(2)])
-    assert np.array_equal(y, direct)
-    yt = (Cm.T @ y.ravel()).reshape(3, 3)
-    fig, axes = plt.subplots(1, 5, figsize=(16, 3.4), gridspec_kw=dict(width_ratios=[1, 0.8, 3, 0.8, 1]))
-    sync_matrix(axes[0], x, title="(a) input 3 × 3")
-    sync_matrix(axes[1], k, title="(b) kernel 2 × 2", cmap="Oranges")
-    sync_matrix(axes[2], Cm.astype(int), title="(c) the convolution as a 4 × 9 matrix C",
-                cmap="Oranges")
-    sync_matrix(axes[3], y.astype(int), title="C · x → 2 × 2")
-    sync_matrix(axes[4], yt.astype(int), title="(d) Cᵀ · y → 3 × 3")
+    assert np.array_equal(yv.reshape(2, 2), direct)
+    tv = Cm.T @ z.reshape(4, 1)
+    ref = F.conv_transpose2d(torch.tensor(z, dtype=torch.float64)[None, None],
+                             torch.tensor(k, dtype=torch.float64)[None, None])[0, 0].numpy()
+    assert np.array_equal(tv.reshape(3, 3), ref.astype(int))
+    cell, fsz, op = 0.5, 10, 18
+    W, H = 11.6, 17.4
+    fig, ax = B.canvas(W, H, (10.4, 15.6))
+
+    def sym(xc, yc, t):
+        ax.text(xc, yc, t, ha="center", va="center", fontsize=op + 14 if t == "·" else op)
+
+    def reshape_arrow(x0, x1, yc, text):
+        B.line_arrow(ax, x0, yc, x1, yc, col="k", lw=1.3)
+        ax.text((x0 + x1) / 2, yc + 0.12, text, ha="center", va="bottom", fontsize=fsz - 1)
+
+    # (a) the direct convolution
+    yt = H - 0.7
+    ax.text(0.2, yt + 0.25, "(a) convolution of a 3 × 3 input with a 2 × 2 kernel",
+            fontsize=fsz + 1, weight="bold")
+    yc = yt - 0.4 - 1.5 * cell
+    a = _grid_matrix(ax, 1.0, yc + 1.5 * cell, x, cell, "input 3 × 3")
+    sym(a[2] + 0.45, yc, "∗")
+    b = _grid_matrix(ax, a[2] + 0.9, yc + cell, k, cell, "kernel 2 × 2")
+    sym(b[2] + 0.45, yc, "=")
+    _grid_matrix(ax, b[2] + 0.9, yc + cell, direct, cell, "output 2 × 2")
+    # (b) the same convolution as a matrix multiplication
+    yt = yc - 1.5 * cell - 1.0
+    ax.text(0.2, yt, "(b) the same convolution as a matrix multiplication", fontsize=fsz + 1,
+            weight="bold")
+    yc = yt - 0.4 - 4.5 * cell
+    c_ = _grid_matrix(ax, 1.0, yc + 2 * cell, Cm, cell,
+                      "convolution matrix C, 4 × 9\n(each row: the kernel values at the\n"
+                      "input positions they multiply)")
+    sym(c_[2] + 0.4, yc, "·")
+    xv_ = _grid_matrix(ax, c_[2] + 0.8, yc + 4.5 * cell, xv, cell, "input\nunrolled\n9 × 1")
+    sym(xv_[2] + 0.4, yc, "=")
+    yv_ = _grid_matrix(ax, xv_[2] + 0.8, yc + 2 * cell, yv, cell, "4 × 1")
+    reshape_arrow(yv_[2] + 0.2, yv_[2] + 1.5, yc, "reshape")
+    _grid_matrix(ax, yv_[2] + 1.7, yc + cell, yv.reshape(2, 2), cell,
+                 "output 2 × 2\n(the same as (a))")
+    # (c) the transpose convolution: C transposed, applied to a small input
+    yt = yc - 4.5 * cell - 1.6
+    ax.text(0.2, yt, "(c) transpose convolution: Cᵀ applied to a 2 × 2 input", fontsize=fsz + 1,
+            weight="bold")
+    yc = yt - 1.4 - 4.5 * cell
+    ct = _grid_matrix(ax, 1.0, yc + 4.5 * cell, Cm.T, cell, "transpose\nconvolution\nmatrix Cᵀ, 9 × 4")
+    sym(ct[2] + 0.4, yc, "·")
+    zx = ct[2] + 0.8
+    zv_ = _grid_matrix(ax, zx, yc + 2 * cell, z.reshape(4, 1), cell, "input\nunrolled\n4 × 1")
+    # the 2 x 2 input itself, above its unrolled vector
+    zi = _grid_matrix(ax, zx + cell / 2 - cell, yc + 2 * cell + 0.9 + 2 * cell, z, cell, None)
+    ax.text((zi[0] + zi[2]) / 2, zi[3] + 0.12, "input 2 × 2", ha="center", va="bottom",
+            fontsize=fsz)
+    B.line_arrow(ax, zx + cell / 2, zi[1] - 0.08, zx + cell / 2, yc + 2 * cell + 0.08,
+                 col="k", lw=1.2)
+    ax.text(zx + cell / 2 + 0.12, (zi[1] + yc + 2 * cell) / 2, "unroll", ha="left",
+            va="center", fontsize=fsz - 1)
+    sym(zv_[2] + 0.4, yc, "=")
+    tv_ = _grid_matrix(ax, zv_[2] + 0.8, yc + 4.5 * cell, tv, cell, "9 × 1")
+    reshape_arrow(tv_[2] + 0.2, tv_[2] + 1.5, yc, "reshape")
+    _grid_matrix(ax, tv_[2] + 1.7, yc + 1.5 * cell, tv.reshape(3, 3), cell,
+                 "output 3 × 3\n(= PyTorch\nconv_transpose2d)")
     png = save_mpl(fig, ctx, "conv_as_matrix")
     return Figure("conv_as_matrix",
-                  "**Convolution as a matrix multiplication.** (a, b) A 3 × 3 input is "
-                  "convolved with a 2 × 2 kernel, giving a 2 × 2 output. (c) The same "
-                  "operation is written as a matrix multiplication: the input is reshaped "
-                  "into a 9 × 1 vector and multiplied by a 4 × 9 matrix in which each row "
-                  "holds the kernel values at the positions they multiply, giving a 4 × 1 "
-                  "vector that is reshaped into the 2 × 2 output. (d) The transpose of the "
-                  "matrix, 9 × 4, maps a 2 × 2 input back to a 3 × 3 output: this is the "
-                  "**transpose convolution**. A convolution reduces the spatial dimensions, "
-                  "and the transpose convolution with the same kernel increases them. (It "
-                  "restores the size, not the values: Cᵀ is not the inverse of C.) The "
+                  "**Convolution as a matrix multiplication.** (a) A 3 × 3 input is "
+                  "convolved with a 2 × 2 kernel, giving a 2 × 2 output. (b) The same "
+                  "operation is written as a matrix multiplication: the input is unrolled "
+                  "into a 9 × 1 vector and multiplied by the 4 × 9 convolution matrix C, in "
+                  "which each row holds the kernel values at the positions of the input "
+                  "they multiply and zeros elsewhere. The 4 × 1 result is reshaped into the "
+                  "same 2 × 2 output as in (a). (c) The transpose of the matrix, Cᵀ, is "
+                  "9 × 4, so it multiplies a 4 × 1 vector, an unrolled 2 × 2 input, and "
+                  "gives a 9 × 1 vector, which is reshaped into a 3 × 3 output: this is the "
+                  "**transpose convolution**, and the result is the same as that of "
+                  "PyTorch's conv_transpose2d with the same kernel. A convolution reduces "
+                  "the spatial dimensions, and the transpose convolution increases them. "
+                  "Cᵀ restores the size, not the values, as it is not the inverse of C. The "
                   "transpose convolution is also the operation used in backpropagation "
                   "through a convolution layer.",
                   png=png)
