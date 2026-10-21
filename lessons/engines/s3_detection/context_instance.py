@@ -124,37 +124,30 @@ def impulse_rf(dilations, n=33):
 
 
 def fig_dilated_conv(ctx: BuildContext) -> Figure:
-    stacks = [([1], "3 × 3 convolution"), ([1, 2], "then 3 × 3, dilation 2"),
-              ([1, 2, 4], "then 3 × 3, dilation 4")]
-    n = 17
-    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.6))
-    for ax, (ds, title) in zip(axes, stacks):
-        g, rf = impulse_rf(ds, n)
+    n = 11
+    c = n // 2
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.8))
+    for ax, d in zip(axes, (1, 2, 4)):
+        g, span = impulse_rf([d], n)               # one 3 x 3 convolution, dilation d
+        assert (g > 0).sum() == 9 and span == 2 * d + 1, (d, (g > 0).sum(), span)
         ax.imshow(g > 0, cmap="Greens", vmin=0, vmax=1.6)
-        # the input positions sampled by the last layer's kernel
-        d = ds[-1]
-        c = n // 2
-        for dy in (-d, 0, d):
-            for dx in (-d, 0, d):
-                ax.add_patch(plt.Rectangle((c + dx - 0.5, c + dy - 0.5), 1, 1, fill=False,
-                                           ec=C["red"], lw=1.8))
+        ax.add_patch(plt.Rectangle((c - d - 0.5, c - d - 0.5), span, span, fill=False,
+                                   ec=C["red"], lw=1.8, ls="--", zorder=10))
         ax.set_xticks(np.arange(-0.5, n, 1), minor=True); ax.set_yticks(np.arange(-0.5, n, 1), minor=True)
-        ax.grid(which="minor", color="white", lw=0.4); _clean(ax)
-        ax.set_title(f"{title}\nreceptive field {rf} × {rf}, {9 * len(ds)} weights", fontsize=10)
-    rfs = [impulse_rf(ds, n)[1] for ds, _ in stacks]
-    assert rfs == [3, 7, 15], rfs
+        ax.grid(which="minor", color="#bbbbbb", lw=0.6); _clean(ax)
+        ax.set_title(f"3 × 3 kernel, dilation {d}\n9 weights cover a {span} × {span} region",
+                     fontsize=10.5)
     png = save_mpl(fig, ctx, "dilated_conv")
     return Figure("dilated_conv",
-                  "**Dilated** (or atrous) convolution, measured by passing gradients "
-                  "through real convolution layers (green: the input pixels that affect "
-                  "the centre output; red: the samples taken by the last kernel). In a "
-                  "dilated convolution the kernel's inputs are spaced out, so a 3 × 3 kernel "
-                  "with a dilation of 2 covers a 5 × 5 region with the same 9 weights. A "
-                  "3 × 3 convolution has a receptive field of 3 × 3; following it with a "
-                  "dilation-2 convolution gives 7 × 7, and a further dilation-4 "
-                  "convolution gives 15 × 15. Dilated convolution is not to be confused "
-                  "with the transpose convolution of Lesson 3.5: no zeros are inserted into "
-                  "the feature map, and its size is unchanged.",
+                  "**Dilated** (or atrous) convolution. In green are the input pixels used "
+                  "by one 3 × 3 kernel to compute one output pixel, found from the gradient "
+                  "of a real convolution layer; the dashed square is the region they cover. "
+                  "With a dilation of 1 this is an ordinary 3 × 3 convolution. With a "
+                  "dilation of 2 the kernel's inputs are spaced two pixels apart and cover "
+                  "a 5 × 5 region, and with a dilation of 4 a 9 × 9 region, always with the "
+                  "same 9 weights. Dilated convolution is not to be confused with the "
+                  "transpose convolution of Lesson 3.5: no zeros are inserted into the "
+                  "feature map, and its size is unchanged.",
                   png=png)
 
 
