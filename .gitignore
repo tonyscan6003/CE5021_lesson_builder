@@ -23,6 +23,11 @@ autoquiz/
 #     git clone https://github.com/tonyscan6003/CE5021_helpers.git CE5021_helpers
 CE5021_helpers/
 
+# Working copy of the PRIVATE CE5021 assignments master repo (solutions included),
+# kept here for reference only and never to be committed or published. Clone it back with:
+#     gh repo clone tonyscan6003/CE5021_AY2627_master CE5021_AY2627_master
+CE5021_AY2627_master/
+
 # Source lecture PDFs: input only, and 53 MB of them. Convert with
 #     python lessons/build/convert_pdfs.py \
 #         --input-dir lessons/reference/pdf_for_conversion \
