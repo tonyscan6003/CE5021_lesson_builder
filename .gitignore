@@ -18,6 +18,11 @@ lessons/data/_sklearn/
 #     git clone https://github.com/tonyscan6003/autoquiz.git autoquiz
 autoquiz/
 
+# Working copy of the CE5021 assignment helpers (github.com/tonyscan6003/CE5021_helpers),
+# kept here for reference only. Clone it back with:
+#     git clone https://github.com/tonyscan6003/CE5021_helpers.git CE5021_helpers
+CE5021_helpers/
+
 # Source lecture PDFs: input only, and 53 MB of them. Convert with
 #     python lessons/build/convert_pdfs.py \
 #         --input-dir lessons/reference/pdf_for_conversion \
