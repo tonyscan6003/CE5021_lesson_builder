@@ -9,6 +9,9 @@ __pycache__/
 lessons/site/
 lessons/site_preview/
 
+# Generated Q&A decks and their figures — rebuild with Q_A_sessions/build/build_decks.py
+Q_A_sessions/output/
+
 # Datasets fetched at runtime by the figure engines
 lessons/data/_sklearn/
 

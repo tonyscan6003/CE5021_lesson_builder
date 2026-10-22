@@ -16,6 +16,7 @@ streamlit
 # started with --gpus=all (see devcontainer.json).
 torch
 torchvision
+python-pptx         # Q_A_sessions decks
 
 # Site builder
 markdown-it-py

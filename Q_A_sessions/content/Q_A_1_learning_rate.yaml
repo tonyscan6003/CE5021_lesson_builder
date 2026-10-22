@@ -1,0 +1,171 @@
+# Q&A 1 — learning-rate policies (supports Assignment 1).
+# Figures come from the engines listed below; {fig ID} captions are the measured
+# values returned by the engine and are added to the speaker notes automatically.
+# No part of the Assignment 1 solution is used: every example is the toy problem.
+id: Q_A_1
+title: Learning-rate policies
+subtitle: CE5021 Q&A 1 · supporting Assignment 1
+footer: CE5021 · Q&A 1 · Learning-rate policies
+output: Q_A_1_learning_rate_policies.pptx
+engines: [qa1_lr.lr_policies]
+lessons: ["1.5 Training neural networks", "1.6 Regularisation"]
+
+slides:
+  - layout: title
+    figure: toy_problem
+    points:
+      - Fixed learning rates, and when to reduce them
+      - Warm-up
+      - Cyclical learning rates (Smith)
+      - The torch.optim schedulers, stepped per epoch or per batch
+    aside: >-
+      Every example on these slides is a toy problem: three spiral arms, one per class,
+      classified by a small MLP trained with SGD (momentum 0.9). Each curve is a real
+      training run.
+    notes: >-
+      This session supports Assignment 1. The learning rate and its schedule are among the
+      hyperparameters to be explored in the assignment, together with the regularisation
+      methods of Lesson 1.6. The examples use a toy problem so that each policy can be run
+      many times in a few seconds; the behaviour carries over to CIFAR-10, but the values
+      do not, and must be found for the assignment network by experiment. Background is in
+      Lesson 1.5 (gradient descent, the learning rate and schedules).
+
+  - layout: figure_cards
+    title: A fixed learning rate
+    figure: fixed_lr
+    cards:
+      - head: Too small
+        text: The loss falls steadily but slowly; many more epochs are needed.
+      - head: Suitable
+        text: The loss falls quickly and keeps falling; the accuracy settles.
+      - head: Too large
+        text: Steps overshoot the minimum; the loss stalls or rises, and the accuracy
+          stays near chance.
+    notes: >-
+      With a fixed rate a compromise is made: large enough for progress early in training,
+      small enough for the parameters to settle at the end. The three runs differ only in
+      the learning rate. The Assignment 1 starter notebook trains with a fixed rate, so its
+      TensorBoard curves are the first place to look: a slow, steady fall suggests a larger
+      rate; noisy, stalled curves suggest a smaller one. Record the optimiser, the rate and
+      the number of epochs of every run, as the notebook asks.
+
+  - layout: figure_cards
+    title: When to reduce the learning rate
+    figure: reduce_lr
+    cards:
+      - head: The signs
+        text: The training loss stops falling or oscillates, and the validation loss
+          reaches a plateau.
+      - head: On a schedule
+        text: StepLR, MultiStepLR, ExponentialLR or CosineAnnealingLR reduce the rate at
+          epochs fixed in advance.
+      - head: On the measured loss
+        text: ReduceLROnPlateau reduces the rate when the validation loss has stopped
+          improving for a set number of epochs.
+    notes: >-
+      A rate that is too large to settle can still be useful early in training, when large
+      steps make fast progress. Reducing it later lets the parameters settle into a
+      minimum. A fixed schedule needs the number of epochs to be known in advance;
+      ReduceLROnPlateau adapts to the run but needs a validation metric each time it is
+      stepped, and its factor and patience must still be chosen. Reductions by a factor of
+      2 to 10 are usual.
+
+  - layout: figure_cards
+    title: Warm-up
+    figure: warmup
+    cards:
+      - head: What
+        text: The rate starts at a small fraction of its peak and rises linearly over
+          the first epochs, before the main schedule.
+      - head: Why
+        text: The first steps from random weights can be very large and can damage the
+          network before it has learned anything.
+      - head: When
+        text: Common with large batches, adaptive optimisers (Adam) and very deep
+          networks. It does not fix a peak rate that is too high.
+    notes: >-
+      In PyTorch a warm-up is built with LinearLR, joined to the main schedule with
+      SequentialLR, and stepped every batch so that the rate rises smoothly. In the toy
+      problem, without warm-up most runs at this peak rate stall at chance from the first
+      epochs; with warm-up none do, but the final accuracy is still poor because the peak
+      itself is too high. Warm-up and the choice of peak rate are separate decisions.
+
+  - layout: figure_cards
+    title: Cyclical learning rates (Smith)
+    figure: cyclic_lr
+    cards:
+      - head: 1. Range test
+        text: One short run with the rate increased every batch shows where training
+          works and where it breaks down.
+      - head: 2. Choose the bounds
+        text: max_lr below the rate at which the loss is lowest; base_lr about a third to
+          a quarter of max_lr.
+      - head: 3. Cycle the rate
+        text: CyclicLR moves between the bounds; OneCycleLR makes one rise and one long
+          fall, for fast training.
+    refs: >-
+      L. N. Smith, Cyclical learning rates for training neural networks, WACV 2017.
+      L. N. Smith and N. Topin, Super-convergence: very fast training of neural networks
+      using large learning rates, 2019.
+    notes: >-
+      Cyclical rates were introduced by Leslie Smith: instead of searching for one fixed
+      rate, the rate is moved between two bounds found with a single range test. Periods
+      at a high rate act as a regulariser and help to leave poor regions of the loss
+      surface; periods at a low rate let the parameters settle. Models should be evaluated
+      at the end of a cycle, where the rate is lowest. The one-cycle policy is the basis of
+      super-convergence. Both papers are linked from the Assignment 1 notebook. In the
+      short 10-epoch budget used here, both cyclic policies outperform the fixed rates.
+
+  - layout: code_figure_below
+    title: The torch.optim package
+    figure: scheduler_catalogue
+    code: |
+      optimizer = torch.optim.SGD(model.parameters(),
+                                  lr=0.1, momentum=0.9)
+      scheduler = torch.optim.lr_scheduler.StepLR(
+          optimizer, step_size=10, gamma=0.1)
+    side:
+      - The optimiser updates the weights; the scheduler changes only its lr.
+      - Create the scheduler after the optimiser, and both again before a new run.
+      - Call optimizer.step() before scheduler.step(); scheduler.get_last_lr() returns
+        the current rate.
+    notes: >-
+      torch.optim contains the optimisers (SGD, Adam, AdamW and others) and, in
+      torch.optim.lr_scheduler, the schedulers. A scheduler wraps an optimiser and changes
+      the lr of its parameter groups each time step() is called; it has no effect on the
+      gradients. The eight panels show the schedules met on the previous slides, drawn from
+      the real scheduler classes. In blue are those normally stepped once per epoch, in
+      pink those stepped once per batch. Re-running the optimiser and scheduler cells
+      before each training run clears the previous state, as the notebook notes for the
+      optimiser.
+
+  - layout: code_figure
+    title: Where to call scheduler.step()
+    figure: step_placement
+    code: |
+      for epoch in range(n_epochs):
+          for i, data in enumerate(train_dataloader, 0):
+              inputs, labels = data
+              outputs = model(inputs)
+              loss = loss_fn(outputs, labels)
+              loss.backward()
+              optimizer.step()
+              optimizer.zero_grad()
+              scheduler.step()        # per batch      @batch
+              ...                     # logging, validation
+          scheduler.step()            # per epoch      @epoch
+          # ReduceLROnPlateau: scheduler.step(val_loss)  @epoch
+    side:
+      - "@batch Per batch: CyclicLR, OneCycleLR, warm-up. Lengths are counted in batches: steps_per_epoch = len(train_dataloader)."
+      - "@epoch Per epoch: StepLR, MultiStepLR, ExponentialLR, CosineAnnealingLR, ReduceLROnPlateau."
+      - One scheduler, called in one place. Log the rate to TensorBoard to check it.
+    notes: >-
+      The loop has the structure of the Assignment 1 training loop: an inner loop over the
+      batches of an epoch and an outer loop over the epochs. A per-batch scheduler is
+      stepped inside the inner loop, straight after optimizer.step(); a per-epoch scheduler
+      after the inner loop has finished. Lengths are counted in the same unit as the calls:
+      step_size of StepLR in epochs, step_size_up of CyclicLR and the length of OneCycleLR
+      in batches. CIFAR-10 at a batch size of 128 has 391 batches per epoch, so stepping a
+      per-epoch scheduler every batch makes it 391 times too fast, as the bottom panel
+      shows. Logging scheduler.get_last_lr()[0] with writer.add_scalar shows the rate
+      beside the loss curves and catches this mistake at once.

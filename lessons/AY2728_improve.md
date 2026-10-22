@@ -8,7 +8,7 @@ These are recommendations for developing the CE5021 *Deep Learning for Computer 
 |---|---|---|---|---|---|
 | 1 | A defined visual theme shared by the HTML pages and every figure engine | raised | high | medium | — |
 | 2 | Modernise the content while keeping the focus on convolutional fundamentals | raised | high | medium | — |
-| 3 | Prepare the repository for the follow-on transformer / generative module | raised | high | medium | 1 |
+| 3 | Prepare the repository for the follow-on transformer / generative module, and merge the Q&A engines | raised | high | medium | 1 |
 | 4 | Integrate the Prince textbook, *Understanding Deep Learning*, as the reading spine | raised | medium | low | — |
 | 5 | Companion Jupyter notebooks built on the existing engines | raised | medium | high | 1 |
 | 6 | Rebuild the slide decks from the same source as the HTML | raised | medium | high | 1 |
@@ -77,6 +77,7 @@ The follow-on transformer and generative module will be added to this repository
 4. **Cross-links.** Allow a directive such as `{{see ce50xx:04_02}}` so the signposts in item 2 link to the lessons they point to.
 5. **Repository size.** Cached model results (`data/_torch/*.npz`) and source images are committed. A second module with transformer and diffusion models will add more, so decide early whether to keep using plain Git, move to Git LFS, or regenerate the caches in CI.
 6. **README.** `lessons/README.md` still says that only Lessons 1.1–1.3 are built, and should be updated.
+7. **Merge the Q&A engines.** The Q&A session decks (`Q_A_sessions/`, from AY 2026/27) have their own content and engine packages, with the same engine contract as the lessons and the shared helpers of `lessons/engines/_common.py`. When the module is revised, engines that support both a lesson and a Q&A session should be moved into the shared layer, so that one engine serves the lesson page, the Q&A deck and any notebook. The learning-rate engine of Q&A 1 (`engines/qa1_lr`), for example, overlaps Lesson 1.5's schedule figure. The two content trees could also share one build with an output option for HTML or slides.
 
 ## 4. Integration of the Prince textbook (raised)
 
@@ -118,7 +119,7 @@ The original slides were the source for the HTML. The figures are now generated 
    - **Reveal.js or Quarto:** HTML decks themed with the same tokens as item 1.
    - **`python-pptx`:** if PowerPoint files are required by the institution or the recording workflow.
 
-   A pilot on one lesson would settle the choice.
+   A pilot on one lesson would settle the choice. The Q&A decks (`Q_A_sessions/build/build_decks.py`) already build `.pptx` files with `python-pptx` from YAML content and engine figures, with speaker notes, and can serve as that pilot.
 3. **Slide variants of the figures.** Slides are 16:9 and are viewed from further away. The engines should accept a `variant="slide"` option that changes the aspect ratio and enlarges the text without changing the content. This depends on the size classes in item 1.
 4. **Speaker notes.** The narration scripts of the original lectures are already converted in `reference/legacy_md/`. They can be updated to match the new content and attached to the slides as speaker notes, which then also feed the narration pipeline (item 7).
 
